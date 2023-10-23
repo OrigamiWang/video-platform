@@ -1,17 +1,17 @@
 package szu.common.api;
 
 /**
- * @BelongsProject: video-platform
- * @BelongsPackage: szu.common
- * @Author: Origami
- * @Date: 2023/10/2 10:32
- */
-/**
- * 封装api的错误码
+ * API返回码接口
+ * Created by macro on 2019/4/19.
  */
 public interface IErrorCode {
-
+    /**
+     * 返回码
+     */
     long getCode();
 
+    /**
+     * 返回信息
+     */
     String getMessage();
 }

@@ -1,27 +1,21 @@
 package szu.common.api;
 
 /**
- * @BelongsProject: video-platform
- * @BelongsPackage: szu.common
- * @Author: Origami
- * @Date: 2023/10/2 10:31
+ * 通用返回结果封装类
+ * Created by macro on 2019/4/19.
  */
-
-import lombok.Getter;
-import lombok.Setter;
-
-
-/**
- * 通用返回对象
- */
-@Getter
-@Setter
 public class CommonResult<T> {
-
+    /**
+     * 状态码
+     */
     private long code;
-
+    /**
+     * 提示信息
+     */
     private String message;
-
+    /**
+     * 数据封装
+     */
     private T data;
 
     protected CommonResult() {
@@ -35,35 +29,46 @@ public class CommonResult<T> {
 
     /**
      * 成功返回结果
+     *
+     * @param data 获取的数据
      */
     public static <T> CommonResult<T> success(T data) {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
+        return new CommonResult<T>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 
     /**
      * 成功返回结果
      *
+     * @param data 获取的数据
+     * @param  message 提示信息
      */
     public static <T> CommonResult<T> success(T data, String message) {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), message, data);
+        return new CommonResult<T>(ResultCode.SUCCESS.getCode(), message, data);
     }
-
 
     /**
      * 失败返回结果
-     *
+     * @param errorCode 错误码
      */
     public static <T> CommonResult<T> failed(IErrorCode errorCode) {
-        return new CommonResult<>(errorCode.getCode(), errorCode.getMessage(), null);
+        return new CommonResult<T>(errorCode.getCode(), errorCode.getMessage(), null);
     }
-
 
     /**
      * 失败返回结果
-     *
+     * @param errorCode 错误码
+     * @param message 错误信息
+     */
+    public static <T> CommonResult<T> failed(IErrorCode errorCode,String message) {
+        return new CommonResult<T>(errorCode.getCode(), message, null);
+    }
+
+    /**
+     * 失败返回结果
+     * @param message 提示信息
      */
     public static <T> CommonResult<T> failed(String message) {
-        return new CommonResult<>(ResultCode.FAILED.getCode(), message, null);
+        return new CommonResult<T>(ResultCode.FAILED.getCode(), message, null);
     }
 
     /**
@@ -82,7 +87,6 @@ public class CommonResult<T> {
 
     /**
      * 参数验证失败返回结果
-     *
      * @param message 提示信息
      */
     public static <T> CommonResult<T> validateFailed(String message) {
@@ -97,34 +101,33 @@ public class CommonResult<T> {
     }
 
     /**
-     * 未登录返回结果
-     */
-    public static <T> CommonResult<T> unauthorized(T data, String message) {
-        return new CommonResult<>(ResultCode.UNAUTHORIZED.getCode(), message, data);
-    }
-
-    /**
      * 未授权返回结果
      */
     public static <T> CommonResult<T> forbidden(T data) {
-        return new CommonResult<>(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), data);
+        return new CommonResult<T>(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), data);
     }
 
-
-    /**
-     * 自定义异常类的返回结果
-     */
-    public static <T> CommonResult<T> customizedException(long code, String msg) {
-        return new CommonResult<>(code, msg, null);
+    public long getCode() {
+        return code;
     }
 
-    /**
-     * 文件传输失败
-     */
-    public static <T> CommonResult<T> fileTransferException(T data) {
-        return new CommonResult<>(ResultCode.FILE_TRANSFER_EXCEPTION.getCode(), ResultCode.FILE_TRANSFER_EXCEPTION.getMessage(), data);
+    public void setCode(long code) {
+        this.code = code;
     }
 
+    public String getMessage() {
+        return message;
+    }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 }

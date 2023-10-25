@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration
-        PUBLIC "-//mybatis.org//DTD MyBatis szu.Generator Configuration 1.0//EN"
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
@@ -18,7 +18,7 @@
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <!-- 生成mapper.xml时覆盖原文件 -->
         <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin" />
-        <commentGenerator type="com.macro.mall.CommentGenerator">
+        <commentGenerator type="szu.CommentGenerator">
             <!-- 是否阻止生成的注释 -->
             <property name="suppressAllComments" value="true"/>
             <!-- 是否阻止生成的注释包含时间戳 -->
@@ -35,12 +35,12 @@
             <property name="nullCatalogMeansCurrent" value="true" />
         </jdbcConnection>
         <!-- 用于控制实体类的生成 -->
-        <javaModelGenerator targetPackage="com.macro.mall.model" targetProject="mall-mbg\src\main\java"/>
+        <javaModelGenerator targetPackage="szu.model" targetProject="mbg\src\main\java"/>
         <!-- 用于控制Mapper.xml文件的生成 -->
-        <sqlMapGenerator targetPackage="com.macro.mall.mapper" targetProject="mall-mbg\src\main\resources"/>
+        <sqlMapGenerator targetPackage="szu.mapper" targetProject="mbg\src\main\resources"/>
         <!-- 用于控制Mapper接口的生成 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.macro.mall.mapper"
-                             targetProject="mall-mbg\src\main\java"/>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="szu.mapper"
+                             targetProject="mbg\src\main\java"/>
         <!-- 配置需要生成的表，生成全部表tableName设为% -->
         <table tableName="%">
             <!-- 用来指定主键生成策略 -->

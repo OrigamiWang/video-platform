@@ -17,10 +17,11 @@
 
     <modules>
         <module>common</module>
-        <module>user</module>
+        <module>manage</module>
         <module>admin</module>
         <module>mbg</module>
         <module>security</module>
+        <module>manage</module>
     </modules>
 
 

@@ -1,4 +1,4 @@
-package szu.manage;
+package szu;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,16 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: video-platform-admin
+  profiles:
+    active: dev
+
+mybatis:
+  mapper-locations:
+    - classpath:dao/*.xml
+
+
+
+

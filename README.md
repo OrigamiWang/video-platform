@@ -17,4 +17,4 @@
 ## 部署问题
 1. 请修改yaml配置
 2. 请修改mbg模块resources下的关于数据库的配置
-3. Swagger访问网址`http://ip:port/swagger-ui/`，亲测少个下划线都不行！
+3. Swagger访问网址`http://ip:port/swagger-ui/index.html`，亲测少个下划线都不行！

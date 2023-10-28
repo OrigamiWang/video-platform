@@ -49,7 +49,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .apiInfo(apiInfo("测video-platform后台相关接口文档"))
                 .pathMapping("/")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("szu.admin.controller"))
+                .apis(RequestHandlerSelectors.basePackage("szu.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

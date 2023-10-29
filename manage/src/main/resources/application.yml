@@ -1,16 +1,13 @@
 server:
-  port: 8888
+  port: 8082
 
 spring:
   application:
-    name: video-platform-admin
+    name: video-platform-manage
   profiles:
     active: dev
 
 mybatis:
   mapper-locations:
     - classpath:dao/*.xml
-
-
-
-
+    - classpath*:com/**/mapper/*.xml

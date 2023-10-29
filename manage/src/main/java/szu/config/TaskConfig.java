@@ -1,5 +1,6 @@
 package szu.config;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,10 +26,11 @@ public class TaskConfig {
     @Scheduled(cron = "0 59 23 * * ? ")
     public void saveVisit(){
         log.info("持久化访问量：{}",new Date());
-        Map<Object, Object> visit = redisService.hGetAll("visit");
+        String today = DateUtil.today();
+        Map<Object, Object> visit = redisService.hGetAll("visit:" + today);
         visit.forEach((key, val) -> {
            visitService.save((String)key, (Integer)val);
         });
     }
-    
+
 }

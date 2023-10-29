@@ -6,7 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import szu.common.config.Interceptor.VisitorInterceptor;
 import javax.annotation.Resource;
 
-
+/**
+ * 拦截器配置
+ */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     @Resource
@@ -15,7 +17,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(visitorInterceptor).addPathPatterns("/**")
-                .excludePathPatterns("");//去除管理端接口
+                .excludePathPatterns("/visit/**")//去除管理端接口
+                .excludePathPatterns("/error/**");
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 }

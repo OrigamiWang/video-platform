@@ -5,9 +5,22 @@
 <mapper namespace="szu.dao.VisitDao">
 <!--    void save(String api, Integer val, String today);-->
     <insert id="save">
-            insert into visit (api, visits, time_id) values (#{api}, #{val}, #{today})
+            insert into visit (api, visits, time_id) values (#{api}, #{val}, #{today});
     </insert>
 
+
+<!--    List<Visit> selectByTimeId(String timeId);-->
+    <select id="selectByTimeId" resultType="visit">
+        select * from visit where time_id = #{timeId};
+    </select>
+
+<!--        List<VisitMonTotal> selectByMon(String match);-->
+    <select id="selectByMon" resultType="visitMonTotal">
+        select api, SUM(visits) as visits, YEAR(time_id) `year`, MONTH(time_id) mon
+        from visit
+        where time_id like #{match}"%"
+        group by api;
+    </select>
 
 
 </mapper>

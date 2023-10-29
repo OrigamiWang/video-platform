@@ -1,5 +1,10 @@
 package szu.dao;
 
+import szu.model.Visit;
+import szu.model.VisitMonTotal;
+
+import java.util.List;
+
 public interface VisitDao {
 
     /**
@@ -9,4 +14,17 @@ public interface VisitDao {
      * @param today yyyy-mm-dd的时间id
      */
     void save(String api, Integer val, String today);
+
+    /**
+     * 根据时间id查询访问量
+     * @param timeId
+     * @return
+     */
+    List<Visit> selectByTimeId(String timeId);
+
+    /**
+     * 根据年月查询月份访问总量
+     * @param match
+     */
+    List<VisitMonTotal> selectByMon(String match);
 }

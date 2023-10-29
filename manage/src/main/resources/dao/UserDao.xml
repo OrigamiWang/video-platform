@@ -22,4 +22,10 @@
     <select id="selectAllUser" resultMap="UserMap">
         SELECT * FROM user
     </select>
+
+<!--    void updateStatusById(Integer id, Byte status);-->
+    <update id="updateStatusById">
+        update user set status = #{status} where id = #{id}
+    </update>
+
 </mapper>

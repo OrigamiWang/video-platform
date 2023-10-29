@@ -24,4 +24,10 @@ public class UserServiceImpl implements UserService {
     public List<User> getUserList() {
         return userDao.selectAllUser();
     }
+
+
+    @Override
+    public void updateStatusById(Integer id, Byte status) {
+        userDao.updateStatusById(id,status);
+    }
 }

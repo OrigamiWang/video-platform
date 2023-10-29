@@ -1,0 +1,14 @@
+server:
+  port: 8848
+
+spring:
+  application:
+    name: mall-security
+  profiles:
+    active: dev #默认为开发环境
+
+
+mybatis:
+  mapper-locations:
+    - classpath:dao/*.xml
+

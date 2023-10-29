@@ -1,4 +1,4 @@
-package szu.common.config.Interceptor;
+package szu.common.interceptor;
 
 import cn.hutool.core.date.DateUtil;
 import org.springframework.stereotype.Component;

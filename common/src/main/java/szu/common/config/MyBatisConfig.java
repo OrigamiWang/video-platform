@@ -1,4 +1,4 @@
-package szu.security.config;
+package szu.common.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +10,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan({"szu.dao","szu.mapper"})
+@MapperScan({"szu.dao"})
 public class MyBatisConfig {
 }

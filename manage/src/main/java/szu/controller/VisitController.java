@@ -6,6 +6,8 @@ import cn.hutool.core.map.MapUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,11 +33,22 @@ import java.util.Map;
 @Api(tags = "VisitController")
 @Tag(name = "VisitController", description = "访问量管理")
 @RequestMapping("/visit")
+@Slf4j
 public class VisitController {
     @Resource
     private VisitService visitService;
     @Resource
     private RedisService redisService;
+
+    @Scheduled(cron = "0 59 23 * * ? ")
+    public void saveVisit(){
+        log.info("持久化访问量：{}",new Date());
+        String today = DateUtil.today();
+        Map<Object, Object> visit = redisService.hGetAll("visit:" + today);
+        visit.forEach((key, val) -> {
+            visitService.save((String)key, (Integer)val);
+        });
+    }
 
     @GetMapping("/today")
     @ApiOperation("获取今日的访问量")

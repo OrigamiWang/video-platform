@@ -1,4 +1,4 @@
-package szu.admin.config;
+package szu.security.config;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
@@ -50,7 +50,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .apiInfo(apiInfo("测video-platform后台相关接口文档"))
                 .pathMapping("/")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("szu.controller"))
+                .apis(RequestHandlerSelectors.basePackage("szu.security.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -94,4 +94,5 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public InternalResourceViewResolver viewResolver() {
         return new InternalResourceViewResolver();
     }
+
 }

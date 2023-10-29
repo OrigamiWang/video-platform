@@ -1,15 +1,15 @@
-package szu.security.service.impl;
+package szu.service.impl;
 
 import org.springframework.stereotype.Service;
-import szu.security.dao.LoginDao;
-import szu.security.dto.RegisterDto;
-import szu.security.service.LoginService;
+import szu.dao.LoginDao;
+import szu.dto.RegisterDto;
+import szu.service.LoginService;
 
 import javax.annotation.Resource;
 
 /**
  * @BelongsProject: video-platform
- * @BelongsPackage: szu.security.service.impl
+ * @BelongsPackage: szu.service.impl
  * @Author: Origami
  * @Date: 2023/10/29 10:09
  */

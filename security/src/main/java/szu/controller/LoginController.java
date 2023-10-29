@@ -1,18 +1,15 @@
-package szu.security.controller;
+package szu.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
-import szu.security.dto.RegisterDto;
-import szu.security.service.LoginService;
+import szu.dto.RegisterDto;
+import szu.service.LoginService;
 
 import javax.annotation.Resource;
 
 /**
  * @BelongsProject: video-platform
- * @BelongsPackage: szu.security.controller
+ * @BelongsPackage: szu.controller
  * @Author: Origami
  * @Date: 2023/10/29 10:13
  */
@@ -28,5 +25,10 @@ public class LoginController {
     public CommonResult<String> register(@RequestBody RegisterDto registerDto) {
         loginService.register(registerDto);
         return CommonResult.success("success");
+    }
+
+    @GetMapping("test")
+    public CommonResult<String> test() {
+        return CommonResult.success("hello");
     }
 }

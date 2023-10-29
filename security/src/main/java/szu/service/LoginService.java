@@ -1,10 +1,10 @@
-package szu.security.service;
+package szu.service;
 
-import szu.security.dto.RegisterDto;
+import szu.dto.RegisterDto;
 
 /**
  * @BelongsProject: video-platform
- * @BelongsPackage: szu.security.service
+ * @BelongsPackage: szu.service
  * @Author: Origami
  * @Date: 2023/10/29 10:08
  */

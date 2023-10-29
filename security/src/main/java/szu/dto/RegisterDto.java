@@ -1,10 +1,10 @@
-package szu.security.dto;
+package szu.dto;
 
 import lombok.*;
 
 /**
  * @BelongsProject: video-platform
- * @BelongsPackage: szu.security.dto
+ * @BelongsPackage: szu.dto
  * @Author: Origami
  * @Date: 2023/10/29 10:11
  */

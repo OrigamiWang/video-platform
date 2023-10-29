@@ -1,10 +1,10 @@
-package szu.security.dao;
+package szu.dao;
 
 import org.apache.ibatis.annotations.Param;
 
 /**
  * @BelongsProject: video-platform
- * @BelongsPackage: szu.security.dao
+ * @BelongsPackage: szu.dao
  * @Author: Origami
  * @Date: 2023/10/29 9:48
  */

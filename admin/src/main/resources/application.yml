@@ -11,3 +11,7 @@ mybatis:
   mapper-locations:
     - classpath:dao/*.xml
     - classpath*:com/**/mapper/*.xml
+
+
+redis:
+  user_prefix: "login_user_"

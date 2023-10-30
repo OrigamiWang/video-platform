@@ -1,4 +1,4 @@
-package szu.config;
+package szu.common.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;

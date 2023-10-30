@@ -12,5 +12,5 @@ mybatis:
     - classpath:dao/*.xml
 
 
-
-
+redis:
+  user_prefix: "login_user_"

@@ -35,12 +35,12 @@ public class UserController {
         return CommonResult.success(userList);
     }
 
-    @PostMapping("/user/{id}/{status}")
-    @ApiOperation("根据用户id修改状态，0正常，1拦截登录")
-    public CommonResult<String> updateUserStatus(@PathVariable("id") Integer id, @PathVariable("status") Byte status){
-        userService.updateStatusById(id, status);
-        return CommonResult.success("success");
-    }
+//    @PostMapping("/user/{id}/{status}")
+//    @ApiOperation("根据用户id修改状态，0正常，1拦截登录")
+//    public CommonResult<String> updateUserStatus(@PathVariable("id") Integer id, @PathVariable("status") Byte status){
+//        userService.updateStatusById(id, status);
+//        return CommonResult.success("success");
+//    }
 
 
 }

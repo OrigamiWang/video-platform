@@ -3,6 +3,8 @@ package szu.service;
 import org.springframework.stereotype.Service;
 import szu.model.Comment;
 
+import java.util.List;
+
 /**
  * @description CommentDao
  * @author UserXin
@@ -15,4 +17,12 @@ public interface CommentService {
      * @param comment
      */
     void addComment(Comment comment);
+
+    /**
+     * 根据foreignId和foreignType获取指定区域的评论
+     * @param foreignId
+     * @param foreignType
+     * @return
+     */
+    List<Comment> getCommentsByForeignIdAndForeignType(Integer foreignId, Integer foreignType);
 }

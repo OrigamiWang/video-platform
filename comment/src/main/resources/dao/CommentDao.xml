@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.CommentDao">
+
     <insert id="addComment" parameterType="szu.model.Comment">
         insert into comment (user_id, username, content, foreign_id, foreign_type, pid, target_username, createTime)
         VALUES (#{userId},#{username},#{content},#{foreignId},#{foreignType},#{pid},#{targetUsername},#{createTime})
 
     </insert>
+    <select id="getCommentsByForeignIdAndForeignType" resultType="szu.model.Comment">
+        select * from comment where foreign_id = #{foreignId} and foreign_type = #{foreignType}
+    </select>
 </mapper>

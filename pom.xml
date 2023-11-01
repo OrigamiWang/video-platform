@@ -22,6 +22,7 @@
         <module>mbg</module>
         <module>security</module>
         <module>manage</module>
+        <module>comment</module>
     </modules>
 
 

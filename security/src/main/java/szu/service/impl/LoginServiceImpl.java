@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Service;
+import szu.common.model.GlobalPermissionMap;
+import szu.common.util.ShaUtil;
 import szu.dao.LoginDao;
+import szu.dao.PermissionDao;
 import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 import szu.model.User;
@@ -12,6 +15,8 @@ import szu.service.LoginService;
 import szu.util.UuidUtil;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +34,9 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private LoginDao loginDao;
 
+    @Resource
+    private PermissionDao permissionDao;
+
     @Value("${redis.user_prefix}")
     private String REDIS_USER_PREFIX;
 
@@ -36,7 +44,8 @@ public class LoginServiceImpl implements LoginService {
     public void register(RegisterDto registerDto) {
         // encrypt the pswd
         String pswd = registerDto.getPswd();
-        String encryptedPswd = pswd;
+        String encryptedPswd = ShaUtil.encode(pswd);
+        System.out.println("encryptedPswd = " + encryptedPswd);
         loginDao.register(registerDto.getName(), registerDto.getPhone(), encryptedPswd);
     }
 
@@ -44,9 +53,17 @@ public class LoginServiceImpl implements LoginService {
     public String login(LoginDto loginDto) {
         String phone = loginDto.getPhone();
         String pswd = loginDto.getPswd();
+        String encryptedPswd = ShaUtil.encode(pswd);
         User user = loginDao.getUser(phone);
-        if (user == null || !Objects.equals(pswd, user.getPassword())) {
+        if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
             return "";
+        }
+        // set permission
+        Map<Integer, Integer> map = GlobalPermissionMap.getInstance();
+        int uid = user.getId();
+        List<Integer> permissionList = permissionDao.getUserPermission(uid);
+        for (Integer p : permissionList) {
+            map.put(p, 0);
         }
         // use uuid as token
         String uuid = UuidUtil.getUuid();

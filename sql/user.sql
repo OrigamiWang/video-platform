@@ -11,7 +11,7 @@ CREATE TABLE `user` (
   `like` INT NOT NULL DEFAULT 0 COMMENT '获赞数量',
   `ip` VARCHAR(5) DEFAULT NULL COMMENT 'ip属地',
   `phone` VARCHAR(11) NOT NULL COMMENT '电话/账号',
-  `password` VARCHAR(20) NOT NULL COMMENT '密码',
+  `password` CHAR(64) NOT NULL COMMENT '密码',
   `info` VARCHAR(100) DEFAULT NULL COMMENT '自我介绍',
   PRIMARY KEY (`id`)
 );
@@ -21,3 +21,5 @@ INSERT INTO `user`(`name`, `phone`, `password`)
 VALUES('御坂', '13880970270', 'abc123');
 
 SELECT * FROM `user` WHERE phone = '13880970270';
+
+DROP TABLE `user`

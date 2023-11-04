@@ -2,14 +2,13 @@ package szu.controller;
 
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
-import szu.common.model.GlobalPermissionMap;
 import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 import szu.service.LoginService;
 import szu.validator.LoginValidator;
+import szu.validator.PermissionValidator;
 
 import javax.annotation.Resource;
-import java.util.Map;
 
 /**
  * @BelongsProject: video-platform
@@ -45,12 +44,18 @@ public class LoginController {
         return CommonResult.success(uuid);
     }
 
-    @GetMapping("test")
+    @GetMapping("p1")
+    @PermissionValidator(pid = 1)
     @LoginValidator(validated = false)
-    public CommonResult<String> test() {
-        Map<Integer, Integer> map = GlobalPermissionMap.getInstance();
-        System.out.println(map);
-        return CommonResult.success("success to login!");
+    public CommonResult<String> p1() {
+        return CommonResult.success("when the pid is 1");
+    }
+
+    @GetMapping("p6")
+    @PermissionValidator(pid = 6)
+    @LoginValidator(validated = false)
+    public CommonResult<String> p6() {
+        return CommonResult.success("when the pid is 6");
     }
 
 

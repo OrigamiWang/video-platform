@@ -4,7 +4,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import szu.common.api.CommonResult;
+import szu.common.model.GlobalPermissionMap;
+import szu.validator.LoginValidator;
+import szu.validator.PermissionValidator;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @BelongsProject: video-platform
@@ -22,9 +30,20 @@ public class PermissionAspect {
 
     @Around("pointCut()")
     public Object before(ProceedingJoinPoint joinpoint) throws Throwable {
-
-
-        // 放行
-        return joinpoint.proceed(joinpoint.getArgs());
+        MethodSignature methodSignature = (MethodSignature) joinpoint.getSignature();
+        Method method = methodSignature.getMethod();
+        PermissionValidator permissionValidator = method.getAnnotation(PermissionValidator.class);
+        if (permissionValidator == null || !permissionValidator.validated()) {
+            // 放行
+            return joinpoint.proceed(joinpoint.getArgs());
+        }
+        int pid = permissionValidator.pid();
+        Map<Integer, Integer> map = GlobalPermissionMap.getInstance();
+        if (map.containsKey(pid)) {
+            // 有权限
+            return joinpoint.proceed(joinpoint.getArgs());
+        }
+        // 无权限
+        return CommonResult.failed("无权限");
     }
 }

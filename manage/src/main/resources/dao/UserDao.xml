@@ -5,11 +5,11 @@
     <resultMap id="UserMap" type="szu.model.User">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="gender" jdbcType="BIT" property="gender"/>
+        <result column="gender" jdbcType="INTEGER" property="gender"/>
         <result column="level" jdbcType="INTEGER" property="level"/>
         <result column="exp" jdbcType="INTEGER" property="exp"/>
-        <result column="status" jdbcType="BIT" property="status"/>
-        <result column="role" jdbcType="BIT" property="role"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="role" jdbcType="INTEGER" property="role"/>
         <result column="fan" jdbcType="INTEGER" property="fan"/>
         <result column="follow" jdbcType="INTEGER" property="follow"/>
         <result column="like" jdbcType="INTEGER" property="like"/>
@@ -25,8 +25,16 @@
         FROM user
     </select>
 
+<!--    void insert(User user);-->
+    <insert id="insert" parameterType="user">
+        insert into user (`name`, `gender`, `level`, `exp`, `status`, `role`, `fan`, `follow`, `like`, `ip`, `phone`, `password`, `info`)
+            values
+        (#{name}, #{gender}, #{level}, #{exp}, #{status}, #{role}, #{fan}, #{follow}, #{like}, #{ip}, #{phone}, #{password}, #{info});
+    </insert>
+
+
 <!--    void updateUserById(User user);-->
-    <update id="update" parameterType="user">
+    <update id="updateUserById" parameterType="user">
         update user
         <set>
             <if test="name != null">
@@ -36,7 +44,7 @@
                 gender = #{gender},
             </if>
             <if test="level != null">
-                level = #{level},
+                `level` = #{level},
             </if>
             <if test="exp != null">
                 exp = #{exp},
@@ -54,16 +62,16 @@
                 follow = #{follow},
             </if>
             <if test="like != null">
-                like = #{like},
+                `like` = #{like},
             </if>
             <if test="ip != null">
                 ip = #{ip},
             </if>
             <if test="phone != null">
-                phone = #{phone},
+                `phone` = #{phone},
             </if>
             <if test="password != null">
-                password = #{password},
+                `password` = #{password},
             </if>
             <if test="info != null">
                 info = #{info},

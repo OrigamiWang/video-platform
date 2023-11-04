@@ -8,7 +8,6 @@ import szu.common.api.CommonResult;
 import szu.common.api.ResultCode;
 import szu.model.User;
 import szu.service.UserService;
-import szu.validator.LoginValidator;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
 @Api(tags = "UserController")
 @Tag(name = "UserController", description = "用户管理")
 @RequestMapping("/mg")
-@LoginValidator
+//@LoginValidator
 public class UserController {
 
     @Resource
@@ -57,7 +56,10 @@ public class UserController {
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
-
+    @PostMapping("/test")
+    public CommonResult<ResultCode> test(){
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
 
 
 }

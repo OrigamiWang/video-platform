@@ -14,7 +14,7 @@ public class User implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "性别")
-    private Boolean gender;
+    private Integer gender;
 
     @ApiModelProperty(value = "等级")
     private Integer level;
@@ -23,10 +23,10 @@ public class User implements Serializable {
     private Integer exp;
 
     @ApiModelProperty(value = "用户目前的状态")
-    private byte[] status;
+    private Integer status;
 
     @ApiModelProperty(value = "用户身份")
-    private byte[] role;
+    private Integer role;
 
     @ApiModelProperty(value = "粉丝数量")
     private Integer fan;

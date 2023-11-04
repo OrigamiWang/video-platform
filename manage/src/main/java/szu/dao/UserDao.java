@@ -11,10 +11,6 @@ import java.util.List;
 public interface UserDao {
     List<User> selectAllUser();
 
-    @Insert("insert into user " +
-            "(name, gender, level, exp, status, role, fan, follow, like, ip, phone, password, info) " +
-            "values " +
-            "(#{name}, #{gender},#{level},#{exp},#{status},#{role},#{fan},#{follow},#{like}, #{ip},#{phone}, #{password}, #{info}")
     void insert(User user);
 
     @Delete("delete from user where id = #{id}")

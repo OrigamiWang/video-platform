@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.UserDao">
+
     <resultMap id="UserMap" type="szu.model.User">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
@@ -18,9 +19,10 @@
         <result column="info" jdbcType="VARCHAR" property="info"/>
     </resultMap>
 
-<!--    List<User> selectAllUser();-->
+    <!--    List<User> selectAllUser();-->
     <select id="selectAllUser" resultMap="UserMap">
-        SELECT * FROM user
+        SELECT *
+        FROM user
     </select>
 
 <!--    void updateUserById(User user);-->

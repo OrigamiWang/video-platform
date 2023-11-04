@@ -3,14 +3,12 @@ package szu.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ResultCode;
 import szu.model.User;
 import szu.service.UserService;
-
-import javax.annotation.PostConstruct;
+import szu.validator.LoginValidator;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -24,6 +22,7 @@ import java.util.List;
 @Api(tags = "UserController")
 @Tag(name = "UserController", description = "用户管理")
 @RequestMapping("/mg")
+@LoginValidator
 public class UserController {
 
     @Resource

@@ -3,12 +3,34 @@
 
 <mapper namespace="szu.dao.LoginDao">
 
+    <resultMap id="UserMap" type="szu.model.User">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="gender" jdbcType="BIT" property="gender"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
+        <result column="exp" jdbcType="INTEGER" property="exp"/>
+        <result column="status" jdbcType="BIT" property="status"/>
+        <result column="role" jdbcType="BIT" property="role"/>
+        <result column="fan" jdbcType="INTEGER" property="fan"/>
+        <result column="follow" jdbcType="INTEGER" property="follow"/>
+        <result column="like" jdbcType="INTEGER" property="like"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="info" jdbcType="VARCHAR" property="info"/>
+    </resultMap>
+
 
     <!--    void register(String encryptedUsername, String encryptedPswd);-->
     <insert id="register">
         INSERT INTO `user`(`name`, `phone`, `password`)
         VALUES (#{name}, #{phone}, #{pswd})
     </insert>
+
+<!--    User login(@Param("phone") String phone);-->
+    <select id="getUser" resultMap="UserMap">
+        SELECT * FROM `user` WHERE phone = #{phone};
+    </select>
 
 
 </mapper>

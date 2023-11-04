@@ -1,5 +1,6 @@
 package szu.service;
 
+import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 
 /**
@@ -10,4 +11,6 @@ import szu.dto.RegisterDto;
  */
 public interface LoginService {
     void register(RegisterDto registerDto);
+
+    String login(LoginDto loginDto);
 }

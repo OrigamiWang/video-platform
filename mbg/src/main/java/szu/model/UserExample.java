@@ -244,52 +244,52 @@ public class UserExample {
             return (Criteria) this;
         }
 
-        public Criteria andGenderEqualTo(Boolean value) {
+        public Criteria andGenderEqualTo(byte[] value) {
             addCriterion("gender =", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderNotEqualTo(Boolean value) {
+        public Criteria andGenderNotEqualTo(byte[] value) {
             addCriterion("gender <>", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderGreaterThan(Boolean value) {
+        public Criteria andGenderGreaterThan(byte[] value) {
             addCriterion("gender >", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderGreaterThanOrEqualTo(Boolean value) {
+        public Criteria andGenderGreaterThanOrEqualTo(byte[] value) {
             addCriterion("gender >=", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderLessThan(Boolean value) {
+        public Criteria andGenderLessThan(byte[] value) {
             addCriterion("gender <", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderLessThanOrEqualTo(Boolean value) {
+        public Criteria andGenderLessThanOrEqualTo(byte[] value) {
             addCriterion("gender <=", value, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderIn(List<Boolean> values) {
+        public Criteria andGenderIn(List<byte[]> values) {
             addCriterion("gender in", values, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderNotIn(List<Boolean> values) {
+        public Criteria andGenderNotIn(List<byte[]> values) {
             addCriterion("gender not in", values, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderBetween(Boolean value1, Boolean value2) {
+        public Criteria andGenderBetween(byte[] value1, byte[] value2) {
             addCriterion("gender between", value1, value2, "gender");
             return (Criteria) this;
         }
 
-        public Criteria andGenderNotBetween(Boolean value1, Boolean value2) {
+        public Criteria andGenderNotBetween(byte[] value1, byte[] value2) {
             addCriterion("gender not between", value1, value2, "gender");
             return (Criteria) this;
         }

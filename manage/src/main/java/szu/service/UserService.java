@@ -13,5 +13,9 @@ import java.util.List;
 public interface UserService {
     List<User> getUserList();
 
-    void updateStatusById(Integer id, Byte status);
+    void insert(User user);
+
+    void deleteById(Integer id);
+
+    void updateUser(User user);
 }

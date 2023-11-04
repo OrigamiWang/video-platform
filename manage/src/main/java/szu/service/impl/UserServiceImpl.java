@@ -27,7 +27,17 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void updateStatusById(Integer id, Byte status) {
-        userDao.updateStatusById(id,status);
+    public void insert(User user) {
+        userDao.insert(user);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        userDao.deleteUserById(id);
+    }
+
+    @Override
+    public void updateUser(User user) {
+        userDao.updateUserById(user);
     }
 }

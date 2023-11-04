@@ -23,9 +23,52 @@
         SELECT * FROM user
     </select>
 
-<!--    void updateStatusById(Integer id, Byte status);-->
-    <update id="updateStatusById">
-        update user set status = #{status} where id = #{id}
+<!--    void updateUserById(User user);-->
+    <update id="update" parameterType="user">
+        update user
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="level != null">
+                level = #{level},
+            </if>
+            <if test="exp != null">
+                exp = #{exp},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
+            <if test="fan != null">
+                fan = #{fan},
+            </if>
+            <if test="follow != null">
+                follow = #{follow},
+            </if>
+            <if test="like != null">
+                like = #{like},
+            </if>
+            <if test="ip != null">
+                ip = #{ip},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="info != null">
+                info = #{info},
+            </if>
+        </set>
+        where id = #{id}
     </update>
+
 
 </mapper>

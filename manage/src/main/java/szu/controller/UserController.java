@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
+import szu.common.api.ResultCode;
 import szu.model.User;
 import szu.service.UserService;
 
@@ -35,12 +36,29 @@ public class UserController {
         return CommonResult.success(userList);
     }
 
-//    @PostMapping("/user/{id}/{status}")
-//    @ApiOperation("根据用户id修改状态，0正常，1拦截登录")
-//    public CommonResult<String> updateUserStatus(@PathVariable("id") Integer id, @PathVariable("status") Byte status){
-//        userService.updateStatusById(id, status);
-//        return CommonResult.success("success");
-//    }
+    @PostMapping("/user/add")
+    @ApiOperation("新增用户")
+    public CommonResult<ResultCode> addUser(@RequestBody User user){
+        userService.insert(user);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+    @DeleteMapping("/user/delete/{id}")
+    @ApiOperation("根据id删除用户")
+    public CommonResult<ResultCode> deleteUserById(@PathVariable Integer id){
+        userService.deleteById(id);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+
+    @PutMapping("/user/update")
+    @ApiOperation("根据用户id修改用户")
+    public CommonResult<ResultCode> updateUser(@RequestBody User user){
+        userService.updateUser(user);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+
 
 
 }

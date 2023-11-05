@@ -40,8 +40,13 @@ public class User implements Serializable {
     @ApiModelProperty(value = "ip属地")
     private String ip;
 
-    @ApiModelProperty(value = "电话/账号")
+    @ApiModelProperty(value = "电话")
     private String phone;
+    @ApiModelProperty(value = "邮箱")
+    private String email;
+
+    @ApiModelProperty(value = "账号")
+    private String username;
 
     @ApiModelProperty(value = "密码")
     private String password;

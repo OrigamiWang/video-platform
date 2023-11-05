@@ -2,16 +2,19 @@ package szu.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Service;
+import szu.common.api.CommonResult;
 import szu.common.model.GlobalPermissionMap;
 import szu.common.util.ShaUtil;
 import szu.dao.LoginDao;
 import szu.dao.PermissionDao;
+import szu.dto.AuthDto;
 import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 import szu.model.User;
 import szu.service.LoginService;
+import szu.service.MailService;
+import szu.util.PinUtil;
 import szu.util.UuidUtil;
 
 import javax.annotation.Resource;
@@ -37,16 +40,76 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private PermissionDao permissionDao;
 
+    @Resource
+    private MailService mailService;
     @Value("${redis.user_prefix}")
     private String REDIS_USER_PREFIX;
+    @Value("${redis.register_pin}")
+    private String REDIS_REGISTER_PIN;
 
     @Override
-    public void register(RegisterDto registerDto) {
-        // encrypt the pswd
-        String pswd = registerDto.getPswd();
-        String encryptedPswd = ShaUtil.encode(pswd);
-        System.out.println("encryptedPswd = " + encryptedPswd);
-        loginDao.register(registerDto.getName(), registerDto.getPhone(), encryptedPswd);
+    public CommonResult<String> register(RegisterDto registerDto) {
+        String name = registerDto.getName();
+        if (name == null || "".equals(name)) {
+            return CommonResult.failed("用户昵称不能为空！");
+        }
+        int type = registerDto.getType();
+        switch (type) {
+            case 0: {
+                String username = registerDto.getUsername();
+                if (username == null || "".equals(username)) {
+                    return CommonResult.failed("账号不能为空！");
+                }
+                String pswd = registerDto.getPswd();
+                if (pswd == null || "".equals(pswd)) {
+                    return CommonResult.failed("密码不能为空！");
+                }
+                // encrypt the pswd
+                String encryptedPswd = ShaUtil.encode(pswd);
+                System.out.println("encryptedPswd = " + encryptedPswd);
+                loginDao.register(registerDto.getName(), registerDto.getUsername(), encryptedPswd);
+                break;
+            }
+            case 1: {
+                System.out.println("手机验证码注冊");
+                String phone = registerDto.getPhone();
+                if (phone == null || "".equals(phone)) {
+                    return CommonResult.failed("手机号不能为空！");
+                }
+                String pin = registerDto.getPin();
+                if (pin == null || "".equals(pin)) {
+                    return CommonResult.failed("验证码不能为空！");
+                }
+                // 校验验证码的正确性
+                if (!checkPin(phone, pin)) {
+                    return CommonResult.failed("验证码错误！");
+                }
+                // 创建用户
+                loginDao.registerByPhone(name, phone);
+                break;
+            }
+            case 2: {
+                System.out.println("邮箱注册");
+                String email = registerDto.getEmail();
+                if (email == null || "".equals(email)) {
+                    return CommonResult.failed("邮箱不能为空！");
+                }
+                String pin = registerDto.getPin();
+                if (pin == null || "".equals(pin)) {
+                    return CommonResult.failed("验证码不能为空！");
+                }
+                if (!checkPin(email, pin)) {
+                    return CommonResult.failed("验证码错误！");
+                }
+                // 创建用户
+                loginDao.registerByEmail(name, email);
+                break;
+            }
+            default:
+                System.out.println("不匹配的类型");
+                break;
+        }
+        return CommonResult.success("注冊成功！");
     }
 
     @Override
@@ -72,5 +135,42 @@ public class LoginServiceImpl implements LoginService {
         redisTemplate.expire(REDIS_USER_PREFIX + uuid, 30, TimeUnit.MINUTES);
         return uuid;
     }
+
+    @Override
+    public boolean checkPin(String suffix, String pin) {
+        String p = (String) redisTemplate.opsForValue().get(REDIS_REGISTER_PIN + suffix);
+        return Objects.equals(p, pin);
+    }
+
+    @Override
+    public CommonResult<String> getPin(AuthDto authDto) {
+        String auth = authDto.getAuth();
+        if (auth == null || "".equals(auth)) {
+            return CommonResult.failed("手机号或邮箱不能为空！");
+        }
+        int type = authDto.getType();
+        String pin = PinUtil.generatePin();
+        System.out.println("pin = " + pin);
+        redisTemplate.opsForValue().set(REDIS_REGISTER_PIN + auth, pin);
+        // 验证码2min内有效
+        redisTemplate.expire(REDIS_REGISTER_PIN + auth, 2, TimeUnit.MINUTES);
+        switch (type) {
+            case 0: {
+                // 邮箱
+                mailService.sendTextMailMessage(auth, pin);
+                break;
+            }
+            case 1: {
+                // 手机号
+
+                break;
+            }
+            default:
+                break;
+        }
+
+        return CommonResult.success("发送验证码成功！");
+    }
+
 
 }

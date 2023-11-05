@@ -23,13 +23,28 @@
 
     <!--    void register(String encryptedUsername, String encryptedPswd);-->
     <insert id="register">
-        INSERT INTO `user`(`name`, `phone`, `password`)
-        VALUES (#{name}, #{phone}, #{pswd})
+        INSERT INTO `user`(`name`, `username`, `password`)
+        VALUES (#{name}, #{username}, #{pswd})
     </insert>
 
-<!--    User login(@Param("phone") String phone);-->
+    <!--    void registerByPhone(@Param("name")String, @Param("phone") String phone);-->
+    <insert id="registerByPhone">
+        INSERT INTO `user`(`name`, `phone`)
+        VALUES (#{name}, #{phone})
+    </insert>
+
+    <!--    void registerByEmail(@Param("name") String name, @Param("email") String email);-->
+    <insert id="registerByEmail">
+        INSERT INTO `user`(`name`, `email`)
+        VALUES (#{name}, #{email})
+    </insert>
+
+
+    <!--    User login(@Param("phone") String phone);-->
     <select id="getUser" resultMap="UserMap">
-        SELECT * FROM `user` WHERE phone = #{phone};
+        SELECT *
+        FROM `user`
+        WHERE phone = #{phone};
     </select>
 
 

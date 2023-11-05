@@ -2,6 +2,7 @@ package szu.controller;
 
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
+import szu.dto.AuthDto;
 import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 import szu.service.LoginService;
@@ -19,7 +20,6 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/scy")
-@LoginValidator
 public class LoginController {
 
     @Resource
@@ -27,21 +27,23 @@ public class LoginController {
 
 
     // validated = false: 不用校验
-    @LoginValidator(validated = false)
     @PostMapping("register")
     public CommonResult<String> register(@RequestBody RegisterDto registerDto) {
-        loginService.register(registerDto);
-        return CommonResult.success("register successful!");
+        return loginService.register(registerDto);
     }
 
     @PostMapping("login")
-    @LoginValidator(validated = false)
     public CommonResult<String> login(@RequestBody LoginDto loginDto) {
         String uuid = loginService.login(loginDto);
         if (uuid.length() == 0) {
             return CommonResult.failed("账号或密码错误！");
         }
         return CommonResult.success(uuid);
+    }
+
+    @PostMapping("pin")
+    public CommonResult<String> getPin(@RequestBody AuthDto authDto) {
+        return loginService.getPin(authDto);
     }
 
     @GetMapping("p1")

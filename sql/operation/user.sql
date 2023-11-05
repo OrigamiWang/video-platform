@@ -1,5 +1,5 @@
-INSERT INTO `user`(`name`, `phone`, `password`)
-VALUES ('御坂', '13880970270', 'abc123');
+INSERT INTO `user`(`name`, `email`, `password`)
+VALUES ('御坂', '2369681583@qq.com', 'abc123');
 
 SELECT *
 FROM `user`

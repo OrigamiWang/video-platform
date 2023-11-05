@@ -9,6 +9,7 @@ CREATE TABLE `comment`  (
   `pid` int(11) DEFAULT NULL COMMENT '父级评论的id',
   `target_username` varchar(20) DEFAULT NULL COMMENT '回复的用户',
   `createTime` datetime NOT NULL COMMENT '评论时间',
+  `like_num` int(11) NOT NULL DEFAULT 0 COMMENT '点赞数量',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 

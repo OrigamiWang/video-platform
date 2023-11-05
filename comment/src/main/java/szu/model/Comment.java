@@ -38,6 +38,7 @@ public class Comment implements Serializable {
     private String targetUsername;   //回复的用户
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;   //评论时间
+    private Integer likeNum;  //点赞数量
 
     @Transient
     private List<Comment> children;  //不在数据库中存储只做临时使用

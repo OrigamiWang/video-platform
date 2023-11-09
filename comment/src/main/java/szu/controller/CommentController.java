@@ -2,8 +2,8 @@ package szu.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ResultCode;
@@ -42,37 +42,42 @@ public class CommentController {
     }
 
     /**
-     * 根据foreignId和foreignType获取指定区域的评论
-     * @param foreignId 评论的对象id
-     * @param foreignType 评论的对象类型(1:动态评论 2:视频评论)
+     * 根据foreignId获取指定区域的评论，根据点赞数排序
+     * @param foreignId 要评论的动态id
      * @return
      */
     @GetMapping("/list")
     @ApiOperation("获取评论")
-    public CommonResult<Map> listComment(Integer foreignId,Integer foreignType){
-        log.info("获取评论：foreignId：{}，foreignType：{}",foreignId,foreignType);
-        Map map = new HashMap<String,Object>();
-        //获取指定区域的所有评论
-        List<Comment> comments = commentService.getCommentsByForeignIdAndForeignType(foreignId,foreignType);
-        //进行分级，分出根评论和子评论 （只有两级）
-        List<Comment> faComments = new ArrayList<>();
-        for (Comment comment : comments) {   //遍历所有的评论
-            if(comment.getPid()==null){   //没有父级评论的就是根评论
-                List<Comment> childrens = new ArrayList<>();    //该根评论的子评论
-
-                for (Comment comment1 : comments) {     //遍历所有评论
-                    if(comment.getId().equals(comment1.getPid())){   //找到Pid为当前根评论id的评论
-                        childrens.add(comment1);    //添加到子评论列表中
-                    }
-                }
-
-                comment.setChildren(childrens); //为根评论设置子评论
-                faComments.add(comment);
-            }
-        }
-
-        map.put("faComments",faComments);
-        return CommonResult.success(map);
+    public CommonResult<List> listComment(Integer foreignId){
+        List<Comment> commentsByForeignId = commentService.getCommentsByForeignId(foreignId);
+        return CommonResult.success(commentsByForeignId);
     }
 
+    /**
+     * 回复评论
+     * @param comment 回复的评论
+     * @param pid 回复的根评论的id
+     * @return
+     */
+
+    @PostMapping("/reply")
+    @ApiOperation("回复评论")
+    public CommonResult replyComment(@RequestBody Comment comment,String pid){
+        commentService.replyComment(comment,pid);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+    /**
+     * 点赞评论
+     * @param flag 1：点赞  -1：取消点赞
+     * @param pid 点赞的根评论的id
+     * @param index 子评论在根的下标
+     * @return
+     */
+    @PostMapping("/like")
+    @ApiOperation("点赞评论")
+    public CommonResult likeComment(Integer flag, String pid, Integer index){
+        commentService.likeComment(flag,pid,index);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
 }

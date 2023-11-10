@@ -13,7 +13,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import szu.common.api.CommonResult;
 import szu.common.model.LoginUser;
-import szu.model.User;
 import szu.validator.LoginValidator;
 
 import javax.annotation.Resource;
@@ -48,7 +47,7 @@ public class LoginAspect {
         Method method = methodSignature.getMethod();
         LoginValidator loginValidator = method.getAnnotation(LoginValidator.class);
         // 如果有，并且值为false，则不校验
-        if (loginValidator != null && !loginValidator.validated()) {
+        if (loginValidator == null || !loginValidator.validated()) {
             return joinpoint.proceed(joinpoint.getArgs());
         }
         // 正常校验 获取request和response

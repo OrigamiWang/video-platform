@@ -15,6 +15,8 @@
         <result column="like" jdbcType="INTEGER" property="like"/>
         <result column="ip" jdbcType="VARCHAR" property="ip"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
         <result column="password" jdbcType="VARCHAR" property="password"/>
         <result column="info" jdbcType="VARCHAR" property="info"/>
     </resultMap>

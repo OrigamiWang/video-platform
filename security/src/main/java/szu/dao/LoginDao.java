@@ -1,7 +1,7 @@
 package szu.dao;
 
 import org.apache.ibatis.annotations.Param;
-import szu.model.User;
+import org.springframework.security.core.parameters.P;
 
 /**
  * @BelongsProject: video-platform
@@ -11,7 +11,12 @@ import szu.model.User;
  */
 public interface LoginDao {
 
-    void register(@Param("name") String name, @Param("phone") String phone, @Param("pswd") String encryptedPswd);
+    void register(@Param("name") String name, @Param("username") String username, @Param("pswd") String encryptedPswd);
 
     User getUser(@Param("phone") String phone);
+
+    void registerByPhone(@Param("name") String name, @Param("phone") String phone);
+
+    void registerByEmail(@Param("name") String name, @Param("email") String email);
+
 }

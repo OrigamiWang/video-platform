@@ -2,7 +2,6 @@ package szu.service.impl;
 
 import org.springframework.stereotype.Service;
 import szu.dao.UserDao;
-import szu.model.User;
 import szu.service.UserService;
 
 import javax.annotation.Resource;

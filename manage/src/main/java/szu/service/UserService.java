@@ -1,7 +1,5 @@
 package szu.service;
 
-import szu.model.User;
-
 import java.util.List;
 
 /**

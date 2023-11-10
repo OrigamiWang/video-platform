@@ -1,4 +1,4 @@
-CREATE TABLE `video-platform`.`visit`(
+CREATE TABLE `visit`(
      `id` INT NOT NULL AUTO_INCREMENT,
      `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最近更新时间',
      `api` VARCHAR(255) NOT NULL COMMENT 'api接口，all为总量',

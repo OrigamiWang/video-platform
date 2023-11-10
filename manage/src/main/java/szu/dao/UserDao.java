@@ -4,6 +4,7 @@ package szu.dao;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import szu.model.User;
 
 import java.util.List;
 

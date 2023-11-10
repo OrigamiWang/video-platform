@@ -11,6 +11,7 @@ import szu.dao.PermissionDao;
 import szu.dto.AuthDto;
 import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
+import szu.model.User;
 import szu.service.LoginService;
 import szu.service.MailService;
 import szu.util.PinUtil;

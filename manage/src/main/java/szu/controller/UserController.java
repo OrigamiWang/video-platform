@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ResultCode;
+import szu.model.User;
 import szu.service.UserService;
 import javax.annotation.Resource;
 import java.util.List;

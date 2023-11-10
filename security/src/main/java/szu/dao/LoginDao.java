@@ -2,6 +2,7 @@ package szu.dao;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
+import szu.model.User;
 
 /**
  * @BelongsProject: video-platform

@@ -7,6 +7,9 @@ spring:
   profiles:
     active: dev
 
+
+
+
 mybatis:
   mapper-locations:
     - classpath:dao/*.xml
@@ -14,6 +17,4 @@ mybatis:
   type-aliases-package: szu.model
   configuration:
     map-underscore-to-camel-case: true
-redis:
-  user_prefix: "login_user_"
 

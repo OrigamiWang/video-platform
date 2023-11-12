@@ -16,7 +16,7 @@ public class UserDetail implements Serializable {
     private Integer uid;
 
     @ApiModelProperty(value = "性别")
-    private byte[] gender;
+    private byte gender;
 
     @ApiModelProperty(value = "经验值")
     private Integer exp;

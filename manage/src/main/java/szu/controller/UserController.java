@@ -3,13 +3,17 @@ package szu.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ResultCode;
 import szu.model.User;
+import szu.model.UserDetail;
+import szu.model.UserStatistics;
 import szu.service.UserService;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @BelongsProject: video-platform
@@ -20,44 +24,73 @@ import java.util.List;
 @RestController
 @Api(tags = "UserController")
 @Tag(name = "UserController", description = "用户管理")
-@RequestMapping("/mg")
+@RequestMapping("/mg/user")
 //@LoginValidator
 public class UserController {
 
     @Resource
     private UserService userService;
 
-    @GetMapping("/user")
-    @ApiOperation("获取所有用户")
-    public CommonResult<List<User>> getAllUser() {
+    @GetMapping("/list")
+    @ApiOperation("获取所有用户（仅user表）")
+    public CommonResult<Object> getAllUser() {
         List<User> userList = userService.getUserList();
+        if(userList == null) return CommonResult.failed("用户列表为空");
         return CommonResult.success(userList);
     }
 
-    @PostMapping("/user/add")
-    @ApiOperation("新增用户")
+    @PostMapping("/add")
+    @ApiOperation("新增用户，同时新增关联的默认detail、statistics、role信息")
     public CommonResult<ResultCode> addUser(@RequestBody User user){
         userService.insert(user);
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
-    @DeleteMapping("/user/delete/{id}")
-    @ApiOperation("根据id删除用户")
-    public CommonResult<ResultCode> deleteUserById(@PathVariable Integer id){
-        userService.deleteById(id);
-        return CommonResult.success(ResultCode.SUCCESS);
+
+    @DeleteMapping("/delete/{id}")
+    @ApiOperation("根据id删除用户，同时删除与之关联的detail、statistics、role信息")
+    public CommonResult<String> deleteUserById(@PathVariable Integer id){
+        boolean flag = userService.deleteById(id);
+        if(!flag) return CommonResult.failed("用户不存在");
+        return CommonResult.success("删除成功");
     }
 
-
-    @PutMapping("/user/update")
-    @ApiOperation("根据用户id修改用户")
+    @PutMapping("/update")
+    @ApiOperation("根据用户id修改用户（仅user）")
     public CommonResult<ResultCode> updateUser(@RequestBody User user){
         userService.updateUser(user);
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
-    @PostMapping("/test")
-    public CommonResult<ResultCode> test(){
+
+    @PostMapping("/addrole/{userId}/{roleId}")
+    @ApiOperation("根据用户id、权限id增加权限")
+    public CommonResult<ResultCode> addRoleById(@PathVariable Integer userId, @PathVariable Integer roleId){
+        boolean flag = userService.addRoleById(userId, roleId);
+        if(!flag) return CommonResult.failed("权限已拥有");
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+    @PostMapping("/deleterole/{userId}/{roleId}")
+    @ApiOperation("根据用户id。权限id删除权限")
+    public CommonResult<ResultCode> deleteRoleById(@PathVariable Integer userId, @PathVariable Integer roleId){
+        boolean flag = userService.deleteRoleById(userId, roleId);
+        if(!flag) return CommonResult.failed("角色未拥有该权限");
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+
+    @PutMapping("/updatestatistics")
+    @ApiOperation("根据uid更新statistics表信息")
+    public CommonResult<ResultCode> updateStatisticsById(@RequestBody UserStatistics userStatistics){
+        userService.updateUserStatistics(userStatistics);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
+    @PutMapping("/updatedetail")
+    @ApiOperation("根据uid更新detail表信息")
+    public CommonResult<ResultCode> updateDetailById(@RequestBody UserDetail userDetail){
+        userService.updateUserDetail(userDetail);
         return CommonResult.success(ResultCode.SUCCESS);
     }
 

@@ -13,6 +13,9 @@
         <artifactId>video-platform</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <properties>
+        <common-codec.version>1.15</common-codec.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.github.pagehelper</groupId>
@@ -62,6 +65,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${common-codec.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

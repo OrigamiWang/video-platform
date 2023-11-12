@@ -1,5 +1,9 @@
 # video-platform
 
+TODO: 实现手机验证码登录注册
+写个util，发送验证码，将验证码存入redis，2min expire
+
+
 **请规范命名文件夹名字**
 
 ## 项目结构

@@ -13,6 +13,9 @@
         <artifactId>video-platform</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <properties>
+        <common-codec.version>1.15</common-codec.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.github.pagehelper</groupId>
@@ -67,6 +70,11 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>8.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${common-codec.version}</version>
         </dependency>
 
     </dependencies>

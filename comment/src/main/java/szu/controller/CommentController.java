@@ -49,6 +49,7 @@ public class CommentController {
     @GetMapping("/list")
     @ApiOperation("获取评论")
     public CommonResult<List> listComment(Integer foreignId){
+        log.info("要获取到评论区域，{}",foreignId);
         List<Comment> commentsByForeignId = commentService.getCommentsByForeignId(foreignId);
         return CommonResult.success(commentsByForeignId);
     }
@@ -63,6 +64,7 @@ public class CommentController {
     @PostMapping("/reply")
     @ApiOperation("回复评论")
     public CommonResult replyComment(@RequestBody Comment comment,String pid){
+        log.info("评论的内容和根评论id，{},{}",comment,pid);
         commentService.replyComment(comment,pid);
         return CommonResult.success(ResultCode.SUCCESS);
     }
@@ -71,12 +73,13 @@ public class CommentController {
      * 点赞评论
      * @param flag 1：点赞  -1：取消点赞
      * @param pid 点赞的根评论的id
-     * @param index 子评论在根的下标
+     * @param index 子评论在根的下标 index=-1代表点赞的是根评论
      * @return
      */
     @PostMapping("/like")
     @ApiOperation("点赞评论")
     public CommonResult likeComment(Integer flag, String pid, Integer index){
+        log.info("点赞评论：{}，点赞的根评论的id：{}，子评论在根的下标：{}",flag,pid,index);
         commentService.likeComment(flag,pid,index);
         return CommonResult.success(ResultCode.SUCCESS);
     }

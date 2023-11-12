@@ -36,6 +36,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void addComment(Comment comment) {
+        if(comment==null) throw new NullPointerException();//安全性检查
         //设置创建时间
         comment.setCreateTime(LocalDateTime.now());
         commentRepository.save(comment);
@@ -48,6 +49,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public List<Comment> getCommentsByForeignId(Integer foreignId) {
+        if(foreignId<0) throw new IllegalArgumentException(); //安全性检查
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         List<Comment> Comments = mongoTemplate.find(query, Comment.class);
         Comments.sort((o1, o2) -> o1.getLikeNum()-o2.getLikeNum()); //按点赞数排序
@@ -61,9 +63,11 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void replyComment(Comment comment,String pid) {
+        if(comment==null||pid==null) throw new NullPointerException(); //安全性检查
         Query query = Query.query(Criteria.where("_id").is(pid)); //找到被评论的评论
         Comment pComment = mongoTemplate.findOne(query, Comment.class, "comment");
         //获取该评论的子评论列表
+        assert pComment != null;  //安全性检查，子评论不为空
         List<Comment> children = pComment.getChildren();
         //追加一条评论
         comment.setCreateTime(LocalDateTime.now());
@@ -82,6 +86,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void likeComment(Integer flag,String pid,Integer index) {
+        //安全性检查
+        if(flag!=-1&&flag!=1) throw new IllegalArgumentException();
+        if(pid==null) throw new NullPointerException();
+        if(index<-1) throw new IndexOutOfBoundsException();
         Query query = Query.query(Criteria.where("_id").is(pid)); //找到被评论的评论
         Comment pComment = mongoTemplate.findOne(query, Comment.class, "comment");
         //获取该评论的子评论列表

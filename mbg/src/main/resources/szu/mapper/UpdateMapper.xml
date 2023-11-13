@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="szu.mapper.UpdatesMapper">
-  <resultMap id="BaseResultMap" type="szu.model.Updates">
+<mapper namespace="szu.mapper.UpdateMapper">
+  <resultMap id="BaseResultMap" type="szu.model.Update">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="uid" jdbcType="INTEGER" property="uid" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="content" jdbcType="VARCHAR" property="content" />
-    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="dateTime" jdbcType="TIMESTAMP" property="datetime" />
     <result column="urls" jdbcType="VARCHAR" property="urls" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,15 +71,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, title, content, type, dateTime, urls
+    id, uid, title, content, status, type, dateTime, urls, pid
   </sql>
-  <select id="selectByExample" parameterType="szu.model.UpdatesExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="szu.model.UpdateExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from updates
+    from update
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -88,35 +90,35 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from updates
+    from update
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from updates
+    delete from update
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="szu.model.UpdatesExample">
-    delete from updates
+  <delete id="deleteByExample" parameterType="szu.model.UpdateExample">
+    delete from update
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="szu.model.Updates">
+  <insert id="insert" parameterType="szu.model.Update">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into updates (uid, title, content, 
-      type, dateTime, urls
-      )
+    insert into update (uid, title, content, 
+      status, type, dateTime, 
+      urls, pid)
     values (#{uid,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
-      #{type,jdbcType=VARCHAR}, #{datetime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR}
-      )
+      #{status,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{datetime,jdbcType=TIMESTAMP}, 
+      #{urls,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="szu.model.Updates">
+  <insert id="insertSelective" parameterType="szu.model.Update">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into updates
+    insert into update
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="uid != null">
         uid,
@@ -127,6 +129,9 @@
       <if test="content != null">
         content,
       </if>
+      <if test="status != null">
+        status,
+      </if>
       <if test="type != null">
         type,
       </if>
@@ -135,6 +140,9 @@
       </if>
       <if test="urls != null">
         urls,
+      </if>
+      <if test="pid != null">
+        pid,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -147,8 +155,11 @@
       <if test="content != null">
         #{content,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
       <if test="type != null">
-        #{type,jdbcType=VARCHAR},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="datetime != null">
         #{datetime,jdbcType=TIMESTAMP},
@@ -156,16 +167,19 @@
       <if test="urls != null">
         #{urls,jdbcType=VARCHAR},
       </if>
+      <if test="pid != null">
+        #{pid,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="szu.model.UpdatesExample" resultType="java.lang.Long">
-    select count(*) from updates
+  <select id="countByExample" parameterType="szu.model.UpdateExample" resultType="java.lang.Long">
+    select count(*) from update
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update updates
+    update update
     <set>
       <if test="row.id != null">
         id = #{row.id,jdbcType=INTEGER},
@@ -179,8 +193,11 @@
       <if test="row.content != null">
         content = #{row.content,jdbcType=VARCHAR},
       </if>
+      <if test="row.status != null">
+        status = #{row.status,jdbcType=INTEGER},
+      </if>
       <if test="row.type != null">
-        type = #{row.type,jdbcType=VARCHAR},
+        type = #{row.type,jdbcType=INTEGER},
       </if>
       <if test="row.datetime != null">
         dateTime = #{row.datetime,jdbcType=TIMESTAMP},
@@ -188,26 +205,31 @@
       <if test="row.urls != null">
         urls = #{row.urls,jdbcType=VARCHAR},
       </if>
+      <if test="row.pid != null">
+        pid = #{row.pid,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update updates
+    update update
     set id = #{row.id,jdbcType=INTEGER},
       uid = #{row.uid,jdbcType=INTEGER},
       title = #{row.title,jdbcType=VARCHAR},
       content = #{row.content,jdbcType=VARCHAR},
-      type = #{row.type,jdbcType=VARCHAR},
+      status = #{row.status,jdbcType=INTEGER},
+      type = #{row.type,jdbcType=INTEGER},
       dateTime = #{row.datetime,jdbcType=TIMESTAMP},
-      urls = #{row.urls,jdbcType=VARCHAR}
+      urls = #{row.urls,jdbcType=VARCHAR},
+      pid = #{row.pid,jdbcType=INTEGER}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="szu.model.Updates">
-    update updates
+  <update id="updateByPrimaryKeySelective" parameterType="szu.model.Update">
+    update update
     <set>
       <if test="uid != null">
         uid = #{uid,jdbcType=INTEGER},
@@ -218,8 +240,11 @@
       <if test="content != null">
         content = #{content,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
       <if test="type != null">
-        type = #{type,jdbcType=VARCHAR},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="datetime != null">
         dateTime = #{datetime,jdbcType=TIMESTAMP},
@@ -227,17 +252,22 @@
       <if test="urls != null">
         urls = #{urls,jdbcType=VARCHAR},
       </if>
+      <if test="pid != null">
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="szu.model.Updates">
-    update updates
+  <update id="updateByPrimaryKey" parameterType="szu.model.Update">
+    update update
     set uid = #{uid,jdbcType=INTEGER},
       title = #{title,jdbcType=VARCHAR},
       content = #{content,jdbcType=VARCHAR},
-      type = #{type,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
       dateTime = #{datetime,jdbcType=TIMESTAMP},
-      urls = #{urls,jdbcType=VARCHAR}
+      urls = #{urls,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

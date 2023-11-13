@@ -10,41 +10,20 @@ public class User implements Serializable {
     @ApiModelProperty(value = "昵称")
     private String name;
 
-    @ApiModelProperty(value = "性别")
-    private byte[] gender;
-
     @ApiModelProperty(value = "等级")
     private Integer level;
 
-    @ApiModelProperty(value = "经验值")
-    private Integer exp;
-
-    @ApiModelProperty(value = "用户目前的状态")
-    private byte[] status;
-
-    @ApiModelProperty(value = "用户身份")
-    private byte[] role;
-
-    @ApiModelProperty(value = "粉丝数量")
-    private Integer fan;
-
-    @ApiModelProperty(value = "关注数量")
-    private Integer follow;
-
-    @ApiModelProperty(value = "获赞数量")
-    private Integer like;
-
-    @ApiModelProperty(value = "ip属地")
-    private String ip;
-
-    @ApiModelProperty(value = "电话/账号")
-    private String phone;
+    @ApiModelProperty(value = "用户状态")
+    private Integer status;
 
     @ApiModelProperty(value = "密码")
     private String password;
 
-    @ApiModelProperty(value = "自我介绍")
-    private String info;
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "邮箱")
+    private String email;
 
     private static final long serialVersionUID = 1L;
 
@@ -64,14 +43,6 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public byte[] getGender() {
-        return gender;
-    }
-
-    public void setGender(byte[] gender) {
-        this.gender = gender;
-    }
-
     public Integer getLevel() {
         return level;
     }
@@ -80,68 +51,12 @@ public class User implements Serializable {
         this.level = level;
     }
 
-    public Integer getExp() {
-        return exp;
-    }
-
-    public void setExp(Integer exp) {
-        this.exp = exp;
-    }
-
-    public byte[] getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(byte[] status) {
+    public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public byte[] getRole() {
-        return role;
-    }
-
-    public void setRole(byte[] role) {
-        this.role = role;
-    }
-
-    public Integer getFan() {
-        return fan;
-    }
-
-    public void setFan(Integer fan) {
-        this.fan = fan;
-    }
-
-    public Integer getFollow() {
-        return follow;
-    }
-
-    public void setFollow(Integer follow) {
-        this.follow = follow;
-    }
-
-    public Integer getLike() {
-        return like;
-    }
-
-    public void setLike(Integer like) {
-        this.like = like;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getPassword() {
@@ -152,12 +67,20 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getInfo() {
-        return info;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setInfo(String info) {
-        this.info = info;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -168,18 +91,11 @@ public class User implements Serializable {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", name=").append(name);
-        sb.append(", gender=").append(gender);
         sb.append(", level=").append(level);
-        sb.append(", exp=").append(exp);
         sb.append(", status=").append(status);
-        sb.append(", role=").append(role);
-        sb.append(", fan=").append(fan);
-        sb.append(", follow=").append(follow);
-        sb.append(", like=").append(like);
-        sb.append(", ip=").append(ip);
-        sb.append(", phone=").append(phone);
         sb.append(", password=").append(password);
-        sb.append(", info=").append(info);
+        sb.append(", phone=").append(phone);
+        sb.append(", email=").append(email);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

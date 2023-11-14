@@ -1,5 +1,6 @@
 package szu.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,6 +11,10 @@ import lombok.Data;
  */
 @Data
 public class Role {
+    @ApiModelProperty("rid")
     private Integer id;
+    @ApiModelProperty("角色名称")
     private String name;
+    @ApiModelProperty("角色权限描述")
+    private String describe;
 }

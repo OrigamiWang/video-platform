@@ -1,6 +1,8 @@
 package szu.service;
 
 import szu.model.User;
+import szu.model.UserDetail;
+import szu.model.UserStatistics;
 
 import java.util.List;
 
@@ -12,4 +14,18 @@ import java.util.List;
  */
 public interface UserService {
     List<User> getUserList();
+
+    void insert(User user);
+
+    boolean deleteById(Integer id);
+
+    void updateUser(User user);
+
+    boolean addRoleById(Integer userId, Integer roleId);
+
+    boolean deleteRoleById(Integer userId, Integer roleId);
+
+    void updateUserStatistics(UserStatistics userStatistics);
+
+    void updateUserDetail(UserDetail userDetail);
 }

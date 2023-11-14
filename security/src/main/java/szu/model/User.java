@@ -1,17 +1,24 @@
 package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
 
 @Data
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable {
     @ApiModelProperty(value = "uid")
     private Integer id;
 
+
+    @ApiParam("张三")
     @ApiModelProperty(value = "昵称")
     private String name;
 

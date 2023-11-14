@@ -50,7 +50,7 @@ public class TestUserController {
     @DisplayName("查询用户接口测试")
     public void test2() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mg/user/list"))
-                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value("200"))
                 .andDo(print());
     }

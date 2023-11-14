@@ -1,7 +1,9 @@
 package szu.service.impl;
 
+import io.swagger.annotations.ApiParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import szu.dao.UserDao;
 import szu.model.User;
 import szu.model.UserDetail;

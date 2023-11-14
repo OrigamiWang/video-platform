@@ -4,3 +4,5 @@ CREATE TABLE `update_partition`
     `name` varchar(10) NOT NULL COMMENT '分区名',
     PRIMARY KEY (`id`)
 );
+
+insert INTO update_partition (name) VALUES ('non');

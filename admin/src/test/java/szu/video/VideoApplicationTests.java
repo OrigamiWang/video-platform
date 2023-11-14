@@ -34,7 +34,8 @@ class VideoApplicationTests {
         //提交文字和图片
         String imagePath = "C:\\Users\\郑榆达\\Desktop\\bg\\gg.jpg";
         File file = new File(imagePath);
-        MockMultipartFile f1 = new MockMultipartFile("images", file.getName(), "image/jpeg", new FileInputStream(file));
+        MockMultipartFile f1 = new MockMultipartFile("images", file.getName(),
+                "image/jpeg", new FileInputStream(file));
         String title = "测试标题";
         String content = "测试内容";
         int partition = 1;
@@ -51,32 +52,32 @@ class VideoApplicationTests {
     }
 
     @Test//deleteById & all
-    public void testDeleteById() throws Exception {
+    public void testDelete_p_all() throws Exception {
         MvcResult result = mockMvc.perform(get("/updates/all")
                         .param("id", "1"))
                 .andReturn();
-//        mockMvc.perform(get("/updates/byPartition")
-//                        .param("pid", "1"))
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//        mockMvc.perform(get("/updates/delete")
-//                        .param("id", "1"))
-//                .andExpect(status().isOk())
-//                .andDo(print());
+        mockMvc.perform(get("/updates/byPartition")
+                        .param("pid", "1"))
+                .andExpect(status().isOk())
+                .andDo(print());
+        mockMvc.perform(get("/updates/delete")
+                        .param("id", "1"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test//getImages & update
-    public void testGetImages() throws Exception {
-//        MvcResult result = mockMvc.perform(get("/updates/getImage")
-//                        .param("url", "1699838310613gg.jpg"))
-//                .andReturn();
-//        System.out.println(result.getResponse().getContentAsString());
-//
-//        String imagePath = "C:\\Users\\郑榆达\\Desktop\\bg\\gg.jpg";
+    public void testGetImages_update() throws Exception {
+        MvcResult result = mockMvc.perform(get("/updates/getImage")
+                        .param("url", "1699838310613gg.jpg"))
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+
         //提交文字和图片
         String imagePath = "C:\\Users\\郑榆达\\Desktop\\bg\\gg.jpg";
         File file = new File(imagePath);
-        MockMultipartFile f1 = new MockMultipartFile("images", file.getName(), "image/jpeg", new FileInputStream(file));
+        MockMultipartFile f1 = new MockMultipartFile("images", file.getName(),
+                "image/jpeg", new FileInputStream(file));
         String title = "测试标题";
         String content = "测试修改";
         int id = 2;

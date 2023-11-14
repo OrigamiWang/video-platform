@@ -87,9 +87,6 @@ public class UpdateServiceImpl implements UpdateService {
         //更新动态信息
         if (params.get("title") != null) updatesOriginal.setTitle((String) params.get("title"));
         if (params.get("content") != null) updatesOriginal.setContent((String) params.get("content"));
-        if (params.get("type") != null) {
-            updatesOriginal.setType((Integer) params.get("type"));
-        }
         if (params.get("pid") != null) {
             if (partitionDao.findById((Integer) params.get("pid")) == null) return false;
             updatesOriginal.setPid((Integer) params.get("pid"));

@@ -67,18 +67,18 @@ public class UserController {
 
 
     @PostMapping("/addrole/{userId}/{roleId}")
-    @ApiOperation("根据用户id、权限id增加权限")
+    @ApiOperation("根据用户id、角色id增加角色")
     public CommonResult<ResultCode> addRoleById(@PathVariable@ApiParam("用户id") Integer userId, @PathVariable@ApiParam("角色id") Integer roleId){
         boolean flag = userService.addRoleById(userId, roleId);
-        if(!flag) return CommonResult.failed("权限已拥有");
+        if(!flag) return CommonResult.failed("角色已拥有");
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
-    @PostMapping("/deleterole/{userId}/{roleId}")
+    @DeleteMapping("/deleterole/{userId}/{roleId}")
     @ApiOperation("根据用户id。权限id删除权限")
     public CommonResult<ResultCode> deleteRoleById(@PathVariable@ApiParam("用户id") Integer userId, @PathVariable@ApiParam("角色id") Integer roleId){
         boolean flag = userService.deleteRoleById(userId, roleId);
-        if(!flag) return CommonResult.failed("角色未拥有该权限");
+        if(!flag) return CommonResult.failed("角色不存在");
         return CommonResult.success(ResultCode.SUCCESS);
     }
 

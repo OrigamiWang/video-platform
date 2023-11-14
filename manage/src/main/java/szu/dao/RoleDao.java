@@ -1,7 +1,7 @@
 package szu.dao;
 
 import org.apache.ibatis.annotations.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import szu.model.Permission;
 import szu.model.Role;
 
 import java.util.List;
@@ -11,8 +11,7 @@ public interface RoleDao {
     @Select("select * from role where name = #{name}")
     Role selectRoleByName(String name);
 
-    @Insert("insert into role (name) values (#{roleName})")
-    void insertRole(String roleName);
+    int insertRole(Role role);
 
     @Delete("delete from role where name = #{roleName}")
     void deleteRole(String roleName);
@@ -26,4 +25,19 @@ public interface RoleDao {
 
     @Delete("delete from role_permission where rid = #{id}")
     void deleteRoleAuth(Integer id);
+
+    void addRolePermission(int rid, List<Integer> permission);
+
+    @Select("select * from permission where name = #{permission}")
+    Permission selectPmByName(String permission);
+
+    @Insert("insert into permission (name) values (#{permission})")
+    void insertPermission(String permission);
+
+    @Delete("delete from permission where name = #{permission}")
+    void deletePermission(String permission);
+
+    @ResultType(Permission.class)
+    @Select("select * from permission")
+    List<Permission> selectAllPermission();
 }

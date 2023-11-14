@@ -14,6 +14,6 @@ import lombok.ToString;
 public class UserRole {
     @ApiModelProperty("用户id")
     private Integer uid;
-    @ApiModelProperty("权限id")
+    @ApiModelProperty("角色id")
     private Integer rid;
 }

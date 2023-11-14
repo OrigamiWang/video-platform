@@ -2,28 +2,78 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.UserDao">
 
-    <resultMap id="UserMap" type="szu.model.User">
-        <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="gender" jdbcType="BIT" property="gender"/>
-        <result column="level" jdbcType="INTEGER" property="level"/>
-        <result column="exp" jdbcType="INTEGER" property="exp"/>
-        <result column="status" jdbcType="BIT" property="status"/>
-        <result column="role" jdbcType="BIT" property="role"/>
-        <result column="fan" jdbcType="INTEGER" property="fan"/>
-        <result column="follow" jdbcType="INTEGER" property="follow"/>
-        <result column="like" jdbcType="INTEGER" property="like"/>
-        <result column="ip" jdbcType="VARCHAR" property="ip"/>
-        <result column="phone" jdbcType="VARCHAR" property="phone"/>
-        <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="username" jdbcType="VARCHAR" property="username"/>
-        <result column="password" jdbcType="VARCHAR" property="password"/>
-        <result column="info" jdbcType="VARCHAR" property="info"/>
-    </resultMap>
-
     <!--    List<User> selectAllUser();-->
-    <select id="selectAllUser" resultMap="UserMap">
+    <select id="selectAllUser" resultType="user">
         SELECT *
         FROM user
     </select>
+
+<!--    void insert(User user);-->
+    <insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="id">
+        insert into user (`name`, `level`, `status`, `phone`, `password`, `email`)
+            values
+        (#{name}, #{level}, #{status}, #{phone}, #{password}, #{email});
+    </insert>
+
+
+<!--    void updateUserById(User user);-->
+    <update id="updateUserById" parameterType="user">
+        update user
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="level != null">
+                `level` = #{level},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="phone != null">
+                `phone` = #{phone},
+            </if>
+            <if test="password != null">
+                `password` = #{password},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!--    void updateUserStatistics(UserStatistics userStatistics);-->
+    <update id="updateUserStatistics" parameterType="userStatistics">
+        update user_statistics
+        <set>
+            <if test="fan != null">
+                `fan` = #{fan},
+            </if>
+            <if test="follow != null">
+                `follow` = #{follow},
+            </if>
+            <if test="like != null">
+                `like` = #{like},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
+
+<!--    void updateUserDetail(UserDetail userDetail);-->
+    <update id="updateUserDetail" parameterType="userDetail">
+        update user_detail
+        <set>
+            <if test="gender != null">
+                `gender` = #{gender},
+            </if>
+            <if test="exp != null">
+                `exp` = #{exp},
+            </if>
+            <if test="ip != null">
+                `ip` = #{ip},
+            </if>
+            <if test="info != null">
+                `info` = #{info},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
+
 </mapper>

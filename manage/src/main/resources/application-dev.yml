@@ -13,3 +13,29 @@ spring:
         login-username: druid
         login-password: druid
 
+  mail:
+    host: smtp.qq.com
+    username: 2241375541@qq.com
+    password: nufzskdyiofzecee
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    port: 587
+    from: 2241375541@qq.com
+
+logging:
+  level:
+    root: info
+    szu.admin: debug
+
+
+redis:
+  user_prefix: "login_user_"
+  login_pin: "login_pin_"
+  register_pin: "register_pin_"

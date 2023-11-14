@@ -2,6 +2,7 @@ package szu.common.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import szu.common.service.RedisService;
 
 import java.util.List;

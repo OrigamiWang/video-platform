@@ -1,3 +1,11 @@
+CREATE TABLE `role_permission`
+(
+    `id`  int NOT NULL AUTO_INCREMENT,
+    `rid` int NOT NULL COMMENT '角色id',
+    `pid` int NOT NULL COMMENT '权限id',
+    PRIMARY KEY (`id`)
+);
+
 INSERT INTO role_permission(`rid`, `pid`)
 VALUES (2, 1),
        (2, 2),

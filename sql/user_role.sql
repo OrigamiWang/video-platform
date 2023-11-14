@@ -5,3 +5,6 @@ CREATE TABLE `user_role`
     `rid` int NOT NULL COMMENT '角色id',
     PRIMARY KEY (`id`)
 );
+
+INSERT INTO user_role(`uid`, `rid`)
+VALUES (1, 2);

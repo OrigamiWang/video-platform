@@ -3,7 +3,6 @@ package szu.common.service.impl;
 import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import szu.common.service.MinioService;
 
 import java.io.BufferedInputStream;
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+
 public class MinioServiceImpl implements MinioService {
     @Autowired
     private MinioClient minioClient;
@@ -23,7 +23,9 @@ public class MinioServiceImpl implements MinioService {
     public boolean uploadFile(String bucketName, String objectName, InputStream stream) {
         try {
             checkBucket(bucketName);
-            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(stream, -1, 5 * 1024 * 1024) // 指定流式上传的InputStream和块大小
+            // 指定流式上传的InputStream和块大小
+            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName)
+                    .stream(stream, -1, 5 * 1024 * 1024)
                     .build());
             return true;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
@@ -39,11 +41,13 @@ public class MinioServiceImpl implements MinioService {
     public byte[] downloadFile(String bucketName, String objectName) {
         try {
             checkBucket(bucketName);
-            if (!doesObjectExist(bucketName, objectName)) return null;
+            if (!doesObjectExist(bucketName, objectName)) {
+                return null;
+            }
             // 读取MinIO对象数据并返回
             InputStream is = new BufferedInputStream(minioClient
                     .getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build()));
-            byte[] bytes = new byte[] {};
+            byte[] bytes = new byte[]{};
             byte[] buffer = new byte[1024];
             int len;
             while ((len = is.read(buffer)) != -1) {
@@ -65,7 +69,9 @@ public class MinioServiceImpl implements MinioService {
     public boolean deleteFile(String bucketName, String objectName) {
         try {
             checkBucket(bucketName);
-            if (!doesObjectExist(bucketName, objectName)) return true;
+            if (!doesObjectExist(bucketName, objectName)) {
+                return true;
+            }
 
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
             return true;
@@ -74,14 +80,19 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
-    public boolean doesObjectExist(String bucketName, String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public boolean doesObjectExist(String bucketName, String objectName) throws ServerException,
+            InsufficientDataException,
+            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException {
         return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build()) != null;
     }
 
     /***
      * 检查存储桶是否存在，不存在则创建
      */
-    public void checkBucket(String bucketName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void checkBucket(String bucketName) throws ServerException, InsufficientDataException, ErrorResponseException,
+            IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException,
+            InternalException {
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         }

@@ -15,8 +15,8 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * @description CommentController
  * @author UserXin
+ * @description CommentController
  * @date 2023-11-01
  */
 
@@ -31,6 +31,7 @@ public class CommentController {
 
     /**
      * 添加评论
+     *
      * @param comment 要添加的评论
      * @return
      */
@@ -44,9 +45,10 @@ public class CommentController {
 
     /**
      * 根据foreignId分页获取指定区域的评论，根据点赞数排序
+     *
      * @param foreignId 要获取评论的动态id
-     * @param page 当前页
-     * @param size 每页大小
+     * @param page      当前页
+     * @param size      每页大小
      * @return
      */
     @GetMapping("/listRootComment/{foreignId}/{page}/{size}")
@@ -61,7 +63,8 @@ public class CommentController {
 
     /**
      * 分页获取对应根评论下的子评论
-     * @param pid 要获取子评论根评论id
+     *
+     * @param pid  要获取子评论根评论id
      * @param page 当前页
      * @param size 每页大小
      * @return
@@ -70,16 +73,17 @@ public class CommentController {
     @ApiOperation("分页获取对应根评论下的子评论")
     public CommonResult<List<Comment>> listChildrenCommentByPages(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid,
                                                          @PathVariable("page") @ApiParam("当前页") int page,
-                                                         @PathVariable("size") @ApiParam("每页大小") int size){
-        log.info("pid：{}，page：{}，size：{}",pid,page,size);
-        List<Comment> childrenCommentByPages = commentService.listChildrenCommentByPages(pid,page,size);
+                                                         @PathVariable("size") @ApiParam("每页大小") int size) {
+        log.info("pid：{}，page：{}，size：{}", pid, page, size);
+        List<Comment> childrenCommentByPages = commentService.listChildrenCommentByPages(pid, page, size);
         return CommonResult.success(childrenCommentByPages);
     }
 
     /**
      * 回复评论
+     *
      * @param comment 回复的评论
-     * @param pid 回复的根评论的id
+     * @param pid     回复的根评论的id
      * @return
      */
 
@@ -94,8 +98,9 @@ public class CommentController {
 
     /**
      * 点赞根评论
+     *
      * @param flag 1：点赞  -1：取消点赞
-     * @param pid 点赞的根评论的id
+     * @param pid  点赞的根评论的id
      * @return
      */
     @PostMapping("/likeRoot/{flag}/{pid}")
@@ -109,9 +114,10 @@ public class CommentController {
 
     /**
      * 点赞子评论
+     *
      * @param flag 1：点赞  -1：取消点赞
-     * @param pid 点赞的对应的根评论id
-     * @param cid 点赞的子评论id
+     * @param pid  点赞的对应的根评论id
+     * @param cid  点赞的子评论id
      * @return
      */
     @PostMapping("/likeChildren/{flag}/{pid}/{cid}")
@@ -127,6 +133,7 @@ public class CommentController {
 
     /**
      * 删除根评论
+     *
      * @param pid 要删除的根评论的id
      * @return
      */
@@ -140,6 +147,7 @@ public class CommentController {
 
     /**
      * 删除子评论
+     *
      * @param pid 要删除的子评论的根评论的id
      * @param cid 要删除的子评论的id
      * @return
@@ -152,5 +160,13 @@ public class CommentController {
         commentService.deleteChildComment(pid,cid);
         return CommonResult.success(ResultCode.SUCCESS);
     }
+
+/**
+ * 根据foreignId和foreignType获取指定区域的评论
+ *
+ * @param foreignId   评论的对象id
+ * @param foreignType 评论的对象类型(1:动态评论 2:视频评论)
+ * @return
+ */
 
 }

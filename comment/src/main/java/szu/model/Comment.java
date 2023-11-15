@@ -1,18 +1,19 @@
 package szu.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
+
  * @ClassName: Comment
  * @Description: 评论实体类
  * @Version 1.0
@@ -48,3 +49,4 @@ public class Comment implements Serializable {
     @ApiModelProperty("子评论")
     private List<Comment> children;  //子评论
 }
+

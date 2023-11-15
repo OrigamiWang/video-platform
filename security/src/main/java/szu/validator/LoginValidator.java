@@ -12,7 +12,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LoginValidator {
-
     boolean validated() default true;
-
 }

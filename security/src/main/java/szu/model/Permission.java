@@ -1,5 +1,6 @@
 package szu.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,6 +11,8 @@ import lombok.Data;
  */
 @Data
 public class Permission {
+    @ApiModelProperty("权限id")
     private Integer id;
+    @ApiModelProperty("权限名称")
     private String name;
 }

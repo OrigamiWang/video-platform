@@ -8,7 +8,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import szu.common.api.CommonResult;
 import szu.common.model.GlobalPermissionMap;
-import szu.validator.LoginValidator;
 import szu.validator.PermissionValidator;
 
 import java.lang.reflect.Method;

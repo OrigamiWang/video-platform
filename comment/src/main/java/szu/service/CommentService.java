@@ -1,5 +1,6 @@
 package szu.service;
 
+
 import szu.model.Comment;
 
 
@@ -16,6 +17,7 @@ public interface CommentService {
      * 添加评论
      * @param comment
      */
+
 //    void addComment(Comment01 comment);
     void addComment(Comment comment);
 
@@ -84,4 +86,5 @@ public interface CommentService {
      * @return
      */
     void deleteChildComment(String pid, String cid);
+
 }

@@ -1,5 +1,6 @@
 package szu.service.Impl;
 
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
@@ -13,13 +14,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import szu.dao.CommentRepository;
+
 import szu.model.Comment;
 import szu.service.CommentService;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.Comparator;
+
 import java.util.List;
 
 /**
@@ -37,12 +41,14 @@ public class CommentServiceImpl implements CommentService {
     @Resource
     private MongoTemplate mongoTemplate;
 
+
     /**
      * 添加评论
      * @param comment
      */
     @Override
     public void addComment(Comment comment) {
+
         if(comment==null) throw new NullPointerException();//安全性检查
         //设置创建时间
         comment.setCreateTime(LocalDateTime.now());

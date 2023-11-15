@@ -17,3 +17,9 @@ logging:
   level:
     root: info
     szu.admin: debug
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket-name: video-platform.updates

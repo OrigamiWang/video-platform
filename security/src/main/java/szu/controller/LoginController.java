@@ -27,12 +27,12 @@ public class LoginController {
 
 
     // validated = false: 不用校验
-    @PostMapping("register")
+    @PostMapping("/register")
     public CommonResult<String> register(@RequestBody RegisterDto registerDto) {
         return loginService.register(registerDto);
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public CommonResult<String> login(@RequestBody LoginDto loginDto) {
         String uuid = loginService.login(loginDto);
         if (uuid.length() == 0) {
@@ -41,21 +41,21 @@ public class LoginController {
         return CommonResult.success(uuid);
     }
 
-    @PostMapping("pin")
+    @PostMapping("/pin")
     public CommonResult<String> getPin(@RequestBody AuthDto authDto) {
         return loginService.getPin(authDto);
     }
 
-    @GetMapping("p1")
+    @GetMapping("/p1")
     @PermissionValidator(pid = 1)
-    @LoginValidator(validated = false)
+    @LoginValidator
     public CommonResult<String> p1() {
         return CommonResult.success("when the pid is 1");
     }
 
-    @GetMapping("p6")
+    @GetMapping("/p6")
     @PermissionValidator(pid = 6)
-    @LoginValidator(validated = false)
+    @LoginValidator
     public CommonResult<String> p6() {
         return CommonResult.success("when the pid is 6");
     }

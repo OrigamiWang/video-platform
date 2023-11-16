@@ -15,7 +15,6 @@ import javax.validation.constraints.Null;
 public class RegisterDto {
 
     private String name;
-    private String username;
     private String email;
     private String phone;
     private String pswd;

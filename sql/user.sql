@@ -10,8 +10,8 @@ CREATE TABLE `user`
     `email`    VARCHAR(30) NULL COMMENT '邮箱'
 );
 
-INSERT INTO `user`(`name`, `email`, `password`)
-VALUES ('御坂', '2369681583@qq.com', 'abc123');
+INSERT INTO `user`(`name`, `phone`, `password`)
+VALUES ('御坂', '13880970270', 'abc123');
 
 SELECT *
 FROM `user`

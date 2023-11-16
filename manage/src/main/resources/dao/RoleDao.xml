@@ -3,12 +3,13 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.RoleDao">
-<!--    void insertRole(Role role);-->
+    <!--    void insertRole(Role role);-->
     <insert id="insertRole" parameterType="role" useGeneratedKeys="true" keyProperty="id">
-        insert into role (`name`, `describe`) values (#{name}, #{describe})
+        insert into role (`name`, `describe`)
+        values (#{name}, #{describe})
     </insert>
 
-<!--        void addRolePermission(int rid, List<Integer> permission);-->
+    <!--        void addRolePermission(int rid, List<Integer> permission);-->
     <insert id="addRolePermission">
         insert into role_permission (rid, pid) values
         <foreach collection="permission" item="per" separator=",">

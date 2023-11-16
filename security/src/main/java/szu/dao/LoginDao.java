@@ -12,7 +12,6 @@ import szu.model.User;
  */
 public interface LoginDao {
 
-    void register(@Param("name") String name, @Param("username") String username, @Param("pswd") String encryptedPswd);
 
     User getUser(@Param("phone") String phone);
 

@@ -56,18 +56,6 @@ public class LoginServiceImpl implements LoginService {
         int type = registerDto.getType();
         switch (type) {
             case 0: {
-                String username = registerDto.getUsername();
-                if (username == null || "".equals(username)) {
-                    return CommonResult.failed("账号不能为空！");
-                }
-                String pswd = registerDto.getPswd();
-                if (pswd == null || "".equals(pswd)) {
-                    return CommonResult.failed("密码不能为空！");
-                }
-                // encrypt the pswd
-                String encryptedPswd = ShaUtil.encode(pswd);
-                System.out.println("encryptedPswd = " + encryptedPswd);
-                loginDao.register(registerDto.getName(), registerDto.getUsername(), encryptedPswd);
                 break;
             }
             case 1: {
@@ -117,6 +105,7 @@ public class LoginServiceImpl implements LoginService {
         String phone = loginDto.getPhone();
         String pswd = loginDto.getPswd();
         String encryptedPswd = ShaUtil.encode(pswd);
+        System.out.println("encryptedPswd = " + encryptedPswd);
         User user = loginDao.getUser(phone);
         if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
             return "";

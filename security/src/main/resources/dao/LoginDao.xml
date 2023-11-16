@@ -12,12 +12,6 @@
     </resultMap>
 
 
-    <!--    void register(String encryptedUsername, String encryptedPswd);-->
-    <insert id="register">
-        INSERT INTO `user`(`name`, `username`, `password`)
-        VALUES (#{name}, #{username}, #{pswd})
-    </insert>
-
     <!--    void registerByPhone(@Param("name")String, @Param("phone") String phone);-->
     <insert id="registerByPhone">
         INSERT INTO `user`(`name`, `phone`)

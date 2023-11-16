@@ -19,4 +19,6 @@ public interface LoginService {
     boolean checkPin(String phone, String pin);
 
     CommonResult<String> getPin(AuthDto authDto);
+
+    boolean logout(String token);
 }

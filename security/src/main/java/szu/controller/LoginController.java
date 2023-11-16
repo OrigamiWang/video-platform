@@ -46,6 +46,14 @@ public class LoginController {
         return loginService.getPin(authDto);
     }
 
+    @GetMapping("/logout")
+    @LoginValidator
+    public CommonResult<String> logout(@RequestHeader String token) {
+        System.out.println("token = " + token);
+        loginService.logout(token);
+        return CommonResult.success("登出");
+    }
+
     @GetMapping("/p1")
     @PermissionValidator(pid = 1)
     @LoginValidator

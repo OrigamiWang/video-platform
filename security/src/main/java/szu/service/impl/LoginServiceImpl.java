@@ -161,5 +161,14 @@ public class LoginServiceImpl implements LoginService {
         return CommonResult.success("发送验证码成功！");
     }
 
+    @Override
+    public boolean logout(String token) {
+        if (redisTemplate.opsForValue().get(REDIS_USER_PREFIX + token) != null) {
+            redisTemplate.delete(REDIS_USER_PREFIX + token);
+            return true;
+        }
+        return false;
+    }
+
 
 }

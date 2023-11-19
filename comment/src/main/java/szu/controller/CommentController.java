@@ -3,7 +3,6 @@ package szu.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
@@ -22,7 +21,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/comment")
-@Api(tags = "评论模块")
+@Api(tags = "CommentController")
 @Slf4j
 public class CommentController {
 

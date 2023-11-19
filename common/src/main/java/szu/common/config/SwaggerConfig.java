@@ -46,7 +46,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public Docket commonDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("video-platform后台系统")
+                .groupName("video-platform")
                 .apiInfo(apiInfo("测video-platform后台相关接口文档"))
                 .pathMapping("/")
                 .select()

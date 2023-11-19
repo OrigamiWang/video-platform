@@ -1,18 +1,26 @@
 package szu.common.exception;
 
-
-import szu.common.api.IErrorCode;
-
 /**
  * 断言处理类，用于抛出各种API异常
- * Created by macro on 2020/2/27.
+ * @author HJH201314
  */
-public class Asserts {
-    public static void fail(String message) {
-        throw new ApiException(message);
+public abstract class Asserts {
+
+    public static void isNull(Object o, String message) {
+        if (o != null) {
+            throw new ApiException(message);
+        }
     }
 
-    public static void fail(IErrorCode errorCode) {
-        throw new ApiException(errorCode);
+    public static void notNull(Object o, String message) {
+        if (o == null) {
+            throw new ApiException(message);
+        }
+    }
+
+    public static void isTrue(boolean expression, String message) {
+        if (!expression) {
+            throw new ApiException(message);
+        }
     }
 }

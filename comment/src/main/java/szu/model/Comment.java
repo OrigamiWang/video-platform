@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,8 @@ import java.util.List;
 @NoArgsConstructor
 @Document(collection="comment")//可以省略，如果省略，则默认使用类名小写映射集合
 public class Comment implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 19826192849347L;
     @ApiModelProperty("id，主键")
     @Id
     private String id;    //id，主键对应着mongodb的主键_id

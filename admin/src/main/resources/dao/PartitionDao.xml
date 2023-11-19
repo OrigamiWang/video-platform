@@ -27,7 +27,6 @@
 
   <select id="findAll" resultMap="BaseResultMap">
     select * from update_partition
-    order by id desc
   </select>
 
   <select id="findById" resultMap="BaseResultMap">

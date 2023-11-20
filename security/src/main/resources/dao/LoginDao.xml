@@ -14,8 +14,8 @@
 
     <!--    void registerByPhone(@Param("name")String, @Param("phone") String phone);-->
     <insert id="registerByPhone">
-        INSERT INTO `user`(`name`, `phone`)
-        VALUES (#{name}, #{phone})
+        INSERT INTO `user`(`name`, `phone`, `password`)
+        VALUES (#{name}, #{phone}, #{pswd})
     </insert>
 
     <!--    void registerByEmail(@Param("name") String name, @Param("email") String email);-->

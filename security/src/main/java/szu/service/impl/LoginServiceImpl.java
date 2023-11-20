@@ -59,25 +59,21 @@ public class LoginServiceImpl implements LoginService {
                 break;
             }
             case 1: {
-                System.out.println("手机验证码注冊");
+                System.out.println("手机号+密码注冊");
                 String phone = registerDto.getPhone();
                 if (phone == null || "".equals(phone)) {
                     return CommonResult.failed("手机号不能为空！");
                 }
-                String pin = registerDto.getPin();
-                if (pin == null || "".equals(pin)) {
-                    return CommonResult.failed("验证码不能为空！");
-                }
-                // 校验验证码的正确性
-                if (!checkPin(phone, pin)) {
-                    return CommonResult.failed("验证码错误！");
+                String pswd = registerDto.getPswd();
+                if (pswd == null || "".equals(pswd)) {
+                    return CommonResult.failed("密码不能为空！");
                 }
                 // 创建用户
-                loginDao.registerByPhone(name, phone);
+                loginDao.registerByPhone(name, phone, pswd);
                 break;
             }
             case 2: {
-                System.out.println("邮箱注册");
+                System.out.println("邮箱+验证码注册");
                 String email = registerDto.getEmail();
                 if (email == null || "".equals(email)) {
                     return CommonResult.failed("邮箱不能为空！");

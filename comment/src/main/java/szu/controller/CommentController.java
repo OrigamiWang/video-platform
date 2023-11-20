@@ -43,6 +43,12 @@ public class CommentController {
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
+    @GetMapping("/count/{foreignId}")
+    @ApiOperation("根据foreignId获取评论总数")
+    public CommonResult<Long> countCommentsByForeignId(@PathVariable Integer foreignId) {
+        return CommonResult.success(commentService.countCommentsByForeignId(foreignId));
+    }
+
     /**
      * 根据foreignId分页获取指定区域的评论，根据点赞数排序
      *

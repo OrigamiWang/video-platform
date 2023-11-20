@@ -44,8 +44,8 @@ public class LoginServiceImpl implements LoginService {
     private MailService mailService;
     @Value("${redis.user_prefix}")
     private String REDIS_USER_PREFIX;
-    @Value("${redis.register_pin}")
-    private String REDIS_REGISTER_PIN;
+    @Value("${redis.auth_pin}")
+    private String REDIS_AUTH_PIN;
 
     @Override
     public CommonResult<String> register(RegisterDto registerDto) {
@@ -90,6 +90,10 @@ public class LoginServiceImpl implements LoginService {
                 if (!checkPin(email, pin)) {
                     return CommonResult.failed("验证码错误！");
                 }
+                User user = loginDao.getUserByEmail(email);
+                if (user != null) {
+                    return CommonResult.failed("该邮箱已经被注册！");
+                }
                 // 创建用户
                 loginDao.registerByEmail(name, email);
                 break;
@@ -103,14 +107,41 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(LoginDto loginDto) {
-        String phone = loginDto.getPhone();
-        String pswd = loginDto.getPswd();
-        String encryptedPswd = ShaUtil.encode(pswd);
-        System.out.println("encryptedPswd = " + encryptedPswd);
-        User user = loginDao.getUser(phone);
-        if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
-            return "";
+        int type = loginDto.getType();
+        User user;
+        switch (type) {
+            case 0: {
+                String phone = loginDto.getPhone();
+                String pswd = loginDto.getPswd();
+                String encryptedPswd = ShaUtil.encode(pswd);
+                System.out.println("encryptedPswd = " + encryptedPswd);
+                user = loginDao.getUser(phone);
+                if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
+                    return "";
+                }
+                break;
+            }
+            case 1: {
+                String email = loginDto.getEmail();
+                String pin = loginDto.getPin();
+                if (pin == null || "".equals(pin)) {
+                    return "";
+                }
+                if (!checkPin(email, pin)) {
+                    return "";
+                }
+                // 查看该邮箱是否注册
+                user = loginDao.getUserByEmail(email);
+                if (user == null) {
+                    return "";
+                }
+                break;
+            }
+            default: {
+                return "";
+            }
         }
+
         // set permission
         Map<Integer, Integer> map = GlobalPermissionMap.getInstance();
         int uid = user.getId();
@@ -137,7 +168,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public boolean checkPin(String suffix, String pin) {
-        String p = (String) redisTemplate.opsForValue().get(REDIS_REGISTER_PIN + suffix);
+        String p = (String) redisTemplate.opsForValue().get(REDIS_AUTH_PIN + suffix);
         return Objects.equals(p, pin);
     }
 
@@ -150,9 +181,9 @@ public class LoginServiceImpl implements LoginService {
         int type = authDto.getType();
         String pin = PinUtil.generatePin();
         System.out.println("pin = " + pin);
-        redisTemplate.opsForValue().set(REDIS_REGISTER_PIN + auth, pin);
+        redisTemplate.opsForValue().set(REDIS_AUTH_PIN + auth, pin);
         // 验证码2min内有效
-        redisTemplate.expire(REDIS_REGISTER_PIN + auth, 2, TimeUnit.MINUTES);
+        redisTemplate.expire(REDIS_AUTH_PIN + auth, 2, TimeUnit.MINUTES);
         switch (type) {
             case 0: {
                 // 邮箱
@@ -161,7 +192,6 @@ public class LoginServiceImpl implements LoginService {
             }
             case 1: {
                 // 手机号
-
                 break;
             }
             default:

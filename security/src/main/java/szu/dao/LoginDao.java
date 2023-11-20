@@ -19,5 +19,5 @@ public interface LoginDao {
 
     void registerByEmail(@Param("name") String name, @Param("email") String email);
 
-
+    User getUserByEmail(@Param("email") String email);
 }

@@ -68,6 +68,11 @@ public class LoginServiceImpl implements LoginService {
                 if (pswd == null || "".equals(pswd)) {
                     return CommonResult.failed("密码不能为空！");
                 }
+                // 判断手机号是否已经被注册
+                User user = loginDao.getUser(phone);
+                if (user != null) {
+                    return CommonResult.failed("该手机号已经被注册！");
+                }
                 // 创建用户
                 loginDao.registerByPhone(name, phone, pswd);
                 break;
@@ -175,5 +180,5 @@ public class LoginServiceImpl implements LoginService {
         return false;
     }
 
-
 }
+

@@ -29,4 +29,5 @@ public interface LoginService {
     CommonResult<String> getPin(AuthDto authDto);
 
     boolean logout(String token);
+
 }

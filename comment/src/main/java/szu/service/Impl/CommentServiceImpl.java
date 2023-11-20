@@ -1,18 +1,23 @@
 package szu.service.Impl;
 
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import szu.common.exception.Asserts;
 import szu.dao.CommentRepository;
 
 import szu.model.Comment;
@@ -20,9 +25,6 @@ import szu.service.CommentService;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ import java.util.List;
  */
 
 @Service
+@Slf4j
 public class CommentServiceImpl implements CommentService {
 
     @Resource
@@ -41,6 +44,17 @@ public class CommentServiceImpl implements CommentService {
     @Resource
     private MongoTemplate mongoTemplate;
 
+    private Comment initComment(Comment comment){
+        if (comment == null) throw new NullPointerException(); //安全性检查
+        if (comment.getTargetUsername() == null) comment.setTargetUsername("");
+        if (comment.getUsername() == null) comment.setUsername("");
+        comment.setReplyNum(0);
+        comment.setLikeNum(0);
+        //设置创建时间
+        comment.setCreateTime(LocalDateTime.now());
+        return comment;
+    }
+
 
     /**
      * 添加评论
@@ -48,11 +62,16 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void addComment(Comment comment) {
-
-        if(comment==null) throw new NullPointerException();//安全性检查
-        //设置创建时间
-        comment.setCreateTime(LocalDateTime.now());
+        comment = initComment(comment);
         commentRepository.save(comment);
+    }
+
+    @Override
+    public Long countCommentsByForeignId(Integer foreignId) {
+        Comment exampleComment = new Comment();
+        exampleComment.setForeignId(foreignId); // 设置查询条件
+        Example<Comment> example = Example.of(exampleComment);
+        return commentRepository.count(example);
     }
 
     /**
@@ -63,16 +82,41 @@ public class CommentServiceImpl implements CommentService {
      * @return
      */
     @Override
-    public List<Comment> getCommentsByForeignIdAndPages(Integer foreignId,int page,int size) {
+    public List<Comment> getCommentsByForeignIdAndPages(Integer foreignId, int page, int size, String sortBy) {
         if(foreignId<0||page<0||size<0) throw new IllegalArgumentException(); //安全性检查
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         //根据点赞数量降序分页查询
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("likeNum")));
+        Asserts.isTrue(sortBy.equals("likeNum") || sortBy.equals("createTime"), "sortBy参数错误");
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
         query.with(pageRequest);
         //限制第一次只查出三条子评论，后续的通过分页获取
         query.fields().slice("children", 3);
         List<Comment> Comments = mongoTemplate.find(query, Comment.class);
         return Comments;
+    }
+
+    @Override
+    public Long countChildCommentsByPid(String pid) {
+        // 构建聚合操作，匹配指定的评论（根据评论的id）
+        AggregationOperation match = Aggregation.match(Criteria.where("_id").is(pid));
+
+        // 拆分子评论数组，并计算数组大小
+        AggregationOperation project = Aggregation.project()
+                .and(ArrayOperators.Size.lengthOfArray("$children")).as("childCommentsCount");
+
+        // 执行聚合操作
+        Aggregation aggregation = Aggregation.newAggregation(match, project);
+        AggregationResults<CommentChildCount> result = mongoTemplate.aggregate(aggregation, "comment", CommentChildCount.class);
+
+        // 获取结果
+        CommentChildCount commentChildCount = result.getUniqueMappedResult();
+        return commentChildCount != null ? commentChildCount.getChildCommentsCount() : 0;
+    }
+
+    // 内部类用于映射聚合结果
+    @Data
+    private static class CommentChildCount {
+        private Long childCommentsCount;
     }
 
     /**
@@ -114,9 +158,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void replyComment(Comment comment,String pid) {
         if(comment==null||pid==null) throw new NullPointerException(); //安全性检查
+        comment = initComment(comment);
         Query query = Query.query(Criteria.where("_id").is(pid)); //找到被评论的评论
-        //追加一条评论
-        comment.setCreateTime(LocalDateTime.now());
         // 为子评论生成唯一的id
         comment.setId(ObjectId.get().toString());
         Update update=new Update();

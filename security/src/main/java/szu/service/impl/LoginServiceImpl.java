@@ -126,6 +126,15 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    public User getCurrentUser(String token) {
+        User user = (User) redisTemplate.opsForValue().get(REDIS_USER_PREFIX + token);
+        if (user != null) {
+            user.setPassword(null);
+        }
+        return user;
+    }
+
+    @Override
     public boolean checkPin(String suffix, String pin) {
         String p = (String) redisTemplate.opsForValue().get(REDIS_REGISTER_PIN + suffix);
         return Objects.equals(p, pin);

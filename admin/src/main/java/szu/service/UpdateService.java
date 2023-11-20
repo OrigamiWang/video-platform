@@ -1,5 +1,7 @@
 package szu.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import szu.model.Partition;
 import szu.model.Update;
@@ -23,8 +25,10 @@ public interface UpdateService {
 
     /***
      * 获取所有动态
+     * @param pageNum 页码
+     * @param pageSize 每页大小
      */
-    List<Update> findAll();
+    List<Update> findAll(int pageNum, int pageSize);
 
     /***
      * 获取指定分区的动态
@@ -44,7 +48,7 @@ public interface UpdateService {
     /***
      * 获取图片
      */
-    byte[] getImage(String url);
+    ResponseEntity<Resource> getImage(String url);
 
     /***
      * 获取指定动态

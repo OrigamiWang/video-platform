@@ -53,8 +53,9 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <select id="findAll" resultMap="BaseResultMap">
-      select *
-      from `update`
+    select *
+    from `update`
+    order by id desc
   </select>
   <select id="findByType" resultMap="BaseResultMap">
     select

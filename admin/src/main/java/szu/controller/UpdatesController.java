@@ -1,11 +1,11 @@
 package szu.controller;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.api.CommonResult;
@@ -21,7 +21,7 @@ import java.util.List;
  * @Date: 2023/10/31 00:29
  */
 @RestController
-@Api(tags = "UpdatesController")
+@Api(tags = "UpdatesController,进行动态的增删改查")
 @Tag(name = "UpdatesController", description = "动态管理")
 @RequestMapping("/updates")
 public class UpdatesController {
@@ -57,8 +57,8 @@ public class UpdatesController {
     @GetMapping("/all")
     @ApiOperation("获取所有动态")
     @ApiResponse(code = 200, message = "Update的List的JSON字符串")
-    public CommonResult<List<Update>> allUpdates(@RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
-        return CommonResult.success(updatesService.findAll(pageNum, pageSize));
+    public CommonResult<List<Update>> allUpdates() {
+        return CommonResult.success(updatesService.findAll());
     }
 
     @GetMapping("/byPartition")
@@ -80,9 +80,14 @@ public class UpdatesController {
      */
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片")
-    @ApiResponse(code = 200,message = "查看图片")
-    public ResponseEntity<org.springframework.core.io.Resource> getImages(@RequestParam("url") String url) {
-        return updatesService.getImage(url);
+    @ApiResponse(code = 200,message = "所求图片的byte[]")
+    public CommonResult<byte[]> getImages(@RequestParam("url") String url) {
+        byte[] imageData = updatesService.getImage(url);
+        if (imageData != null && imageData.length > 0) {
+            return CommonResult.success(imageData);
+        } else {
+            return CommonResult.failed();
+        }
     }
 
     /***

@@ -14,8 +14,8 @@
 
     <!--    void registerByPhone(@Param("name")String, @Param("phone") String phone);-->
     <insert id="registerByPhone">
-        INSERT INTO `user`(`name`, `phone`, `password`)
-        VALUES (#{name}, #{phone}, #{pswd})
+        INSERT INTO `user`(`name`, `phone`)
+        VALUES (#{name}, #{phone})
     </insert>
 
     <!--    void registerByEmail(@Param("name") String name, @Param("email") String email);-->
@@ -30,13 +30,6 @@
         SELECT *
         FROM `user`
         WHERE phone = #{phone};
-    </select>
-
-<!--    User getUserByEmail(@Param("email") String email);-->
-    <select id="getUserByEmail" resultMap="UserMap">
-        SELECT *
-        FROM `user`
-        WHERE email = #{email};
     </select>
 
 

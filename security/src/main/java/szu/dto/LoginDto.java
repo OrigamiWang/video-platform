@@ -11,10 +11,6 @@ import lombok.Data;
 @Data
 public class LoginDto {
     private String phone;
-    private String email;
+
     private String pswd;
-    private String pin;
-    // 0: 手机号+密码
-    // 1: 邮箱+验证码
-    private int type;
 }

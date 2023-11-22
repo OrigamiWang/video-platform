@@ -1,9 +1,10 @@
 package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
-
+@Data
 public class User implements Serializable {
     @ApiModelProperty(value = "uid")
     private Integer id;
@@ -12,7 +13,7 @@ public class User implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "性别")
-    private byte[] gender;
+    private byte gender;
 
     @ApiModelProperty(value = "等级")
     private Integer level;

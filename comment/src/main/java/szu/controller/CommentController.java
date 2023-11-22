@@ -3,10 +3,10 @@ package szu.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
-import szu.common.api.ListResult;
 import szu.common.api.ResultCode;
 import szu.model.Comment;
 import szu.service.CommentService;
@@ -22,7 +22,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/comment")
-@Api(tags = "CommentController")
+@Api(tags = "评论模块")
 @Slf4j
 public class CommentController {
 
@@ -31,7 +31,6 @@ public class CommentController {
 
     /**
      * 添加评论
-     *
      * @param comment 要添加的评论
      * @return
      */
@@ -41,12 +40,6 @@ public class CommentController {
         log.info("添加评论：{}",comment);
         commentService.addComment(comment);
         return CommonResult.success(ResultCode.SUCCESS);
-    }
-
-    @GetMapping("/count/{foreignId}")
-    @ApiOperation("根据foreignId获取评论总数")
-    public CommonResult<Long> countCommentsByForeignId(@PathVariable Integer foreignId) {
-        return CommonResult.success(commentService.countCommentsByForeignId(foreignId));
     }
 
     /**
@@ -59,14 +52,12 @@ public class CommentController {
      */
     @GetMapping("/listRootComment/{foreignId}/{page}/{size}")
     @ApiOperation("分页获取评论")
-    public CommonResult<ListResult<Comment>> listCommentByPages(@PathVariable("foreignId") @ApiParam("要获取评论的动态id") Integer foreignId,
+    public CommonResult<List<Comment>> listCommentByPages(@PathVariable("foreignId") @ApiParam("要获取评论的动态id") Integer foreignId,
                                           @PathVariable("page") @ApiParam("当前页") int page,
-                                          @PathVariable("size") @ApiParam("每页大小") int size,
-                                          @RequestParam @ApiParam("排序字段") String sortBy){
+                                          @PathVariable("size") @ApiParam("每页大小") int size){
         log.info("要获取的评论区域，{},page:{},size:{}",foreignId,page,size);
-        Long total = commentService.countCommentsByForeignId(foreignId);
-        List<Comment> commentsByForeignIdAndPages = commentService.getCommentsByForeignIdAndPages(foreignId, page, size, sortBy);
-        return CommonResult.success(new ListResult<>(commentsByForeignIdAndPages, total));
+        List<Comment> commentsByForeignIdAndPages = commentService.getCommentsByForeignIdAndPages(foreignId,page,size);
+        return CommonResult.success(commentsByForeignIdAndPages);
     }
 
     /**
@@ -79,13 +70,12 @@ public class CommentController {
      */
     @GetMapping("/listChildrenComment/{pid}/{page}/{size}")
     @ApiOperation("分页获取对应根评论下的子评论")
-    public CommonResult<ListResult<Comment>> listChildrenCommentByPages(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid,
+    public CommonResult<List<Comment>> listChildrenCommentByPages(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid,
                                                          @PathVariable("page") @ApiParam("当前页") int page,
                                                          @PathVariable("size") @ApiParam("每页大小") int size) {
         log.info("pid：{}，page：{}，size：{}", pid, page, size);
-        Long total = commentService.countChildCommentsByPid(pid);
         List<Comment> childrenCommentByPages = commentService.listChildrenCommentByPages(pid, page, size);
-        return CommonResult.success(new ListResult<>(childrenCommentByPages, total));
+        return CommonResult.success(childrenCommentByPages);
     }
 
     /**

@@ -1,4 +1,4 @@
-package szu.model;
+package szu.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,6 +7,9 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * 用户信息vo
+ */
 @Data
 @ApiModel(description = "用户外显信息")
 public class UserInfo implements Serializable {
@@ -17,7 +20,7 @@ public class UserInfo implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "性别")
-    private byte[] gender;
+    private byte gender;
 
     @ApiModelProperty(value = "等级")
     private Integer level;

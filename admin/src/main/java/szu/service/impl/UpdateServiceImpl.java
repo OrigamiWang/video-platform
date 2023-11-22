@@ -1,11 +1,8 @@
 package szu.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.service.MinioService;
@@ -130,8 +127,7 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public List<Update> findAll(int pageNum, int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+    public List<Update> findAll() {
         return updatesDao.findAll();
     }
 
@@ -151,9 +147,9 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public ResponseEntity<Resource> getImage(String url) {
+    public byte[] getImage(String url) {
         //从minio中获取图片
-        return minioService.viewImage(bucketName, url);
+        return minioService.downloadFile(bucketName, url);
     }
 
     @Override

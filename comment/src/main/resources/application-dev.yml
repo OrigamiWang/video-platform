@@ -25,6 +25,22 @@ spring:
       database: videoPlatform
       port: 27017
 
+  mail:
+    host: smtp.qq.com
+    username: 2241375541@qq.com
+    password: nufzskdyiofzecee
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    port: 587
+    from: 2241375541@qq.com
+
 logging:
   level:
     root: info
@@ -35,3 +51,5 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket-name: video-platform.updates
+
+

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.result.StatusResultMatchers;
 import szu.CommentApplication;
 import szu.model.Comment;
+import szu.service.LikeService;
 
 @SpringBootTest(classes = CommentApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -135,6 +136,17 @@ public class CommentApplicationTests {
         ResultMatcher result = content.json("{\"data\":[{\"id\":\"6550cc92743f7d2629801653\",\"userId\":1,\"username\":\"XiaoMing\",\"content\":\"test01\",\"foreignId\":1,\"targetUsername\":null,\"createTime\":\"2023-11-12 21:01:06\",\"likeNum\":0,\"replyNum\":0,\"children\":null}]}");
         action.andExpect(result);
 
+    }
+
+    @Autowired
+    private LikeService likeService;
+    @Test
+    void insertLikeUser(){
+        likeService.insertLikeUser(1);
+    }
+    @Test
+    void testLike(){
+        likeService.like(1,"2",2,-1);
     }
 
 }

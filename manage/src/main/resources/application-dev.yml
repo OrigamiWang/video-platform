@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: 123456
+    password: youxin
     druid:
       initial-size: 5 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
@@ -39,6 +39,12 @@ redis:
   user_prefix: "login_user_"
   login_pin: "login_pin_"
   register_pin: "register_pin_"
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket-name: video-platform.updates
 
 minio:
   endpoint: http://127.0.0.1:9000

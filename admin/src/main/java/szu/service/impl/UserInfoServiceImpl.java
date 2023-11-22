@@ -4,7 +4,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import szu.dao.UserInfoDao;
 import szu.model.User;
-import szu.model.UserInfo;
+import szu.vo.UserInfo;
 import szu.service.UserInfoService;
 
 import javax.annotation.Resource;

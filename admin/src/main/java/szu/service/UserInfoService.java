@@ -1,6 +1,6 @@
 package szu.service;
 
-import szu.model.UserInfo;
+import szu.vo.UserInfo;
 
 public interface UserInfoService {
 

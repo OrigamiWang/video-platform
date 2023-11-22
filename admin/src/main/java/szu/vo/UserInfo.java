@@ -1,4 +1,4 @@
-package szu.model;
+package szu.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -31,6 +31,7 @@ public class CommentVo implements Serializable {
     private LocalDateTime createTime;   //评论时间
     private Integer likeNum;  //点赞数量
     private Integer replyNum;  //回复数量
-    private List<CommentVo> children;  //子评论
     private Boolean isLiked; //是否被点赞
+    private List<CommentVo> children;  //子评论
+
 }

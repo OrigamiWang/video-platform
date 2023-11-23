@@ -58,6 +58,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment.getUsername() == null) comment.setUsername("");
         comment.setReplyNum(0);
         comment.setLikeNum(0);
+        comment.setIsTop(0);
         //设置创建时间
         comment.setCreateTime(LocalDateTime.now());
         return comment;
@@ -119,7 +120,8 @@ public class CommentServiceImpl implements CommentService {
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         //根据点赞数量降序分页查询
         Asserts.isTrue(sortBy.equals("likeNum") || sortBy.equals("createTime"), "sortBy参数错误");
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
+        //如果有置顶的那么置顶的就是第一个
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("isTop")).and(Sort.by(Sort.Order.desc(sortBy))));
         query.with(pageRequest);
         //限制第一次只查出三条子评论，后续的通过分页获取
         query.fields().slice("children", 3);
@@ -278,6 +280,20 @@ public class CommentServiceImpl implements CommentService {
         doc.put("_id", cid);
         update.pull("children", doc);
         update.inc("replyNum",-1);
+        mongoTemplate.updateFirst(query,update,Comment.class);
+    }
+
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    @Override
+    public void toTopComment(String pid,Integer flag) {
+        Query query = Query.query(Criteria.where("_id").is(pid));
+        Update update = new Update();
+        update.set("isTop",flag);
         mongoTemplate.updateFirst(query,update,Comment.class);
     }
 

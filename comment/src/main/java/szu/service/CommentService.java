@@ -98,4 +98,11 @@ public interface CommentService {
      */
     void deleteChildComment(String pid, String cid);
 
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    void toTopComment(String pid,Integer flag);
 }

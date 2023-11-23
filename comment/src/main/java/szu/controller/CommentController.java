@@ -188,6 +188,20 @@ public class CommentController {
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    @PostMapping("/toTopComment/{pid}/{flag}")
+    @ApiOperation("置顶评论")
+    public CommonResult<ResultCode> toTopComment(@PathVariable("pid") @ApiParam("要置顶的评论id（只能为根评论）") String pid,
+                                                 @PathVariable("flag") @ApiParam("置顶或取消置顶") Integer flag){
+        log.info("置顶评论,pid:{},flag:{}",pid,flag);
+        commentService.toTopComment(pid,flag);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
 
 
 }

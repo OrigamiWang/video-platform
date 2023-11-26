@@ -24,6 +24,8 @@ public class VideoDetailVo {
     private int coin;
     @ApiModelProperty("转发数量")
     private int share;
+    @ApiModelProperty("收藏")
+    private int star;
     @ApiModelProperty("视频作者名字")
     private String upName;
     @ApiModelProperty("视频作者关注数")

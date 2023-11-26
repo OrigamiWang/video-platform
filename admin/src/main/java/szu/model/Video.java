@@ -1,7 +1,9 @@
 package szu.model;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ public class Video {
     @ApiModelProperty("视频id")
     private int id;
     @ApiModelProperty("视频url")
-    private String url;
+    private String url;//
     @ApiModelProperty("播放量")
     private int playNum;
     @ApiModelProperty("弹幕数量")
@@ -21,12 +23,10 @@ public class Video {
     private String totalTime;
     @ApiModelProperty("标题")
     private String title;
-    @ApiModelProperty("作者uid")
-    private int uid;
-    @ApiModelProperty("上传时间")
-    private LocalDateTime uploadTime;
     @ApiModelProperty("分区id")
     private int pid;
     @ApiModelProperty("收藏数量")
-    private int star;
+    private int starNum;
+    @ApiModelProperty("投币数量")
+    private int coinNum;
 }

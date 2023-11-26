@@ -4,13 +4,17 @@ import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.service.MinioService;
 import szu.dao.PartitionDao;
 import szu.dao.UpdateDao;
+import szu.dao.VideoDao;
 import szu.model.Partition;
 import szu.model.Update;
+import szu.model.Video;
 import szu.service.UpdateService;
+import szu.vo.VideoVo;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -26,18 +30,30 @@ public class UpdateServiceImpl implements UpdateService {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private PartitionDao partitionDao;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired
+    private VideoDao videoDao;
     @Value("${minio.bucket-name}")
     private String bucketName;
+    @Value("${shen_he.unchecked}")
+    private int UNCHECKED;
+    @Value("${shen_he.checked}")
+    private int CHECKED;
+    @Value("${shen_he.off_shelf}")
+    private int OFF_SHELF;
+    //shen_he:
+    //    unchecked: 0
+    //    checked: 1
+    //    off_shelf: 2
 
+    @Transactional
     @Override
-    public boolean publish(int uid, String title, String content, int type, int pid, MultipartFile[] files) {
+    public void publishEssay(int uid, String content, MultipartFile[] files) {
         //没有图片,设置为空数组
         if (files == null) files = new MultipartFile[0];
-        //校验参数，如果type或pid不存在，返回false
-        if (partitionDao.findById(pid) == null) return false;
-
         String[] urls = new String[files.length];
         int numOfUpload = 0;
+        //使用事务，保证minio和数据库的一致性
         try {
             //上传minio，并记录url
             for (; numOfUpload < files.length; numOfUpload++) {
@@ -49,22 +65,17 @@ public class UpdateServiceImpl implements UpdateService {
             }
 
             //调用dao层插入数据库
-            updatesDao.insert(uid, title, content, 0,
-                    type, new Timestamp(System.currentTimeMillis()).toString(),
-                    JSON.toJSONString(urls), pid);
-            return true;
+            updatesDao.insert(0, uid, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
+                    JSON.toJSONString(urls));
         } catch (Exception e) {
-            e.printStackTrace();
-            //上传失败,删除已上传的文件
-            for (int j = 0; j < numOfUpload; j++)
-                minioService.deleteFile(bucketName, urls[j]);
-            return false;
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Publish essay failed", e);
         }
+
     }
 
-
     @Override
-    public void deleteById(int id) {
+    public void deleteEssayById(int id) {
         //获取原动态信息
         Update updatesOriginal = updatesDao.findById(id);
         if (updatesOriginal == null) return;
@@ -78,72 +89,58 @@ public class UpdateServiceImpl implements UpdateService {
         updatesDao.deleteById(id);
     }
 
+    @Transactional
     @Override
-    public boolean update(HashMap<String, Object> params, MultipartFile[] files) {
+    public boolean updateEssay(int id, String content, MultipartFile[] files) {
         //获取原动态信息
-        Update updatesOriginal = updatesDao.findById((Integer) params.get("id"));
-        if (updatesOriginal == null) return false;
-
-        //更新动态信息
-        if (params.get("title") != null) updatesOriginal.setTitle((String) params.get("title"));
-        if (params.get("content") != null) updatesOriginal.setContent((String) params.get("content"));
-        if (params.get("pid") != null) {
-            if (partitionDao.findById((Integer) params.get("pid")) == null) return false;
-            updatesOriginal.setPid((Integer) params.get("pid"));
-        }
-        if (params.get("status") != null) {
-            updatesOriginal.setStatus((Integer) params.get("status"));
-        }
-        if (files != null) {//修改中包含图片的修改
+        try {
+            Update updatesOriginal = updatesDao.findById(id);
+            if (updatesOriginal == null) return false;
+            //更新动态信息
+            updatesOriginal.setContent(content);
             //删除原来的图片
             String[] urls = JSON.parseObject(updatesOriginal.getUrls(), String[].class);
             for (String url : urls) {
                 minioService.deleteFile(bucketName, url);
             }
             String[] urlsNew = new String[files.length];
-            //上传新的图片
-            try {
-                for (int i = 0; i < files.length; i++) {
-                    //获取时间戳命名
-                    urlsNew[i] = System.currentTimeMillis() + files[i].getOriginalFilename();
-                    //上传文件
-                    minioService.uploadFile(bucketName, urlsNew[i], files[i].getInputStream());
-                }
-            } catch (Exception e) {
-                for (String url : urlsNew) {//上传失败,删除已上传的文件
-                    minioService.deleteFile(bucketName, url);
-                }
-                return false;
+            for (int i = 0; i < files.length; i++) {
+                //获取时间戳命名
+                urlsNew[i] = System.currentTimeMillis() + files[i].getOriginalFilename();
+                //上传文件
+                minioService.uploadFile(bucketName, urlsNew[i], files[i].getInputStream());
             }
             updatesOriginal.setUrls(JSON.toJSONString(urlsNew));
+            //更新数据库
+            updatesDao.update(updatesOriginal.getId(), updatesOriginal.getVid(), updatesOriginal.getUid(),
+                    updatesOriginal.getContent(), updatesOriginal.getStatus(),
+                    String.valueOf(updatesOriginal.getDatetime()),
+                    updatesOriginal.getUrls());
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Update essay failed", e);
         }
-        //更新数据库
-        updatesDao.update(updatesOriginal.getId(), updatesOriginal.getUid(),
-                updatesOriginal.getTitle(), updatesOriginal.getContent(),
-                updatesOriginal.getStatus(), updatesOriginal.getType(),
-                new Timestamp(System.currentTimeMillis()).toString(),
-                updatesOriginal.getUrls(), updatesOriginal.getPid());
-        return true;
     }
 
     @Override
-    public List<Update> findAll() {
+    public List<Update> findEssayInPage(int pageNum, int pageSize) {
+        return updatesDao.findInPage(pageNum, pageSize);
+    }
+
+    @Override
+    public List<Update> findEssayAll() {
         return updatesDao.findAll();
     }
 
     @Override
-    public List<Update> findByPartition(int pid) {
-        return updatesDao.findByPid(pid);
-    }
-
-    @Override
-    public List<Update> findByType(int type) {
-        return updatesDao.findByType(type);
-    }
-
-    @Override
-    public List<Update> findByUid(int uid) {
+    public List<Update> findEssayByUid(int uid) {
         return updatesDao.findByUid(uid);
+    }
+
+    @Override
+    public Update findEssayById(int id) {
+        return updatesDao.findById(id);
     }
 
     @Override
@@ -152,11 +149,53 @@ public class UpdateServiceImpl implements UpdateService {
         return minioService.downloadFile(bucketName, url);
     }
 
+    @Transactional
     @Override
-    public Update findById(int id) {
-        return updatesDao.findById(id);
+    public void publishVideo(Integer id, String title, String content, Integer pid, MultipartFile video) {
+        //先插入video表，获取vid；再插入update表
+
+        try {
+            //TODO 剪视频第一帧作为封面，上传minio
+            //上传视频
+            String videoUrl = System.currentTimeMillis() + video.getOriginalFilename();
+            minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
+            //插入video表
+            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, "0", title, pid, 0, 0));
+            //插入update表
+            updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
+                    JSON.toJSONString(new HashMap<>()));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Publish video failed", e);
+        }
     }
 
+    @Transactional
+    @Override
+    public void deleteVideoById(int id) {
+        try {
+            //删除原来的视频
+            Video video = videoDao.findById(id);
+            if (video == null) return;
+            minioService.deleteFile(bucketName, video.getUrl());
+            //删除数据库中的记录
+            videoDao.deleteById(id);
+            //删除update表中的记录
+            Update byVid = updatesDao.findByVid(id);
+            String[] urls = JSON.parseObject(byVid.getUrls(), String[].class);
+            for (String url : urls) {
+                minioService.deleteFile(bucketName, url);
+            }
+            updatesDao.deleteById(byVid.getId());
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Delete video failed", e);
+        }
+    }
+
+    /**
+     * 分区管理
+     */
     @Override
     public List<Partition> getPartitions() {
         return partitionDao.findAll();
@@ -176,4 +215,16 @@ public class UpdateServiceImpl implements UpdateService {
     public void updatePartition(int id, String name) {
         partitionDao.update(id, name);
     }
+
+
+    /**
+     * 面向前端
+     */
+    @Override
+    public List<VideoVo> getHomePage(int pageNum, int pageSize) {
+
+        return null;
+    }
+
+
 }

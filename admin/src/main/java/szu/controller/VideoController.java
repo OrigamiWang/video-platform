@@ -27,7 +27,7 @@ public class VideoController {
     @ApiOperation("获取视频详情（点开视频详情页），传入路径参数vid")
     public CommonResult<VideoDetailVo> getPage(@PathVariable @ApiParam("视频的vid") Integer vid){
         //TODO 获取推荐视频列表
-        VideoDetailVo videoVo = videoService.getVideoDetatil(vid);
+        VideoDetailVo videoVo = videoService.getVideoDetail(vid);
         if(videoVo == null){
             return CommonResult.failed();
         }

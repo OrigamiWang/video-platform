@@ -80,14 +80,9 @@ public class UpdatesController {
      */
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片")
-    @ApiResponse(code = 200,message = "所求图片的byte[]")
-    public CommonResult<byte[]> getImages(@RequestParam("url") String url) {
-        byte[] imageData = updatesService.getImage(url);
-        if (imageData != null && imageData.length > 0) {
-            return CommonResult.success(imageData);
-        } else {
-            return CommonResult.failed();
-        }
+    @ApiResponse(code = 200, message = "查看图片")
+    public ResponseEntity<org.springframework.core.io.Resource> getImages(@RequestParam("url") String url) {
+        return updatesService.getImage(url);
     }
 
     /***
@@ -96,11 +91,11 @@ public class UpdatesController {
     @PostMapping("/update")
     @ApiOperation("修改动态")
     public CommonResult<String> update(
-            @ApiParam(value = "目标修改动态的id",required = true)@RequestParam("id") int id,
-            @ApiParam(value = "动态的标题,长度1~40",required = false)@RequestParam(value = "title", required = false) String title,
-            @ApiParam(value = "动态的正文，长度1~1024",required = false)@RequestParam(value = "content", required = false) String content,
-            @ApiParam(value = "动态的分区，未分区的动态的pid=1",required = false)@RequestParam(value = "pid", required = false) Integer pid,
-            @ApiParam(value = "动态所附带的图片，最大9张；",required = false)@RequestParam(value = "images", required = false) MultipartFile[] images
+            @ApiParam(value = "目标修改动态的id", required = true) @RequestParam("id") int id,
+            @ApiParam(value = "动态的标题,长度1~40", required = false) @RequestParam(value = "title", required = false) String title,
+            @ApiParam(value = "动态的正文，长度1~1024", required = false) @RequestParam(value = "content", required = false) String content,
+            @ApiParam(value = "动态的分区，未分区的动态的pid=1", required = false) @RequestParam(value = "pid", required = false) Integer pid,
+            @ApiParam(value = "动态所附带的图片，最大9张；", required = false) @RequestParam(value = "images", required = false) MultipartFile[] images
     ) {
         //如果全部为空
         if (title == null && content == null) {

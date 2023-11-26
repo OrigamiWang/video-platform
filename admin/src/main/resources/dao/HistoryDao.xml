@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="szu.dao.HistoryDao">
+
+
+    <resultMap id="historyMap" type="szu.model.History">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="media_id" property="mediaId"/>
+        <result column="media_type" property="mediaType"/>
+        <result column="watched_at" property="watchedAt"/>
+        <result column="his_time" property="hisTime"/>
+    </resultMap>
+
+    <insert id="insertHis">
+        INSERT INTO history(user_id, media_id, media_type, watched_at)
+        VALUES (#{userId}, #{mediaId}, #{mediaType}, #{watchedAt})
+    </insert>
+
+    <update id="updateHis">
+        UPDATE history
+        SET watched_at = #{watchedAt}
+        WHERE user_id = #{userId}
+          AND media_id = #{mediaId}
+          AND media_type = #{mediaType}
+    </update>
+    <select id="selectRecentHis" resultMap="historyMap">
+        SELECT *
+        FROM history
+        WHERE user_id = #{userId}
+          AND media_type = #{mediaType}
+        ORDER BY his_time DESC
+        LIMIT #{offset}, #{count}
+    </select>
+
+
+</mapper>

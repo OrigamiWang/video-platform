@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +12,7 @@ import java.io.Serializable;
 @Data
 @ApiModel(description = "用户外显信息")
 public class UserInfo implements Serializable {
+    private static final long serialVersionUID = 4782763419834L;
     @ApiModelProperty(value = "uid")
     private Integer id;
 
@@ -40,8 +40,6 @@ public class UserInfo implements Serializable {
     @ApiModelProperty(value = "自我介绍")
     private String info;
 
-    @Serial
-    private static final long serialVersionUID = 4782763419834L;
 
     @Override
     public String toString() {

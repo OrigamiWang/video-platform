@@ -214,7 +214,7 @@ public class UpdatesController {
 //        return CommonResult.success("删除成功");
 //    }
     @GetMapping("/HomePage")
-    @ApiOperation("获取首页视频动态")
+    @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
     @ApiResponse(code = 200, message = "VideoVo List")
     public CommonResult<List<VideoVo>> getHomePage(@RequestParam("pageNum") int pageNum,
                                                    @RequestParam("pageSize") int pageSize) {

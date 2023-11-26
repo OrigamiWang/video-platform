@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  # Mysql 8
+  mysql:
+    image: mysql:8.0.35-debian
+    container_name: video-platform-mysql
+    restart: unless-stopped
+    volumes:
+      - mysql-conf:/etc/mysql
+      - mysql-data:/var/lib/mysql
+      - mysql-logs:/var/log/mysql
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: Sz8u#_Vid5eo_#Plat9form!*Mysql
+
+  # Redis 7
+  redis:
+    image: redis:7.2.0-alpine
+    container_name: video-platform-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+      - redis-conf:/usr/local/etc/redis
+      - redis-logs:/var/log/redis
+    command: redis-server --requirepass "Sz8u#_Vid5eo_#Plat9form!*Redis"
+    environment:
+      TZ: Asia/Shanghai
+
+  # Mongo
+  mongo:
+    image: mongo
+    container_name: video-platform-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+      - mongo-conf:/etc/mongo
+      - mongo-logs:/var/log/mongo
+    environment:
+      TZ: Asia/Shanghai
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: Sz8u#_Vid5eo_#Plat9form!*Mongo
+
+  # Minio 2023
+  minio:
+    image: bitnami/minio:2023
+    container_name: video-platform-minio
+    restart: unless-stopped
+    volumes:
+      - minio-data:/bitnami/minio/data
+      - minio-conf:/bitnami/minio/conf
+      - minio-logs:/bitnami/minio/logs
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: Sz8u#_Vid5eo_#Plat9form!*Minio

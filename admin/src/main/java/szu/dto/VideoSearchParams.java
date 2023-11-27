@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 视频搜索传递的参数
  */
-@ApiModel("视频搜索传递的参数，若不传则默认为空")
+@ApiModel("视频搜索传递的参数，若不传则key默认为空串，其他id默认为0，表示不区分")
 @Data
 public class VideoSearchParams {
     @ApiModelProperty("搜索框内输入的搜索关键词")

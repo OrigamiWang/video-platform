@@ -16,6 +16,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <elasticsearch.version>7.12.1</elasticsearch.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>szu</groupId>
@@ -38,6 +42,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.12.3</version>
+        </dependency>
+<!--        es依赖-->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
     </dependencies>
 

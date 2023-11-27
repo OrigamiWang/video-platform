@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -25,7 +26,7 @@ public class Update implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "时间")
-    private Date datetime;
+    private LocalDateTime uploadTime;
 
     @ApiModelProperty(value = "多媒体urls的json")
     private String urls;

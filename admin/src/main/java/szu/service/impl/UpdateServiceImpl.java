@@ -114,7 +114,7 @@ public class UpdateServiceImpl implements UpdateService {
             //更新数据库
             updatesDao.update(updatesOriginal.getId(), updatesOriginal.getVid(), updatesOriginal.getUid(),
                     updatesOriginal.getContent(), updatesOriginal.getStatus(),
-                    String.valueOf(updatesOriginal.getDatetime()),
+                    String.valueOf(updatesOriginal.getUploadTime()),
                     updatesOriginal.getUrls());
             return true;
         } catch (Exception e) {

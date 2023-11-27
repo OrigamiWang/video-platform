@@ -16,7 +16,7 @@ public class Video {
     @ApiModelProperty("视频id")
     private int id;
     @ApiModelProperty("视频url")
-    private String url;//
+    private String url;
     @ApiModelProperty("播放量")
     private int playNum;
     @ApiModelProperty("弹幕数量")

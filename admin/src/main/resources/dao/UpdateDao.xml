@@ -6,55 +6,55 @@
         <result column="uid" jdbcType="INTEGER" property="uid"/>
         <result column="content" jdbcType="VARCHAR" property="content"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
-        <result column="dateTime" jdbcType="TIMESTAMP" property="datetime"/>
+        <result column="uploadTime" jdbcType="TIMESTAMP" property="uploadTime"/>
         <result column="urls" jdbcType="VARCHAR" property="urls"/>
     </resultMap>
     <insert id="insert">
-        insert into `update` (uid, content, status, dateTime, urls)
+        insert into `updates` (uid, content, status, uploadTime, urls)
         values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
-                #{datetime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})
+                #{uploadTime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})
     </insert>
     <update id="update">
-        update `update`
+        update `updates`
         set uid = #{uid,jdbcType=INTEGER},
             content = #{content,jdbcType=VARCHAR},
             status = #{status,jdbcType=INTEGER},
-            dateTime = #{datetime,jdbcType=TIMESTAMP},
+            uploadTime = #{uploadTime,jdbcType=TIMESTAMP},
             urls = #{urls,jdbcType=VARCHAR}
         where id = #{id,jdbcType=INTEGER}
     </update>
     <delete id="deleteById">
         delete
-        from `update`
+        from `updates`
         where id = #{id,jdbcType=INTEGER}
     </delete>
     <delete id="deleteByVid">
         delete
-        from `update`
+        from `updates`
         where uid = #{uid,jdbcType=INTEGER}
     </delete>
     <select id="findInPage" resultMap="BaseResultMap">
         select *
-        from `update`
+        from `updates`
     </select>
     <select id="findByUid" resultMap="BaseResultMap">
         select *
-        from `update`
+        from `updates`
         where uid = #{uid,jdbcType=INTEGER}
     </select>
     <select id="findById" resultMap="BaseResultMap">
         select *
-        from `update`
+        from `updates`
         where id = #{id,jdbcType=INTEGER}
     </select>
     <select id="findAll" resultType="szu.model.Update">
         select *
-        from `update`
+        from `updates`
     </select>
     <select id="findByVid" resultType="szu.model.Update">
         select *
-        from `update`
-        where uid = #{uid,jdbcType=INTEGER}
+        from `updates`
+        where vid = #{vid,jdbcType=INTEGER}
     </select>
 
 </mapper>

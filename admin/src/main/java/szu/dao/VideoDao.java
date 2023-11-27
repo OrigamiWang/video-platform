@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import szu.model.Video;
 
+import java.util.List;
+
 @Mapper
 public interface VideoDao {
     @Insert("INSERT INTO video (url,play_num,dm_num,total_time,title,pid,star_num,coin_num) " +
@@ -16,8 +18,8 @@ public interface VideoDao {
 
     @Delete("DELETE FROM video WHERE id=#{id}")
     void deleteById(int id);
-
-
+    @Select("select * from video")
+    List<Video> selectAll();//测试用，获取所有视频
 
 
 }

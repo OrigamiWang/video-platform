@@ -16,5 +16,5 @@ public interface UpdateDao {
 
     void deleteByVid(int id);
 
-    Update findByVid(int id);
+    Update findByVid(int vid);
 }

@@ -156,6 +156,7 @@ public class UpdateServiceImpl implements UpdateService {
 
         try {
             //TODO 剪视频第一帧作为封面，上传minio
+            // ffmpeg
             //上传视频
             String videoUrl = System.currentTimeMillis() + video.getOriginalFilename();
             minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
@@ -212,7 +213,7 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public void updatePartition(int id, String name) {
+    public void updatePartition(int id, String name){
         partitionDao.update(id, name);
     }
 

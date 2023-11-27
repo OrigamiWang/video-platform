@@ -16,5 +16,9 @@ public interface VideoDao {
 
     @Delete("DELETE FROM video WHERE id=#{id}")
     void deleteById(int id);
+
+
+
+
 }
 

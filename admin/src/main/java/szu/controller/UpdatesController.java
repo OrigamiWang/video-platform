@@ -65,12 +65,13 @@ public class UpdatesController {
     @GetMapping("/inPage")
     @ApiOperation("分页获取图文动态")
     @ApiResponse(code = 200, message = "Update的List")
-    public CommonResult<List<Update>> getInPage(@RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
+    public CommonResult<List<Update>> getInPage(@ApiParam("页码")@RequestParam("pageNum") int pageNum,
+                                                @ApiParam("每页大小")@RequestParam("pageSize") int pageSize) {
         return CommonResult.success(updatesService.findEssayInPage(pageNum, pageSize));
     }
     @GetMapping("/info/{id}")
     @ApiOperation("获取单条图文动态")
-    @ApiResponse(code = 200, message = "Update的List")
+    @ApiResponse(code = 200, message = "Update")
     public CommonResult<Update> getEssayById(@PathVariable("id") int id) {
         return CommonResult.success(updatesService.findEssayById(id));
     }
@@ -95,6 +96,8 @@ public class UpdatesController {
         updatesService.deleteEssayById(id);
         return CommonResult.success("操作成功");
     }
+
+
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片，暂时也可以用来获取视频资源")
     @ApiResponse(code = 200, message = "获取成功")

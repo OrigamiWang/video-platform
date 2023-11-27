@@ -1,12 +1,9 @@
 # video-platform
 
-TODO: 实现手机验证码登录注册
-写个util，发送验证码，将验证码存入redis，2min expire
-
-
 **请规范命名文件夹名字**
 
 ## 项目结构
+
 - `admin`
     - 主要逻辑/视频
 - `common`
@@ -17,8 +14,9 @@ TODO: 实现手机验证码登录注册
     - 用户权限
 - `manage`
     - 后台管理
-  
+
 ## 部署问题
+
 1. 请修改yaml配置
 2. 请修改mbg模块resources下的关于数据库的配置
 3. Swagger访问网址`http://ip:port/swagger-ui/`，亲测少个下划线都不行！

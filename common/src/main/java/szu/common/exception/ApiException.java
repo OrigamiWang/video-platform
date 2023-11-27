@@ -10,8 +10,6 @@ import szu.common.api.IErrorCode;
 public class ApiException extends RuntimeException {
     private IErrorCode errorCode;
 
-    private Object data;
-
     public ApiException(IErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;

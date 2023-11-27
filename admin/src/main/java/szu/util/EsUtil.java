@@ -10,6 +10,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+import szu.common.api.ListResult;
 import szu.model.Video;
 import szu.model.VideoSearchDoc;
 import szu.vo.VideoVo;
@@ -28,7 +29,7 @@ public class EsUtil {
      * 仅有关键词，无排序
      * @return
      */
-    public List<Object> getAllVideoByKeyOnly(String key){
+    public ListResult<VideoVo> getAllVideoByKeyOnly(String key){
         SearchRequest request = new SearchRequest(INDICES);
         request.source().query(QueryBuilders.matchQuery("all", key));
         SearchResponse response;
@@ -40,12 +41,11 @@ public class EsUtil {
         return handleResponse(response);
     }
 
-    private List<Object> handleResponse(SearchResponse response) {
-        List<Object> res = new ArrayList<>();
+    private ListResult<VideoVo> handleResponse(SearchResponse response) {
+        List<VideoVo> res = new ArrayList<>();
         SearchHits searchHits = response.getHits();
         // 获取总条数
         long total = searchHits.getTotalHits().value;
-        res.add(total);
         // 获取文档数组
         SearchHit[] hits = searchHits.getHits();
         // 遍历数组
@@ -58,7 +58,7 @@ public class EsUtil {
             BeanUtils.copyProperties(videoSearchDoc, videoVo);
             res.add(videoVo);
         }
-        return res;
+        return new ListResult<VideoVo>(res, total);
     }
 
 

@@ -2,6 +2,7 @@ package szu.service.impl;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
+import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
 import szu.service.VideoService;
 import szu.util.EsUtil;
@@ -23,10 +24,10 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public List<Object> search(VideoSearchParams params) {
+    public ListResult<VideoVo> search(VideoSearchParams params) {
         if("".equals(params.getKey())) return null;
-
-        List<Object> res = esUtil.getAllVideoByKeyOnly(params.getKey());
+        ListResult<VideoVo> res = esUtil.getAllVideoByKeyOnly(params.getKey());
+        //TODO 根据指定的排序类型进行排序
         return null;
     }
 }

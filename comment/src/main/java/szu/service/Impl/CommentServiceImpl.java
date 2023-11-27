@@ -3,6 +3,11 @@ package szu.service.Impl;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+<<<<<<< HEAD
+=======
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Example;
+>>>>>>> UserXin
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,19 +17,27 @@ import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import szu.dao.CommentRepository;
 
 import szu.model.Comment;
+import szu.model.Like;
 import szu.service.CommentService;
+import szu.vo.CommentVo;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Comparator;
 
+=======
+import java.util.HashMap;
+>>>>>>> UserXin
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @description CommentDao
@@ -42,6 +55,42 @@ public class CommentServiceImpl implements CommentService {
     private MongoTemplate mongoTemplate;
 
 
+    private Comment initComment(Comment comment){
+        if (comment == null) throw new NullPointerException(); //安全性检查
+        if (comment.getTargetUsername() == null) comment.setTargetUsername("");
+        if (comment.getUsername() == null) comment.setUsername("");
+        comment.setReplyNum(0);
+        comment.setLikeNum(0);
+        comment.setIsTop(0);
+        //设置创建时间
+        comment.setCreateTime(LocalDateTime.now());
+        return comment;
+    }
+
+    /**
+     * 给评论加上是否点赞的标签封装为vo返回
+     * @param uid
+     * @param commentList
+     * @return
+     */
+    public List<CommentVo> getCommentVoListWithLike(Integer uid, List<Comment> commentList) {
+        Query query = Query.query(Criteria.where("uid").is(uid)); //找到当前登录的用户的点赞列表
+        Like like = mongoTemplate.findOne(query, Like.class);
+        HashMap<String, Integer> fidMap = like.getFidMap();
+        List<CommentVo> commentVoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            CommentVo commentVo = new CommentVo();
+            BeanUtils.copyProperties(comment,commentVo);
+            if(fidMap.containsKey(comment.getId())){  //在点赞列表里面，说明该用户点赞
+                commentVo.setIsLiked(true); //设置已点赞
+            }else {
+                commentVo.setIsLiked(false); //设置未点赞
+            }
+            commentVoList.add(commentVo);
+        }
+        return commentVoList;
+    }
+
     /**
      * 添加评论
      * @param comment
@@ -57,33 +106,44 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * 根据foreignId分页获取指定区域的评论，根据点赞数排序
+     * @param uid 当前登录的用户id
      * @param foreignId 要获取评论的动态id
      * @param page 当前页
      * @param size 每页大小
      * @return
      */
     @Override
-    public List<Comment> getCommentsByForeignIdAndPages(Integer foreignId,int page,int size) {
+    public List<CommentVo> getCommentsByForeignIdAndPages(Integer uid,Integer foreignId, int page, int size, String sortBy) {
         if(foreignId<0||page<0||size<0) throw new IllegalArgumentException(); //安全性检查
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         //根据点赞数量降序分页查询
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("likeNum")));
+        Asserts.isTrue(sortBy.equals("likeNum") || sortBy.equals("createTime"), "sortBy参数错误");
+        //如果有置顶的那么置顶的就是第一个
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("isTop")).and(Sort.by(Sort.Order.desc(sortBy))));
         query.with(pageRequest);
         //限制第一次只查出三条子评论，后续的通过分页获取
         query.fields().slice("children", 3);
         List<Comment> Comments = mongoTemplate.find(query, Comment.class);
-        return Comments;
+
+        //加上点赞封装为vo返回
+        List<CommentVo> commentVos = getCommentVoListWithLike(uid, Comments);
+        for (int i = 0; i < Comments.size(); i++) {
+            commentVos.get(i).setChildren(getCommentVoListWithLike(uid,Comments.get(i).getChildren()));
+        }
+        return commentVos;
     }
 
     /**
      * 分页获取对应根评论下的子评论
-     * @param pid 要获取子评论根评论id
+     *
+     * @param pid  要获取子评论根评论id
      * @param page 当前页
      * @param size 每页大小
+     * @param uid 当前登录用户id
      * @return
      */
     @Override
-    public List<Comment> listChildrenCommentByPages(String pid, int page, int size) {
+    public List<CommentVo> listChildrenCommentByPages(String pid, int page, int size, Integer uid) {
         //安全性检查
         if(page<0||size<0) throw new IllegalArgumentException();
         if(pid==null) throw new NullPointerException();
@@ -103,7 +163,8 @@ public class CommentServiceImpl implements CommentService {
         // 执行聚合管道
         Aggregation aggregation = Aggregation.newAggregation(match, project, unwind, skip, limit, replaceRoot);
         List<Comment> results = mongoTemplate.aggregate(aggregation, "comment", Comment.class).getMappedResults();
-        return results;
+        //加上点赞封装为vo返回
+        return getCommentVoListWithLike(uid,results);
     }
 
     /**
@@ -196,4 +257,19 @@ public class CommentServiceImpl implements CommentService {
         update.inc("replyNum",-1);
         mongoTemplate.updateFirst(query,update,Comment.class);
     }
+
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    @Override
+    public void toTopComment(String pid,Integer flag) {
+        Query query = Query.query(Criteria.where("_id").is(pid));
+        Update update = new Update();
+        update.set("isTop",flag);
+        mongoTemplate.updateFirst(query,update,Comment.class);
+    }
+
 }

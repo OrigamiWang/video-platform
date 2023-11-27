@@ -6,6 +6,11 @@ spring:
     name: video-platform-manage
   profiles:
     active: dev
+  servlet:
+    multipart:
+      enabled: true #默认支持文件上传
+      max-file-size: -1 #不做限制
+      max-request-size: -1 #不做限制
 
 
 

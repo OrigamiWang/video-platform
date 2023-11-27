@@ -73,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
                     return CommonResult.failed("验证码错误！");
                 }
                 // 创建用户
-                loginDao.registerByPhone(name, phone);
+//                loginDao.registerByPhone(name, phone, ShaUtil.encode(pswd));
                 break;
             }
             case 2: {

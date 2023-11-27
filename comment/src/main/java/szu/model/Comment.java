@@ -46,6 +46,8 @@ public class Comment implements Serializable {
     private Integer likeNum;  //点赞数量
     @ApiModelProperty("回复数量")
     private Integer replyNum;  //回复数量
+    @ApiModelProperty("是否置顶（1：置顶 0：不置顶）")
+    private Integer isTop; //是否置顶
     @ApiModelProperty("子评论")
     private List<Comment> children;  //子评论
 }

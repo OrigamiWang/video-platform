@@ -68,6 +68,12 @@ public class UpdatesController {
     public CommonResult<List<Update>> getInPage(@RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
         return CommonResult.success(updatesService.findEssayInPage(pageNum, pageSize));
     }
+    @GetMapping("/info/{id}")
+    @ApiOperation("获取单条图文动态")
+    @ApiResponse(code = 200, message = "Update的List")
+    public CommonResult<Update> getEssayById(@PathVariable("id") int id) {
+        return CommonResult.success(updatesService.findEssayById(id));
+    }
     @GetMapping("/all")
     @ApiOperation("获取所有图文动态")
     @ApiResponse(code = 200, message = "Update的List")

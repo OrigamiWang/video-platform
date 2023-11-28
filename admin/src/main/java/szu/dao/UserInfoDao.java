@@ -16,4 +16,7 @@ public interface UserInfoDao {
 
     @Select("select * from user_statistics where uid = #{uid}")
     UserStatistics getUserStatisticsById(int uid);
+
+    @Select("select name from user where id=#{id}")
+    String getNameById(int id);
 }

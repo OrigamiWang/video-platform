@@ -1,6 +1,5 @@
 package szu.service.impl;
 
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
 import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
@@ -10,7 +9,6 @@ import szu.vo.VideoDetailVo;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @Service
 public class VideoServiceImpl implements VideoService {

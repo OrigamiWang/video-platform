@@ -62,29 +62,33 @@ public class UpdatesController {
             return CommonResult.failed("发布失败");
         }
     }
+
     @GetMapping("/inPage")
     @ApiOperation("分页获取图文动态")
     @ApiResponse(code = 200, message = "Update的List")
-    public CommonResult<List<Update>> getInPage(@ApiParam("页码")@RequestParam("pageNum") int pageNum,
-                                                @ApiParam("每页大小")@RequestParam("pageSize") int pageSize) {
+    public CommonResult<List<Update>> getInPage(@ApiParam("页码") @RequestParam("pageNum") int pageNum,
+                                                @ApiParam("每页大小") @RequestParam("pageSize") int pageSize) {
         return CommonResult.success(updatesService.findEssayInPage(pageNum, pageSize));
     }
+
     @GetMapping("/info/{id}")
     @ApiOperation("获取单条图文动态")
     @ApiResponse(code = 200, message = "Update")
     public CommonResult<Update> getEssayById(@PathVariable("id") int id) {
         return CommonResult.success(updatesService.findEssayById(id));
     }
+
     @GetMapping("/all")
     @ApiOperation("获取所有图文动态")
     @ApiResponse(code = 200, message = "Update的List")
     public CommonResult<List<Update>> allEssay() {
         return CommonResult.success(updatesService.findEssayAll());
     }
+
     @DeleteMapping("/delete")
     @ApiOperation("删除指定图文动态")
     public CommonResult<String> deleteEssayById(@RequestParam("id") int id,
-                                           @RequestHeader(value = "Authorization") String token) {
+                                                @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
         User user = (User) redisService.get(token);
         if (user == null) {
@@ -101,7 +105,7 @@ public class UpdatesController {
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片，暂时也可以用来获取视频资源")
     @ApiResponse(code = 200, message = "获取成功")
-    public ResponseEntity<byte[]> getImages(@ApiParam(value = "图片的url")@RequestParam("url") String url) {
+    public ResponseEntity<byte[]> getImages(@ApiParam(value = "图片的url") @RequestParam("url") String url) {
         return ResponseEntity.ok(updatesService.getImage(url));
     }
 
@@ -181,7 +185,7 @@ public class UpdatesController {
     @ApiOperation("删除指定视频动态")
     @ApiResponse(code = 200, message = "删除成功")
     public CommonResult<String> deleteVideoById(@RequestParam("id") int id,
-                                           @RequestHeader(value = "Authorization") String token) {
+                                                @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
         User user = (User) redisService.get(token);
         if (user == null) {
@@ -194,15 +198,7 @@ public class UpdatesController {
         return CommonResult.success("操作成功");
     }
 
-
-    @GetMapping("/partition")
-    @ApiOperation("获取所有视频分区")
-    @ApiResponse(code = 200, message = "Partition的List")
-    public CommonResult<List<Partition>> allPartitions() {
-        return CommonResult.success(updatesService.getPartitions());
-    }
-
-//    @PostMapping("/partition")
+    //    @PostMapping("/partition")
 //    @ApiOperation("添加动态分区")
 //    public CommonResult<String> addPartition(@RequestParam("name") String name) {
 //        updatesService.addPartition(name);
@@ -222,11 +218,16 @@ public class UpdatesController {
 //        updatesService.deletePartitionById(id);
 //        return CommonResult.success("删除成功");
 //    }
-    @GetMapping("/HomePage")
+    @GetMapping("/partition")
+    @ApiOperation("获取所有视频分区")
+    @ApiResponse(code = 200, message = "Partition的List")
+    public CommonResult<List<Partition>> allPartitions() {
+        return CommonResult.success(updatesService.getPartitions());
+    }
+    @GetMapping("/homePage")
     @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
     @ApiResponse(code = 200, message = "VideoVo List")
-    public CommonResult<List<VideoVo>> getHomePage(@RequestParam("pageNum") int pageNum,
-                                                   @RequestParam("pageSize") int pageSize) {
-        return CommonResult.success(updatesService.getHomePage(pageNum, pageSize));
+    public CommonResult<List<VideoVo>> getHomePage(@RequestParam("pageSize") int pageSize) {
+        return CommonResult.success(updatesService.getHomePage(pageSize));
     }
 }

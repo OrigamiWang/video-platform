@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.service.MinioService;
-import szu.dao.PartitionDao;
-import szu.dao.UpdateDao;
-import szu.dao.VideoDao;
+import szu.dao.*;
 import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
@@ -17,6 +15,7 @@ import szu.service.UpdateService;
 import szu.vo.VideoVo;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,6 +32,9 @@ public class UpdateServiceImpl implements UpdateService {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private VideoDao videoDao;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired
+    private UserInfoDao userInfoDao;
     @Value("${minio.bucket-name}")
     private String bucketName;
     @Value("${shen_he.unchecked}")
@@ -188,7 +190,7 @@ public class UpdateServiceImpl implements UpdateService {
                 minioService.deleteFile(bucketName, url);
             }
             updatesDao.deleteById(byVid.getId());
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Delete video failed", e);
         }
@@ -213,7 +215,7 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public void updatePartition(int id, String name){
+    public void updatePartition(int id, String name) {
         partitionDao.update(id, name);
     }
 
@@ -222,9 +224,33 @@ public class UpdateServiceImpl implements UpdateService {
      * 面向前端
      */
     @Override
-    public List<VideoVo> getHomePage(int pageNum, int pageSize) {
-
-        return null;
+    public List<VideoVo> getHomePage(int pageSize) {
+        //TODO 推荐算法
+        //计算有多少个视频
+        List<Integer> ids = videoDao.selectAllId();
+        int videoNum =ids.size();
+        //获取pageSize个随机int
+        int[] randomNums = new int[pageSize];
+        for (int i = 0; i < pageSize; i++) {
+            randomNums[i] = ((int) (Math.random() * 10*videoNum))%videoNum;
+        }
+        //获取这些动态与视频,拼接vo
+        List<VideoVo> videoVos = new ArrayList<>();
+        for (int id: ids) {
+            Video video = videoDao.findById(id);
+            Update update = updatesDao.findByVid(id);
+            VideoVo videoVo = new VideoVo();
+            videoVo.setId(id);
+            videoVo.setUrl(video.getUrl());
+            videoVo.setUploadTime(update.getUploadTime());
+            videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
+            videoVo.setPlayNum(video.getPlayNum());
+            videoVo.setDmNUm(video.getDmNum());
+            videoVo.setTotalTime(video.getTotalTime());
+            videoVo.setTitle(video.getTitle());
+            videoVos.add(videoVo);
+        }
+        return videoVos;
     }
 
 

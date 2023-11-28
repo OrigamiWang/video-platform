@@ -119,7 +119,7 @@ public class CommentServiceImpl implements CommentService {
         if(foreignId<0||page<0||size<0) throw new IllegalArgumentException(); //安全性检查
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         //根据点赞数量降序分页查询
-        Asserts.isTrue(sortBy.equals("likeNum") || sortBy.equals("createTime"), "sortBy参数错误");
+//        Asserts.isTrue(sortBy.equals("likeNum") || sortBy.equals("createTime"), "sortBy参数错误");
         //如果有置顶的那么置顶的就是第一个
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("isTop")).and(Sort.by(Sort.Order.desc(sortBy))));
         query.with(pageRequest);

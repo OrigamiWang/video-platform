@@ -3,9 +3,10 @@ server:
 
 spring:
   application:
-    name: video-platform-Comment
+    name: video-platform-Star
   profiles: 
     active: dev
+
 
 mybatis:
   mapper-locations:

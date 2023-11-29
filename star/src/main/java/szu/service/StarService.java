@@ -1,6 +1,8 @@
 package szu.service;
 
 import szu.model.Star;
+import szu.model.StarVideo;
+import szu.vo.StarVo;
 
 import java.util.List;
 
@@ -24,10 +26,10 @@ public interface StarService {
     /**
      * 收藏视频
      * @param sids 收藏夹id集合
-     * @param vid 要收藏的视频id
+     * @param updateId 要收藏的视频的动态id
      * @return
      */
-    boolean starVideo(List<Integer> sids, Integer vid);
+    boolean starVideo(List<String> sids, Integer updateId);
 
     /**
      * 根据用户uid获取收藏夹列表
@@ -36,5 +38,12 @@ public interface StarService {
      */
     List<Star> listStarByUid(Integer uid);
 
-
+    /**
+     * 根据收藏夹id分页获取收藏夹内容
+     * @param sid 收藏夹id
+     * @param page 当前页
+     * @param size 每页大小
+     * @return
+     */
+    List<StarVo> listStarContentBySidByPage(String sid, Integer page, Integer size);
 }

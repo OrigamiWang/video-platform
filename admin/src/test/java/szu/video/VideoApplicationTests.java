@@ -19,6 +19,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.WebApplicationContext;
 import szu.AdminApplication;
+import szu.common.api.ListResult;
 import szu.dao.UpdateDao;
 import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
@@ -38,6 +41,7 @@ import szu.model.Update;
 import szu.model.User;
 import szu.model.Video;
 import szu.model.VideoSearchDoc;
+import szu.service.VideoService;
 import szu.util.EsUtil;
 import szu.vo.VideoVo;
 
@@ -45,9 +49,14 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -155,7 +164,7 @@ class VideoApplicationTests {
             int vid = video.getId();
             BeanUtils.copyProperties(video, videoSearchDoc);
             Update update = updateDao.findByVid(vid);
-            videoSearchDoc.setUploadTime(dateFormat.format(update.getUploadTime()));
+            videoSearchDoc.setUploadTime(update.getUploadTime());
             videoSearchDoc.setId(update.getId());//doc里面的id是update的id
             User user = userInfoDao.getUserById(update.getUid());
             videoSearchDoc.setName(user.getName());
@@ -205,6 +214,17 @@ class VideoApplicationTests {
             String json = hit.getSourceAsString();
             // 反序列化
             VideoSearchDoc videoSearchDoc = JSON.parseObject(json, VideoSearchDoc.class);
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            if (!CollectionUtils.isEmpty(highlightFields)) {
+                // 根据字段名获取高亮结果
+                HighlightField highlightField = highlightFields.get("all");
+                if (highlightField != null) {
+                    // 获取高亮值
+                    String name = highlightField.getFragments()[0].string();
+                    // 覆盖非高亮结果
+                    System.out.println(name);
+                }
+            }
             System.out.println("videoSearchDoc = " + videoSearchDoc);
         }
     }
@@ -212,13 +232,18 @@ class VideoApplicationTests {
 
     @Test
     void test(){
-        List<Video> videos = videoDao.selectAll();
-        Video video = videos.get(0);
-        int videoId = video.getId();
-        Update update = updateDao.findByVid(videoId);
-        VideoVo videoVo = new VideoVo();
-        videoVo.setUploadTime(update.getUploadTime());
-        System.out.println(videoVo.getUploadTime());
+        VideoSearchParams videoSearchParams = new VideoSearchParams("原神");
+        System.out.println(videoSearchParams);
+//        ListResult<VideoVo> search = esUtil.search();
     }
 
+
+    @Resource
+    VideoService videoService;
+    @Test
+    void testGetVideById(){
+        //结果正确
+//        ListResult<VideoVo> res = videoService.getVideoById(1, 0, 1, 10);
+
+    }
 }

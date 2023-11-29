@@ -23,7 +23,7 @@ public class VideoVo {
     @ApiModelProperty("视频播放量")
     private int playNum;
     @ApiModelProperty("弹幕数量")
-    private int dmNUm;
+    private int dmNum;
     @ApiModelProperty("总时长")
     private String totalTime;
     @ApiModelProperty("视频标题")

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -25,7 +26,7 @@ public class VideoSearchDoc {
     private int playNum;
     @ApiModelProperty("弹幕数量")
     private int dmNum;
-    @ApiModelProperty("视频时长")
+    @ApiModelProperty("视频时长，统一转换为秒数便于排序与筛选")
     private String totalTime;
     @ApiModelProperty("分区id")
     private int pid;
@@ -36,8 +37,8 @@ public class VideoSearchDoc {
     //以下在updates表中查询，其中name通过updates下的uid查user表
     @ApiModelProperty("作者名字")
     private String name;
-    @ApiModelProperty("上传日期，以yyyy-mm-dd hh:mm:ss的形式")
-    private String uploadTime;
+    @ApiModelProperty("上传日期")
+    private LocalDateTime uploadTime;
 
     //补全字段由标题和作者名称组成
     @ApiModelProperty("补全字段")

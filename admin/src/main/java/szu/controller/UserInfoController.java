@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import szu.common.api.CommonResult;
+import szu.common.api.ListResult;
+import szu.service.VideoService;
 import szu.vo.UserInfo;
 import szu.service.UserInfoService;
 import szu.vo.VideoVo;
@@ -23,6 +25,8 @@ public class UserInfoController {
 
     @Resource
     private UserInfoService userInfoService;
+    @Resource
+    private VideoService videoService;
 
     @GetMapping("/get-by-uid")
     @ApiOperation("根据uid获取用户基础信息")
@@ -32,10 +36,12 @@ public class UserInfoController {
     }
 
     @GetMapping("/list-video")
-    @ApiOperation("根据uid获取用户的投稿")
-    public CommonResult<VideoVo> getUserVideo(@RequestParam @ApiParam("指定uid") Integer uid,
-                                              @RequestParam(defaultValue = "0") @ApiParam("指定排列方式，0最新、1最多播放、2最多收藏，默认为0") Integer sort){
-
-        return null;
+    @ApiOperation("根据uid获取用户的投稿列表")
+    public ListResult<VideoVo> getUserVideo(@RequestParam @ApiParam("指定uid") Integer uid,
+                                              @RequestParam(defaultValue = "0") @ApiParam("指定排列方式，0最新、1最多播放、2最多收藏，默认为0") Integer sort,
+                                              @RequestParam(defaultValue = "1") @ApiParam("第几页，默认1") Integer page,
+                                              @RequestParam(defaultValue = "10") @ApiParam("每页数量，默认10") Integer size
+    ){
+        return videoService.getVideoById(uid, sort, page, size);
     }
 }

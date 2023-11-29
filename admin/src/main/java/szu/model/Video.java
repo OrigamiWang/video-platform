@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 
 @Data

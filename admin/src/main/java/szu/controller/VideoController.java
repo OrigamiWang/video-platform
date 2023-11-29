@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
+import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
 import szu.service.VideoService;
 import szu.model.Video;
 import szu.vo.VideoDetailVo;
+import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -36,12 +38,13 @@ public class VideoController {
 
     @GetMapping("/search")
     @ApiOperation("根据传参搜索视频")
-    public CommonResult<List<Video>> search(@RequestParam
-                                            @ApiParam("key、classification、sortBy、time、partition")
+    public CommonResult<ListResult<VideoVo>> search(@RequestParam
+                                            @ApiParam("key（空串表示没有key参与搜索）、classification、sortBy、time、partition这些等于0表示默认情况即可")
                                                 VideoSearchParams params)
     {
-
-        return null;
+        ListResult<VideoVo> res = videoService.search(params);
+        if(res == null) return CommonResult.failed("fail！key is null");
+        return CommonResult.success(res);
     }
 
 

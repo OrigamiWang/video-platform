@@ -2,10 +2,9 @@ package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class Update implements Serializable {
@@ -25,7 +24,7 @@ public class Update implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "时间")
-    private Date datetime;
+    private LocalDateTime uploadTime;
 
     @ApiModelProperty(value = "多媒体urls的json")
     private String urls;

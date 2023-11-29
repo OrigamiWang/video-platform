@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,7 +17,7 @@ public class Video {
     @ApiModelProperty("视频id")
     private int id;
     @ApiModelProperty("视频url")
-    private String url;//
+    private String url;
     @ApiModelProperty("播放量")
     private int playNum;
     @ApiModelProperty("弹幕数量")

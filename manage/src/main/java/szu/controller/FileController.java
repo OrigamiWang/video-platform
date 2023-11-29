@@ -30,6 +30,7 @@ public class FileController {
     public CommonResult<String> upload(MultipartFile file){
         log.info("文件上传,{}", file);
         try {
+
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 

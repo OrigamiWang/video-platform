@@ -1,6 +1,5 @@
 package szu.service.impl;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -9,9 +8,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import szu.common.service.RedisService;
-import szu.dao.StarDao;
 import szu.model.Star;
 import szu.model.StarVideo;
+import szu.service.RedisWithMysql;
 import szu.service.StarService;
 import szu.vo.StarVo;
 
@@ -32,14 +31,13 @@ import java.util.List;
 public class StarServiceImpl implements StarService {
 
     @Resource
-    private StarDao starDao;
-
-
-    @Resource
     private MongoTemplate mongoTemplate;
 
     @Resource
     private RedisService redisService;
+
+    @Resource
+    private RedisWithMysql redisWithMysql;
 
     /**
      * 添加收藏夹
@@ -136,7 +134,16 @@ public class StarServiceImpl implements StarService {
             Integer updateId = result.getUpdateId();
             StarVo starVo = new StarVo();
             String key = prefix+updateId;
-            setStarVoFromRedis(starVo, key);
+            if(redisService.hGet(key,"vid")==null){
+                //缓存未命中
+                if(redisWithMysql.updateRedisByUpdateId(updateId)){  //更新缓存
+                    setStarVoFromRedis(starVo, key);   //从redis中取数据封装到starVo中
+                }else{
+                    starVo.setVid(-1);   //找不到就将vid设为-1
+                }
+            }else{
+                setStarVoFromRedis(starVo, key);  //从redis中取数据封装到starVo中
+            }
             starVo.setStarDate(result.getStarDate());
             starVos.add(starVo);
         }
@@ -149,10 +156,6 @@ public class StarServiceImpl implements StarService {
      * @param key
      */
     private void setStarVoFromRedis(StarVo starVo, String key) {
-        if(redisService.hGet(key,"vid")==null){
-            starVo.setVid(-1);   //找不到就将vid设为-1
-            return;
-        }
         starVo.setVid((Integer) redisService.hGet(key,"vid"));
         starVo.setTitle((String) redisService.hGet(key,"title"));
         starVo.setPlayNum((Integer) redisService.hGet(key,"playNum"));

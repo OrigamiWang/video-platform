@@ -45,9 +45,15 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket-name: video-platform.updates
-#审核状态码，0：未审核，1：审核通过，2：已下架
-shen_he:
+
+const: #常量
+  shen_he: #审核状态码，0：未审核，1：审核通过，2：已下架
     unchecked: 0
     checked: 1
     off_shelf: 2
+  redis: #redis key前缀
+    prefix:
+      essay: "updates:photoUpdate:"
+      video: "updates:videoUpdate:"
+
 

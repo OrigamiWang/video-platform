@@ -3,6 +3,7 @@ package szu.service;
 import org.springframework.web.multipart.MultipartFile;
 import szu.model.Partition;
 import szu.model.Update;
+import szu.model.Video;
 import szu.vo.VideoVo;
 
 import java.util.List;
@@ -68,6 +69,9 @@ public interface UpdateService {
 /*****************************************************面向前端******************************************/
     List<VideoVo> getHomePage(int pageSize);
 
+    //发布视频
     void publishVideo(Integer id, String title, String content, Integer pid, MultipartFile video);
-    void deleteVideoById(int id);
+    void deleteVideoByVid(int id);//删除指定id的视频
+
+    Video findVideoByVid(int id);//获取指定id的视频,返回Video
 }

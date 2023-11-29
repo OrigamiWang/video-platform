@@ -1,12 +1,12 @@
 package szu.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.service.MinioService;
+import szu.common.service.RedisService;
 import szu.dao.*;
 import szu.model.Partition;
 import szu.model.Update;
@@ -14,39 +14,44 @@ import szu.model.Video;
 import szu.service.UpdateService;
 import szu.vo.VideoVo;
 
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
-    @Autowired
+    @Resource
     private MinioService minioService;
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Resource
     private UpdateDao updatesDao;
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Resource
     private PartitionDao partitionDao;
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Resource
     private VideoDao videoDao;
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Resource
     private UserInfoDao userInfoDao;
+    @Resource
+    private UpdateHeatDao updateHeatDao;
+    @Resource
+    private RedisService redisService;
+    @Resource
+    private RedisWithMysqlImpl syncService;
     @Value("${minio.bucket-name}")
-    private String bucketName;
-    @Value("${shen_he.unchecked}")
-    private int UNCHECKED;
-    @Value("${shen_he.checked}")
-    private int CHECKED;
-    @Value("${shen_he.off_shelf}")
-    private int OFF_SHELF;
-    //shen_he:
-    //    unchecked: 0
-    //    checked: 1
-    //    off_shelf: 2
+    private String bucketName;//minio桶名
+    @Value("${const.shen_he.unchecked}")
+    private int UNCHECKED;//未审核
+    @Value("${const.shen_he.checked}")
+    private int CHECKED;//审核通过
+    @Value("${const.shen_he.off_shelf}")
+    private int OFF_SHELF;//下架
+    @Value("${const.redis.prefix.essay}")
+    private String ESSAY_PREFIX;//redis中essay的前缀
+    @Value("${const.redis.prefix.video}")
+    private String VIDEO_PREFIX;//redis中video的前缀
+
 
     @Transactional
     @Override
@@ -67,8 +72,12 @@ public class UpdateServiceImpl implements UpdateService {
             }
 
             //调用dao层插入数据库
-            updatesDao.insert(0, uid, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
+            int id = updatesDao.insert(0, uid, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
                     JSON.toJSONString(urls));
+
+            //TODO 通知管理员审核
+            //新建一个update_heat记录
+            updateHeatDao.insert(id, 0, 0, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Publish essay failed", e);
@@ -76,28 +85,38 @@ public class UpdateServiceImpl implements UpdateService {
 
     }
 
+
+    @Transactional
     @Override
     public void deleteEssayById(int id) {
-        //获取原动态信息
-        Update updatesOriginal = updatesDao.findById(id);
-        if (updatesOriginal == null) return;
-
-        //删除原来的图片
-        String[] urls = JSON.parseObject(updatesOriginal.getUrls(), String[].class);
-        for (String url : urls) {
-            minioService.deleteFile(bucketName, url);
+        try {
+            //获取原动态信息
+            Update updatesOriginal = findEssayById(id);
+            if (updatesOriginal == null) return;//动态不存在
+            //删除原来的图片
+            String[] urls = JSON.parseObject(updatesOriginal.getUrls(), String[].class);
+            for (String url : urls) {
+                minioService.deleteFile(bucketName, url);
+            }
+            //删除数据库中的记录
+            updatesDao.deleteById(id);
+            //删除update_heat中的记录
+            updateHeatDao.deleteByUpdateId(id);
+            //delete data in redis
+            syncService.updateRedisByUpdateId(id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Delete essay failed", e);
         }
-        //删除数据库中的记录
-        updatesDao.deleteById(id);
     }
 
     @Transactional
     @Override
     public boolean updateEssay(int id, String content, MultipartFile[] files) {
-        //获取原动态信息
         try {
-            Update updatesOriginal = updatesDao.findById(id);
-            if (updatesOriginal == null) return false;
+            //获取原动态信息
+            Update updatesOriginal = findEssayById(id);
+            if (updatesOriginal == null) return false;//动态不存在
             //更新动态信息
             updatesOriginal.setContent(content);
             //删除原来的图片
@@ -118,6 +137,8 @@ public class UpdateServiceImpl implements UpdateService {
                     updatesOriginal.getContent(), updatesOriginal.getStatus(),
                     String.valueOf(updatesOriginal.getUploadTime()),
                     updatesOriginal.getUrls());
+            //update data in redis
+            syncService.updateRedisByUpdateId(id);
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -136,13 +157,20 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public List<Update> findEssayByUid(int uid) {
+    public List<Update> findEssayByUid(int uid) {//获取指定用户的动态,返回List<Update>
         return updatesDao.findByUid(uid);
     }
 
     @Override
     public Update findEssayById(int id) {
-        return updatesDao.findById(id);
+        Map<Object, Object> objectMap = redisService.hGetAll(ESSAY_PREFIX + id);
+        if (objectMap == null) {
+            Update update = updatesDao.findById(id);
+            if (update == null) return null;//数据库中没有该动态
+            syncService.updateRedisByUpdateId(id);
+            return update;
+        }
+        return JSON.parseObject(JSON.toJSONString(objectMap), Update.class);
     }
 
     @Override
@@ -165,8 +193,11 @@ public class UpdateServiceImpl implements UpdateService {
             //插入video表
             int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, "0", title, pid, 0, 0));
             //插入update表
-            updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
+            int new_id = updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
                     JSON.toJSONString(new HashMap<>()));
+            //TODO 通知管理员审核
+            //新建一个update_heat记录
+            updateHeatDao.insert(new_id, 0, 0, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Publish video failed", e);
@@ -175,16 +206,16 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Transactional
     @Override
-    public void deleteVideoById(int id) {
+    public void deleteVideoByVid(int vid) {
         try {
             //删除原来的视频
-            Video video = videoDao.findById(id);
+            Video video = findVideoByVid(vid);
             if (video == null) return;
             minioService.deleteFile(bucketName, video.getUrl());
             //删除数据库中的记录
-            videoDao.deleteById(id);
+            videoDao.deleteById(vid);
             //删除update表中的记录
-            Update byVid = updatesDao.findByVid(id);
+            Update byVid = updatesDao.findByVid(vid);
             String[] urls = JSON.parseObject(byVid.getUrls(), String[].class);
             for (String url : urls) {
                 minioService.deleteFile(bucketName, url);
@@ -194,6 +225,18 @@ public class UpdateServiceImpl implements UpdateService {
             System.out.println(e.getMessage());
             throw new RuntimeException("Delete video failed", e);
         }
+    }
+
+    @Override
+    public Video findVideoByVid(int vid) {
+        Map<Object, Object> objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
+        if (objectMap == null) {
+            Video video = videoDao.findById(vid);
+            if (video == null) return null;//数据库中没有该视频
+            syncService.updateRedisByVideoId(vid);
+            return video;
+        }
+        return JSON.parseObject(JSON.toJSONString(objectMap), Video.class);
     }
 
     /**
@@ -228,16 +271,16 @@ public class UpdateServiceImpl implements UpdateService {
         //TODO 推荐算法
         //计算有多少个视频
         List<Integer> ids = videoDao.selectAllId();
-        int videoNum =ids.size();
+        int videoNum = ids.size();
         //获取pageSize个随机int
         int[] randomNums = new int[pageSize];
         for (int i = 0; i < pageSize; i++) {
-            randomNums[i] = ((int) (Math.random() * 10*videoNum))%videoNum;
+            randomNums[i] = ((int) (Math.random() * 10 * videoNum)) % videoNum;
         }
         //获取这些动态与视频,拼接vo
         List<VideoVo> videoVos = new ArrayList<>();
-        for (int id: ids) {
-            Video video = videoDao.findById(id);
+        for (int id : ids) {
+            Video video = findVideoByVid(id);
             Update update = updatesDao.findByVid(id);
             VideoVo videoVo = new VideoVo();
             videoVo.setId(id);
@@ -245,7 +288,7 @@ public class UpdateServiceImpl implements UpdateService {
             videoVo.setUploadTime(update.getUploadTime());
             videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
             videoVo.setPlayNum(video.getPlayNum());
-            videoVo.setDmNUm(video.getDmNum());
+            videoVo.setDmNum(video.getDmNum());
             videoVo.setTotalTime(video.getTotalTime());
             videoVo.setTitle(video.getTitle());
             videoVos.add(videoVo);

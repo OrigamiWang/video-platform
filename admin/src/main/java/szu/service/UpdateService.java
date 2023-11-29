@@ -66,7 +66,7 @@ public interface UpdateService {
      */
     void updatePartition(int id, String name);
 /*****************************************************面向前端******************************************/
-    List<VideoVo> getHomePage(int pageNum, int pageSize);
+    List<VideoVo> getHomePage(int pageSize);
 
     void publishVideo(Integer id, String title, String content, Integer pid, MultipartFile video);
     void deleteVideoById(int id);

@@ -21,6 +21,7 @@ public interface VideoDao {
     @Select("select * from video")
     List<Video> selectAll();//测试用，获取所有视频
 
-
+    @Select("select id from video")
+    List<Integer> selectAllId();//获取所有视频id
 }
 

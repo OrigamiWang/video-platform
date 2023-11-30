@@ -20,5 +20,4 @@ public class History {
     private Integer mediaType;
     private Time watchedAt;
     private Timestamp hisTime;
-
 }

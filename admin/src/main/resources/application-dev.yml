@@ -45,9 +45,20 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket-name: video-platform.updates
-#审核状态码，0：未审核，1：审核通过，2：已下架
-shen_he:
+
+redis:
+  user_prefix: "login_user_"
+  login_pin: "login_pin_"
+  register_pin: "register_pin_"
+
+const: #常量，原本使用注入方法，但是因别的模块需要使用，所以改为类内常量
+  shen_he: #审核状态码，0：未审核，1：审核通过，2：已下架
     unchecked: 0
     checked: 1
     off_shelf: 2
+  redis: #redis key前缀
+    prefix:
+      essay: "updates:photoUpdate:"
+      video: "updates:videoUpdate:"
+
 

@@ -9,7 +9,7 @@
         <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime"/>
         <result column="urls" jdbcType="VARCHAR" property="urls"/>
     </resultMap>
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into `updates` (uid, content, status, upload_time, urls)
         values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
                 #{uploadTime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})

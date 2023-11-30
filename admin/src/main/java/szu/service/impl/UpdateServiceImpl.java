@@ -41,16 +41,13 @@ public class UpdateServiceImpl implements UpdateService {
     private RedisWithMysqlImpl syncService;
     @Value("${minio.bucket-name}")
     private String bucketName;//minio桶名
-    @Value("${const.shen_he.unchecked}")
-    private int UNCHECKED;//未审核
-    @Value("${const.shen_he.checked}")
-    private int CHECKED;//审核通过
-    @Value("${const.shen_he.off_shelf}")
-    private int OFF_SHELF;//下架
-    @Value("${const.redis.prefix.essay}")
-    private String ESSAY_PREFIX;//redis中essay的前缀
-    @Value("${const.redis.prefix.video}")
-    private String VIDEO_PREFIX;//redis中video的前缀
+
+    /**常量**/
+    private static final int UNCHECKED = 0;//未审核
+    private static final int CHECKED = 1;//审核通过
+    private static final int OFF_SHELF = 2;//下架
+    private static final String ESSAY_PREFIX = "updates:photoUpdate:";//redis中essay的前缀
+    private static final String VIDEO_PREFIX = "updates:videoUpdate:";//redis中video的前缀
 
 
     @Transactional
@@ -296,5 +293,13 @@ public class UpdateServiceImpl implements UpdateService {
         return videoVos;
     }
 
-
+    @Override
+    public Update findVideoUpdateByVid(int id) {
+        try {
+            return updatesDao.findByVid(id);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

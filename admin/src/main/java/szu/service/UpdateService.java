@@ -68,10 +68,10 @@ public interface UpdateService {
     void updatePartition(int id, String name);
 /*****************************************************面向前端******************************************/
     List<VideoVo> getHomePage(int pageSize);
-
+/*****************************************************视频动态******************************************/
     //发布视频
     void publishVideo(Integer id, String title, String content, Integer pid, MultipartFile video);
     void deleteVideoByVid(int id);//删除指定id的视频
-
     Video findVideoByVid(int id);//获取指定id的视频,返回Video
+    Update findVideoUpdateByVid(int id);//获取指定id的视频,返回Update
 }

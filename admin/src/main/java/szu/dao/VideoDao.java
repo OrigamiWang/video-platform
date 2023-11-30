@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import szu.model.Video;
 import szu.model.VideoSearchDoc;
+import szu.vo.VideoDetailVo;
 
 import java.util.List;
 
@@ -34,5 +35,8 @@ public interface VideoDao {
             "left join video v on up.vid = v.id " +
             "left join user us on up.uid = us.id")
     List<VideoSearchDoc> selectAllVideoSearchDoc();
+
+    @Select("")
+    VideoDetailVo getVideoDetail(Integer id);
 }
 

@@ -25,13 +25,13 @@ public class VideoController {
     private VideoService videoService;
 
 
-    @GetMapping("/page/{vid}")
+    @GetMapping("/page/{id}")
     @ApiOperation("获取视频详情（点开视频详情页），传入路径参数vid")
-    public CommonResult<VideoDetailVo> getPage(@PathVariable @ApiParam("视频的vid") Integer vid){
+    public CommonResult<VideoDetailVo> getPage(@PathVariable @ApiParam("动态id") Integer id){
         //TODO 获取推荐视频列表
-        VideoDetailVo videoVo = videoService.getVideoDetail(vid);
+        VideoDetailVo videoVo = videoService.getVideoDetail(id);
         if(videoVo == null){
-            return CommonResult.failed("分类id不存在");
+            return CommonResult.failed("视频不存在");
         }
         return CommonResult.success(videoVo);
     }

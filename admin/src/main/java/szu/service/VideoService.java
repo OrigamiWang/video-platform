@@ -8,7 +8,7 @@ import szu.vo.VideoVo;
 import java.util.List;
 
 public interface VideoService {
-    VideoDetailVo getVideoDetail(Integer vid);
+    VideoDetailVo getVideoDetail(Integer id);
 
     ListResult search(VideoSearchParams params);
 

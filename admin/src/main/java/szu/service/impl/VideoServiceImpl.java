@@ -5,6 +5,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.springframework.stereotype.Service;
 import szu.common.api.ListResult;
 import szu.dao.UserInfoDao;
+import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
 import szu.model.User;
 import szu.service.VideoService;
@@ -21,11 +22,14 @@ public class VideoServiceImpl implements VideoService {
     private EsUtil esUtil;
     @Resource
     private UserInfoDao userInfoDao;
+    @Resource
+    private VideoDao videoDao;
 
     @Override
-    public VideoDetailVo getVideoDetail(Integer vid) {
+    public VideoDetailVo getVideoDetail(Integer id) {
         //TODO 查询video表与用户表，组装vo返回
-        return null;
+        VideoDetailVo videoDetailVo = videoDao.getVideoDetail(id);
+        return videoDetailVo;
     }
 
     @Override

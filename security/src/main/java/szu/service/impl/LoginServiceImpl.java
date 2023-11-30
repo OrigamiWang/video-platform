@@ -99,10 +99,10 @@ public class LoginServiceImpl implements LoginService {
                 }
                 // 创建用户
 //                loginDao.registerByEmail(name, email);
-                User user = new User();
-                user.setName(name);
-                user.setEmail(email);
-                userService.insert(user);
+                User userTmp = new User();
+                userTmp.setName(name);
+                userTmp.setEmail(email);
+                userService.insert(userTmp);
                 break;
             }
             default:

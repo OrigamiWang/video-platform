@@ -14,3 +14,8 @@ mybatis:
     - classpath*:com/**/mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true  # ??????
+
+redis:
+  user_prefix: "login_user_"
+  login_pin: "login_pin_"
+  register_pin: "register_pin_"

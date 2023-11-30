@@ -51,5 +51,8 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket-name: video-platform.updates
-
-
+#审核状态码，0：未审核，1：审核通过，2：已下架
+shen_he:
+  unchecked: 0
+  checked: 1
+  off_shelf: 2

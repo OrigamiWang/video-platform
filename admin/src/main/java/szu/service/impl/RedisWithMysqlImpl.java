@@ -2,6 +2,7 @@ package szu.service.impl;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import szu.common.service.RedisService;
 import szu.dao.*;
 import szu.model.*;
@@ -19,6 +20,7 @@ import java.util.Map;
  * @Date: 2023-11-29 9:04
  * @Auther: UserXin
  */
+@Service
 public class RedisWithMysqlImpl implements RedisWithMysql {
     @Resource
     private UpdateDao updateDao;

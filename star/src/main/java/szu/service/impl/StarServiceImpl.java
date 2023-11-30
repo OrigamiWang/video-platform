@@ -1,15 +1,23 @@
 package szu.service.impl;
 
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import szu.dao.StarContentDao;
-import szu.dao.StarDao;
+import szu.common.service.RedisService;
 import szu.model.Star;
-import szu.model.StarContent;
+import szu.model.StarVideo;
+import szu.service.RedisWithMysql;
 import szu.service.StarService;
+import szu.vo.StarVo;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,10 +31,13 @@ import java.util.List;
 public class StarServiceImpl implements StarService {
 
     @Resource
-    private StarDao starDao;
+    private MongoTemplate mongoTemplate;
 
     @Resource
-    private StarContentDao starContentDao;
+    private RedisService redisService;
+
+    @Resource
+    private RedisWithMysql redisWithMysql;
 
     /**
      * 添加收藏夹
@@ -39,36 +50,36 @@ public class StarServiceImpl implements StarService {
     public boolean addStar(Integer uid, String starName) {
         if(uid<0) throw new IllegalArgumentException();
         if (starName==null) throw new NullPointerException();
-        if(starDao.addStar(uid, starName)>0){
-            return true;
-        }else{
-            return false;
-        }
+        Star star = new Star();
+        star.setUid(uid);
+        star.setStarName(starName);
+        star.setStarNum(0);
+        star.setStarVideos(new ArrayList<>());
+        mongoTemplate.save(star);
+        return true;
 
     }
 
     /**
      * 收藏视频
      * @param sids 收藏夹id集合
-     * @param vid 要收藏的视频id
+     * @param updateId 要收藏的视频的动态id
      * @return
      */
     @Override
-    @Transactional //添加事务
-    public boolean starVideo(List<Integer> sids, Integer vid) {
-        if(vid<0 || sids==null || sids.size()==0) throw new IllegalArgumentException();
+    public boolean starVideo(List<String> sids, Integer updateId) {
+        if(updateId<0 || sids==null || sids.size()==0) throw new IllegalArgumentException();
         int successNum = 0;
-        for (Integer sid : sids) {
-            if(starDao.updateStarNumById(sid)>0){ //设置收藏夹收藏数量加一
-                //添加视频在收藏夹内
-                StarContent starContent = new StarContent();
-                starContent.setSid(sid);
-                starContent.setVid(vid);
-                starContent.setStarDate(LocalDateTime.now());
-                if(starContentDao.starVideo(starContent)>0){
-                    successNum++;
-                }
-            }
+        for (String sid : sids) {
+            //设置收藏夹收藏数量加一
+            Query query = Query.query(Criteria.where("_id").is(sid));
+            Update update = new Update();
+            update.inc("starNum",1);
+            //添加视频在收藏夹内
+            StarVideo starVideo = new StarVideo(updateId, LocalDateTime.now());
+            update.push("starVideos", starVideo);
+            mongoTemplate.updateFirst(query,update,Star.class);
+            successNum++;
         }
        if(successNum<sids.size()) {
            return false;
@@ -85,9 +96,74 @@ public class StarServiceImpl implements StarService {
     @Override
     public List<Star> listStarByUid(Integer uid) {
         if(uid<0) throw new IllegalArgumentException();
-        return starDao.listStarByUid(uid);
+        Query query = Query.query(Criteria.where("uid").is(uid));
+        query.fields().slice("starVideos", 0);
+        List<Star> stars = mongoTemplate.find(query, Star.class);
+        return stars;
     }
 
+
+    /**
+     * 根据收藏夹id分页获取收藏夹内容
+     * @param sid 收藏夹id
+     * @param page 当前页
+     * @param size 每页大小
+     * @return
+     */
+    @Override
+    public List<StarVo> listStarContentBySidByPage(String sid, Integer page, Integer size) {
+        if("".equals(sid)||page<0||size<=0) throw new IllegalArgumentException();
+        //匹配对应收藏夹
+        AggregationOperation match = Aggregation.match(Criteria.where("_id").is(sid));
+        //提取出收藏夹内容
+        AggregationOperation project = Aggregation.project("starVideos").andExclude("_id");
+        //把收藏内容一行内容拆开为多行
+        AggregationOperation unwind = Aggregation.unwind("starVideos");
+        //分页
+        AggregationOperation skip = Aggregation.skip(page*size);
+        AggregationOperation limit = Aggregation.limit(size);
+        //将收藏夹内容作为新的根文档返回
+        AggregationOperation replaceRoot = Aggregation.replaceRoot("starVideos");
+
+        // 执行聚合管道
+        Aggregation aggregation = Aggregation.newAggregation(match, project, unwind, skip, limit,replaceRoot);
+        List<StarVideo> results = mongoTemplate.aggregate(aggregation, "star", StarVideo.class).getMappedResults();
+        String prefix = "updates:videoUpdate:";
+        List<StarVo> starVos = new ArrayList<>();
+        for (StarVideo result : results) {
+            Integer updateId = result.getUpdateId();
+            StarVo starVo = new StarVo();
+            String key = prefix+updateId;
+            if(redisService.hGet(key,"vid")==null){
+                //缓存未命中
+                if(redisWithMysql.updateRedisByUpdateId(updateId)){  //更新缓存
+                    setStarVoFromRedis(starVo, key);   //从redis中取数据封装到starVo中
+                }else{
+                    starVo.setVid(-1);   //找不到就将vid设为-1
+                }
+            }else{
+                setStarVoFromRedis(starVo, key);  //从redis中取数据封装到starVo中
+            }
+            starVo.setStarDate(result.getStarDate());
+            starVos.add(starVo);
+        }
+        return starVos;
+    }
+
+    /**
+     * 从redis中取数据封装到starVo中
+     * @param starVo
+     * @param key
+     */
+    private void setStarVoFromRedis(StarVo starVo, String key) {
+        starVo.setVid((Integer) redisService.hGet(key,"vid"));
+        starVo.setTitle((String) redisService.hGet(key,"title"));
+        starVo.setPlayNum((Integer) redisService.hGet(key,"playNum"));
+        starVo.setStarNum((Integer) redisService.hGet(key,"starNum"));
+        starVo.setUpName((String) redisService.hGet(key,"upName"));
+        LocalDateTime uploadTime = LocalDateTime.parse((String) redisService.hGet(key, "uploadTime"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        starVo.setUploadTime(uploadTime);
+    }
 
 
 }

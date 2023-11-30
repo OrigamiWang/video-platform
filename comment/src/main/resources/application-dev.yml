@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: youxin
+    password: 123456
 
     druid:
       initial-size: 5 #连接池初始化大小
@@ -17,7 +17,7 @@ spring:
     host: localhost
     port: 6379
     password: 123456
-    database: 10
+    database: 9
 
   data:
     mongodb:

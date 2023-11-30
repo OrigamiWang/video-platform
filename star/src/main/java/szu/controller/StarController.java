@@ -9,9 +9,9 @@ import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.common.api.ResultCode;
 import szu.model.Star;
-import szu.model.StarContent;
-import szu.service.StarContentService;
+import szu.model.StarVideo;
 import szu.service.StarService;
+import szu.vo.StarVo;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -32,9 +32,6 @@ public class StarController {
 
     @Resource
     private StarService starService;
-
-    @Resource
-    private StarContentService starContentService;
 
     /**
      * 添加收藏夹
@@ -58,15 +55,15 @@ public class StarController {
     /**
      * 收藏视频
      * @param sids 收藏夹id集合
-     * @param vid 要收藏的视频id
+     * @param updateId 要收藏的视频的动态id
      * @return
      */
-    @PostMapping("/starVideo/{vid}")
+    @PostMapping("/starVideo/{updateId}")
     @ApiOperation("收藏视频")
-    public CommonResult<ResultCode> starVideo(@RequestBody @ApiParam("收藏夹id") List<Integer> sids,
-                                              @PathVariable("vid") @ApiParam("要收藏的视频id") Integer vid){
-        log.info("收藏视频sid:{},vid:{}",sids,vid);
-        if(starService.starVideo(sids,vid)){
+    public CommonResult<ResultCode> starVideo(@RequestBody @ApiParam("收藏夹id") List<String> sids,
+                                              @PathVariable("updateId") @ApiParam("要收藏的视频id") Integer updateId){
+        log.info("收藏视频sid:{},updateId:{}",sids,updateId);
+        if(starService.starVideo(sids,updateId)){
             return CommonResult.success(ResultCode.SUCCESS);
         }else{
             return CommonResult.success(ResultCode.FAILED);
@@ -100,15 +97,15 @@ public class StarController {
      */
     @GetMapping("/listStarContent/{sid}/{page}/{size}")
     @ApiOperation("根据收藏夹id分页获取收藏夹内容")
-    public CommonResult<ListResult<StarContent>> listStarContentBySidByPage(@PathVariable("sid") @ApiParam("收藏夹id") Integer sid,
-                                                                      @PathVariable("page") @ApiParam("当前页") Integer page,
-                                                                      @PathVariable("size") @ApiParam("每页大小") Integer size){
+    public CommonResult<ListResult<StarVo>> listStarContentBySidByPage(@PathVariable("sid") @ApiParam("收藏夹id") String sid,
+                                                                       @PathVariable("page") @ApiParam("当前页") Integer page,
+                                                                       @PathVariable("size") @ApiParam("每页大小") Integer size){
         log.info("根据收藏夹id分页获取收藏夹内容,sid:{},page:{},size:{}",sid,page,size);
         //分页查询结果
-        List<StarContent> starContentList = starContentService.listStarContentBySidByPage(sid,page,size);
+        List<StarVo> videoIdsList = starService.listStarContentBySidByPage(sid,page,size);
         //封装统一的list返回结果
-        ListResult<StarContent> starContentListResult = new ListResult<>(starContentList, (long) starContentList.size());
-        return CommonResult.success(starContentListResult);
+        ListResult<StarVo> videoIdsListResult = new ListResult<>(videoIdsList, (long) videoIdsList.size());
+        return CommonResult.success(videoIdsListResult);
     }
 
 

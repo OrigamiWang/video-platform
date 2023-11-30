@@ -194,7 +194,7 @@ public class UpdatesController {
         if (!Objects.equals(user.getId(), updatesService.findEssayById(id).getUid())) {
             return CommonResult.failed("无权删除");
         }
-        updatesService.deleteVideoById(id);
+        updatesService.deleteVideoByVid(id);
         return CommonResult.success("操作成功");
     }
 
@@ -224,10 +224,11 @@ public class UpdatesController {
     public CommonResult<List<Partition>> allPartitions() {
         return CommonResult.success(updatesService.getPartitions());
     }
+
     @GetMapping("/homePage")
     @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
     @ApiResponse(code = 200, message = "VideoVo List")
-    public CommonResult<List<VideoVo>> getHomePage(@RequestParam("pageSize") int pageSize) {
+    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
         return CommonResult.success(updatesService.getHomePage(pageSize));
     }
 }

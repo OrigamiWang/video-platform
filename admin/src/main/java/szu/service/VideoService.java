@@ -5,10 +5,12 @@ import szu.dto.VideoSearchParams;
 import szu.vo.VideoDetailVo;
 import szu.vo.VideoVo;
 
+import java.util.List;
+
 public interface VideoService {
     VideoDetailVo getVideoDetail(Integer vid);
 
-    ListResult<VideoVo> search(VideoSearchParams params);
+    ListResult search(VideoSearchParams params);
 
     /**
      * 用户个人主页的投稿展示
@@ -19,4 +21,6 @@ public interface VideoService {
      * @return
      */
     ListResult<VideoVo> getVideoById(Integer id, Integer sort, Integer page, Integer size);
+
+    List<String> searchSuggest(String key);
 }

@@ -8,10 +8,11 @@ import szu.model.UserRole;
 import szu.model.UserStatistics;
 
 import java.util.List;
-
+@Mapper
 public interface UserDao {
     List<User> selectAllUser();
 
+    //仅插入name与email
     void insert(User user);
     @Select("select * from user where id = #{id}")
     User selectUserById(Integer id);

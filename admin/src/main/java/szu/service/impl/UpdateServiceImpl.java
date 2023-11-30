@@ -12,9 +12,12 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
+import szu.util.TimeUtil;
 import szu.vo.VideoVo;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -163,7 +166,7 @@ public class UpdateServiceImpl implements UpdateService {
             String videoUrl = System.currentTimeMillis() + video.getOriginalFilename();
             minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
             //插入video表
-            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, "0", title, pid, 0, 0));
+            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, 0, title, pid, 0, 0));
             //插入update表
             updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
                     JSON.toJSONString(new HashMap<>()));
@@ -245,8 +248,8 @@ public class UpdateServiceImpl implements UpdateService {
             videoVo.setUploadTime(update.getUploadTime());
             videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
             videoVo.setPlayNum(video.getPlayNum());
-            videoVo.setDmNUm(video.getDmNum());
-            videoVo.setTotalTime(video.getTotalTime());
+            videoVo.setDmNum(video.getDmNum());
+            videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
             videoVo.setTitle(video.getTitle());
             videoVos.add(videoVo);
         }

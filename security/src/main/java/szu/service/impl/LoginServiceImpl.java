@@ -14,6 +14,7 @@ import szu.dto.RegisterDto;
 import szu.model.User;
 import szu.service.LoginService;
 import szu.service.MailService;
+import szu.service.UserService;
 import szu.util.PinUtil;
 import szu.util.UuidUtil;
 
@@ -39,6 +40,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Resource
     private PermissionDao permissionDao;
+    @Resource
+    private UserService userService;
 
     @Resource
     private MailService mailService;
@@ -90,7 +93,11 @@ public class LoginServiceImpl implements LoginService {
                     return CommonResult.failed("验证码错误！");
                 }
                 // 创建用户
-                loginDao.registerByEmail(name, email);
+//                loginDao.registerByEmail(name, email);
+                User user = new User();
+                user.setName(name);
+                user.setEmail(email);
+                userService.insert(user);
                 break;
             }
             default:

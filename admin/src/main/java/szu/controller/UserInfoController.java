@@ -35,13 +35,15 @@ public class UserInfoController {
         return userInfo != null ? CommonResult.success(userInfo) : CommonResult.failed("获取用户信息失败");
     }
 
-    @GetMapping("/list-video")
-    @ApiOperation("根据uid获取用户的投稿列表")
-    public ListResult<VideoVo> getUserVideo(@RequestParam @ApiParam("指定uid") Integer uid,
+    @GetMapping("/list-video-by-uid")
+    @ApiOperation("根据uid获取用户的投稿列表，total表示该用户的所有投稿量")
+    public CommonResult<ListResult<VideoVo>> getUserVideo(@RequestParam @ApiParam("指定uid") Integer uid,
                                               @RequestParam(defaultValue = "0") @ApiParam("指定排列方式，0最新、1最多播放、2最多收藏，默认为0") Integer sort,
                                               @RequestParam(defaultValue = "1") @ApiParam("第几页，默认1") Integer page,
                                               @RequestParam(defaultValue = "10") @ApiParam("每页数量，默认10") Integer size
     ){
-        return videoService.getVideoById(uid, sort, page, size);
+        ListResult<VideoVo> res = videoService.getVideoById(uid, sort, page, size);
+        if(res == null) return CommonResult.failed("用户不存在");
+        return CommonResult.success(res);
     }
 }

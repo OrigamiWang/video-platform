@@ -20,6 +20,11 @@
     </properties>
     <dependencies>
 
+
+        <dependency>
+            <groupId>szu</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

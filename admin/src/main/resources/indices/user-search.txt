@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "key_analyzer": {
+          "char_filter": "remove_spaces",
+          "tokenizer": "ik_max_word",
+          "filter": "py"
+        }
+      },
+      "filter": {
+        "py": {
+          "type": "pinyin",
+          "keep_full_pinyin": false,
+          "keep_joined_full_pinyin": true,
+          "keep_original": true,
+          "limit_first_letter_length": 16,
+          "remove_duplicated_term": true,
+          "none_chinese_pinyin_tokenize": false
+        }
+      },
+      "char_filter": {
+        "remove_spaces": {
+          "type": "pattern_replace",
+          "pattern": "\\s+",
+          "replacement": ""
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id":{
+        "type": "keyword"
+      },
+      "name":{
+        "type": "text",
+        "analyzer": "key_analyzer",
+        "search_analyzer": "ik_smart"
+      },
+      "info":{
+        "type": "text",
+        "index": false
+      },
+      "fan":{
+        "type": "integer"
+      },
+      "video_num":{
+        "type": "integer"
+      },
+      "level":{
+        "type": "integer",
+        "index": false
+      }
+    }
+  }
+}

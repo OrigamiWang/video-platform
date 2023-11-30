@@ -10,9 +10,9 @@
 
 <!--    void insert(User user);-->
     <insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="id">
-        insert into user (`name`, `level`, `status`, `phone`, `password`, `email`)
+        insert into user (`name`, `email`)
             values
-        (#{name}, #{level}, #{status}, #{phone}, #{password}, #{email});
+        (#{name}, #{email});
     </insert>
 
 
@@ -51,6 +51,12 @@
             </if>
             <if test="like != null">
                 `like` = #{like},
+            </if>
+            <if test="videoNum != null">
+                `video_num` = #{#videoNum},
+            </if>
+            <if test="videoTotalPlay != null">
+                `video_total_play` = #{videoTotalPlay},
             </if>
         </set>
         where uid = #{uid}

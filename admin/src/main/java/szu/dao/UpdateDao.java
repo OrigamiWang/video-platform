@@ -16,5 +16,5 @@ public interface UpdateDao {
 
     void deleteByVid(int id);
 
-    Update findByVid(int vid);
+    Update findByVid(int vid);//根据vid找到那条动态获取详细信息
 }

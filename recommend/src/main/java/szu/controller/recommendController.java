@@ -48,12 +48,14 @@ public class recommendController {
     }
 
     @GetMapping("/getRecommend/{uid}")
+    @ApiOperation("获取推荐的动态id（如果历史数据不足，返回的第一个元素是-1，然后后面跟着的就是得分前五的分区id）")
     public CommonResult<List<Integer>> getRecommend(@PathVariable("uid") Integer uid) throws IOException, TasteException {
         List<Integer> integers = recommendService.recommendUpdateList(uid);
         return CommonResult.success(integers);
     }
 
     @GetMapping("/getRecommend/{uid}/{updateId}")
+    @ApiOperation("根据当前观看的视频动态id获取推荐的动态id（如果历史数据不足，返回的第一个元素是-1，然后后面跟着的就是得分前五的分区id）")
     public CommonResult<List<Integer>> getRecommendByUpdateId(@PathVariable("uid") Integer uid,
                                                               @PathVariable("updateId") Integer updateId) throws IOException, TasteException {
         List<Integer> integers = recommendService.recommendUpdateListByUpdateId(uid,updateId);

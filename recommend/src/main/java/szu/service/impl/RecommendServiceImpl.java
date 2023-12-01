@@ -28,10 +28,7 @@ import szu.service.RecommendService;
 
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @ClassName: recommendServiceImpl
@@ -47,6 +44,8 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Resource
     private UpdateAndVideoDao updateAndVideoDao;
+
+    private Map<Integer,GenericItemBasedRecommender> map = new HashMap<>();
 
     /**
      * 增加得分
@@ -83,8 +82,15 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Override
     public List<Integer> recommendUpdateList(Integer uid) throws TasteException {
-
-        GenericItemBasedRecommender recommender = getGenericItemBasedRecommender();
+        GenericItemBasedRecommender recommender = null;
+        if(map.containsKey(uid)){
+            System.out.println("contains"+uid);
+            recommender = map.get(uid);   //已经有了就不再创建直接获取
+        }else{
+            System.out.println("创建");
+            recommender = getGenericItemBasedRecommender();
+            map.put(uid,recommender);
+        }
         //推荐50个视频
         List<RecommendedItem> recommend = recommender.recommend(uid, 50);
         return getResult(uid, recommend);
@@ -92,7 +98,15 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Override
     public List<Integer> recommendUpdateListByUpdateId(Integer uid, Integer updateId) throws TasteException {
-        GenericItemBasedRecommender recommender = getGenericItemBasedRecommender();
+        GenericItemBasedRecommender recommender = null;
+        if(map.containsKey(uid)){
+            System.out.println("contains"+uid);
+            recommender = map.get(uid);   //已经有了就不再创建直接获取
+        }else{
+            System.out.println("创建");
+            recommender = getGenericItemBasedRecommender();
+            map.put(uid,recommender);
+        }
         //推荐50个视频
         List<RecommendedItem> recommend = recommender.recommendedBecause(uid,updateId, 50);
         return getResult(uid, recommend);
@@ -108,7 +122,7 @@ public class RecommendServiceImpl implements RecommendService {
     private List<Integer> getResult(Integer uid, List<RecommendedItem> recommend) {
         List<Integer> recommendUpdateId = new ArrayList<>();
         for (RecommendedItem recommendedItem : recommend) {
-            System.out.println(recommendedItem);
+            //System.out.println(recommendedItem);
             recommendUpdateId.add((int) recommendedItem.getItemID());
         }
         Query query = Query.query(Criteria.where("uid").is(uid));

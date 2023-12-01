@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import szu.model.User;
 import szu.model.UserDetail;
 import szu.model.UserStatistics;
+import szu.service.UserService;
 
 import javax.annotation.Resource;
 
@@ -138,7 +139,6 @@ public class TestUserController {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("操作成功"))
                 .andDo(print());
     }
-
 
 
 }

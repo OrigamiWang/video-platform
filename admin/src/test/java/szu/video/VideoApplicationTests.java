@@ -1,6 +1,7 @@
 package szu.video;
 
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -34,27 +35,31 @@ import org.springframework.web.context.WebApplicationContext;
 import szu.AdminApplication;
 import szu.common.api.ListResult;
 import szu.dao.UpdateDao;
+import szu.dao.UserDao;
 import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
-import szu.model.Update;
-import szu.model.User;
-import szu.model.Video;
-import szu.model.VideoSearchDoc;
+import szu.model.*;
 import szu.service.VideoService;
 import szu.util.EsUtil;
+import szu.util.TimeUtil;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +73,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = AdminApplication.class)
 @AutoConfigureMockMvc
 class VideoApplicationTests {
-    @Resource
-    private VideoDao videoDao;
-    @Resource
-    private UpdateDao updateDao;
-    @Resource
-    private UserInfoDao userInfoDao;
-    @Resource
-    private EsUtil esUtil;
     @Autowired
     private MockMvc mockMvc;
+
 
     @Test//测试发布动态接口
     public void testPublish() throws Exception {
@@ -141,109 +139,5 @@ class VideoApplicationTests {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-    @Resource
-    private RestHighLevelClient client;
-    @Test
-    void testExistsHotelIndex() throws IOException {
-        GetIndexRequest request = new GetIndexRequest("video-search");
-        boolean exists = client.indices().exists(request, RequestOptions.DEFAULT);
-        System.err.println(exists ? "索引库已经存在！" : "索引库不存在！");
-    }
 
-
-    /**
-     * 将数据库内容组装成doc存入es
-     */
-    @Test
-    public void initEs(){
-        List<Video> videos = videoDao.selectAll();
-        BulkRequest request = new BulkRequest();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for (Video video : videos) {
-            VideoSearchDoc videoSearchDoc = new VideoSearchDoc();
-            int vid = video.getId();
-            BeanUtils.copyProperties(video, videoSearchDoc);
-            Update update = updateDao.findByVid(vid);
-            videoSearchDoc.setUploadTime(update.getUploadTime());
-            videoSearchDoc.setId(update.getId());//doc里面的id是update的id
-            User user = userInfoDao.getUserById(update.getUid());
-            videoSearchDoc.setName(user.getName());
-            List<String> sug = new ArrayList<>();
-            sug.add(videoSearchDoc.getName());
-            sug.add(videoSearchDoc.getTitle());
-            videoSearchDoc.setSuggestion(sug);
-//            videoSearchDoc.setTitle(videoSearchDoc.getTitle().replaceAll(" ",""));//去除标题中的空格
-            request.add(new IndexRequest("video-search")
-                    .id(videoSearchDoc.getId()+"")
-                    .source(JSON.toJSONString(videoSearchDoc), XContentType.JSON)
-            );
-        }
-        try {
-            client.bulk(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 查询所有数据
-     */
-    @Test
-    void testMatchAll() throws IOException {
-        // Request
-        SearchRequest request = new SearchRequest("video-search");
-        // DSL
-        request.source()
-                .query(QueryBuilders.matchAllQuery());
-        // 发送请求
-        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-
-        // 解析响应
-        handleResponse(response);
-    }
-
-    private void handleResponse(SearchResponse response) {
-        SearchHits searchHits = response.getHits();
-        // 获取总条数
-        long total = searchHits.getTotalHits().value;
-        // 获取文档数组
-        SearchHit[] hits = searchHits.getHits();
-        // 遍历数组
-        for (SearchHit hit : hits) {
-            // 获取文档source
-            String json = hit.getSourceAsString();
-            // 反序列化
-            VideoSearchDoc videoSearchDoc = JSON.parseObject(json, VideoSearchDoc.class);
-            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-            if (!CollectionUtils.isEmpty(highlightFields)) {
-                // 根据字段名获取高亮结果
-                HighlightField highlightField = highlightFields.get("all");
-                if (highlightField != null) {
-                    // 获取高亮值
-                    String name = highlightField.getFragments()[0].string();
-                    // 覆盖非高亮结果
-                    System.out.println(name);
-                }
-            }
-            System.out.println("videoSearchDoc = " + videoSearchDoc);
-        }
-    }
-
-
-    @Test
-    void test(){
-        VideoSearchParams videoSearchParams = new VideoSearchParams("原神");
-        System.out.println(videoSearchParams);
-//        ListResult<VideoVo> search = esUtil.search();
-    }
-
-
-    @Resource
-    VideoService videoService;
-    @Test
-    void testGetVideById(){
-        //结果正确
-//        ListResult<VideoVo> res = videoService.getVideoById(1, 0, 1, 10);
-
-    }
 }

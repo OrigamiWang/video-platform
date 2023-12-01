@@ -27,7 +27,7 @@ public class VideoSearchDoc {
     @ApiModelProperty("弹幕数量")
     private int dmNum;
     @ApiModelProperty("视频时长，统一转换为秒数便于排序与筛选")
-    private String totalTime;
+    private int totalTime;
     @ApiModelProperty("分区id")
     private int pid;
     @ApiModelProperty("收藏数量")

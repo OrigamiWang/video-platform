@@ -17,8 +17,6 @@ public class User implements Serializable {
     @ApiModelProperty(value = "uid")
     private Integer id;
 
-
-    @ApiParam("张三")
     @ApiModelProperty(value = "昵称")
     private String name;
 

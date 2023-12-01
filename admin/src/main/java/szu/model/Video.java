@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.sql.Time;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +22,7 @@ public class Video {
     @ApiModelProperty("弹幕数量")
     private int dmNum;
     @ApiModelProperty("总时长")
-    private String totalTime;
+    private int totalTime;
     @ApiModelProperty("标题")
     private String title;
     @ApiModelProperty("分区id")

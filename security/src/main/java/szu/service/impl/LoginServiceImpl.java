@@ -14,6 +14,7 @@ import szu.dto.RegisterDto;
 import szu.model.User;
 import szu.service.LoginService;
 import szu.service.MailService;
+import szu.service.UserService;
 import szu.util.PinUtil;
 import szu.util.UuidUtil;
 
@@ -39,13 +40,15 @@ public class LoginServiceImpl implements LoginService {
 
     @Resource
     private PermissionDao permissionDao;
+    @Resource
+    private UserService userService;
 
     @Resource
     private MailService mailService;
     @Value("${redis.user_prefix}")
     private String REDIS_USER_PREFIX;
-    @Value("${redis.register_pin}")
-    private String REDIS_REGISTER_PIN;
+    @Value("${redis.auth_pin}")
+    private String REDIS_AUTH_PIN;
 
     @Override
     public CommonResult<String> register(RegisterDto registerDto) {
@@ -59,25 +62,26 @@ public class LoginServiceImpl implements LoginService {
                 break;
             }
             case 1: {
-                System.out.println("手机验证码注冊");
+                System.out.println("手机号+密码注冊");
                 String phone = registerDto.getPhone();
                 if (phone == null || "".equals(phone)) {
                     return CommonResult.failed("手机号不能为空！");
                 }
-                String pin = registerDto.getPin();
-                if (pin == null || "".equals(pin)) {
-                    return CommonResult.failed("验证码不能为空！");
+                String pswd = registerDto.getPswd();
+                if (pswd == null || "".equals(pswd)) {
+                    return CommonResult.failed("密码不能为空！");
                 }
-                // 校验验证码的正确性
-                if (!checkPin(phone, pin)) {
-                    return CommonResult.failed("验证码错误！");
+                // 判断手机号是否已经被注册
+                User user = loginDao.getUser(phone);
+                if (user != null) {
+                    return CommonResult.failed("该手机号已经被注册！");
                 }
                 // 创建用户
-//                loginDao.registerByPhone(name, phone, ShaUtil.encode(pswd));
+                loginDao.registerByPhone(name, phone, ShaUtil.encode(pswd));
                 break;
             }
             case 2: {
-                System.out.println("邮箱注册");
+                System.out.println("邮箱+验证码注册");
                 String email = registerDto.getEmail();
                 if (email == null || "".equals(email)) {
                     return CommonResult.failed("邮箱不能为空！");
@@ -89,8 +93,16 @@ public class LoginServiceImpl implements LoginService {
                 if (!checkPin(email, pin)) {
                     return CommonResult.failed("验证码错误！");
                 }
+                User user = loginDao.getUserByEmail(email);
+                if (user != null) {
+                    return CommonResult.failed("该邮箱已经被注册！");
+                }
                 // 创建用户
-                loginDao.registerByEmail(name, email);
+//                loginDao.registerByEmail(name, email);
+                User userTmp = new User();
+                userTmp.setName(name);
+                userTmp.setEmail(email);
+                userService.insert(userTmp);
                 break;
             }
             default:
@@ -102,14 +114,41 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(LoginDto loginDto) {
-        String phone = loginDto.getPhone();
-        String pswd = loginDto.getPswd();
-        String encryptedPswd = ShaUtil.encode(pswd);
-        System.out.println("encryptedPswd = " + encryptedPswd);
-        User user = loginDao.getUser(phone);
-        if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
-            return "";
+        int type = loginDto.getType();
+        User user;
+        switch (type) {
+            case 0: {
+                String phone = loginDto.getPhone();
+                String pswd = loginDto.getPswd();
+                String encryptedPswd = ShaUtil.encode(pswd);
+                System.out.println("encryptedPswd = " + encryptedPswd);
+                user = loginDao.getUser(phone);
+                if (user == null || !Objects.equals(encryptedPswd, user.getPassword())) {
+                    return "";
+                }
+                break;
+            }
+            case 1: {
+                String email = loginDto.getEmail();
+                String pin = loginDto.getPin();
+                if (pin == null || "".equals(pin)) {
+                    return "";
+                }
+                if (!checkPin(email, pin)) {
+                    return "";
+                }
+                // 查看该邮箱是否注册
+                user = loginDao.getUserByEmail(email);
+                if (user == null) {
+                    return "";
+                }
+                break;
+            }
+            default: {
+                return "";
+            }
         }
+
         // set permission
         Map<Integer, Integer> map = GlobalPermissionMap.getInstance();
         int uid = user.getId();
@@ -126,8 +165,17 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    public User getCurrentUser(String token) {
+        User user = (User) redisTemplate.opsForValue().get(REDIS_USER_PREFIX + token);
+        if (user != null) {
+            user.setPassword(null);
+        }
+        return user;
+    }
+
+    @Override
     public boolean checkPin(String suffix, String pin) {
-        String p = (String) redisTemplate.opsForValue().get(REDIS_REGISTER_PIN + suffix);
+        String p = (String) redisTemplate.opsForValue().get(REDIS_AUTH_PIN + suffix);
         return Objects.equals(p, pin);
     }
 
@@ -140,9 +188,9 @@ public class LoginServiceImpl implements LoginService {
         int type = authDto.getType();
         String pin = PinUtil.generatePin();
         System.out.println("pin = " + pin);
-        redisTemplate.opsForValue().set(REDIS_REGISTER_PIN + auth, pin);
+        redisTemplate.opsForValue().set(REDIS_AUTH_PIN + auth, pin);
         // 验证码2min内有效
-        redisTemplate.expire(REDIS_REGISTER_PIN + auth, 2, TimeUnit.MINUTES);
+        redisTemplate.expire(REDIS_AUTH_PIN + auth, 2, TimeUnit.MINUTES);
         switch (type) {
             case 0: {
                 // 邮箱
@@ -151,7 +199,6 @@ public class LoginServiceImpl implements LoginService {
             }
             case 1: {
                 // 手机号
-
                 break;
             }
             default:
@@ -170,5 +217,5 @@ public class LoginServiceImpl implements LoginService {
         return false;
     }
 
-
 }
+

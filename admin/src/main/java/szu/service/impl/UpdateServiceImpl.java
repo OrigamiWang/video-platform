@@ -12,10 +12,13 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
+import szu.util.TimeUtil;
 import szu.vo.VideoVo;
+
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,16 +44,13 @@ public class UpdateServiceImpl implements UpdateService {
     private RedisWithMysqlImpl syncService;
     @Value("${minio.bucket-name}")
     private String bucketName;//minio桶名
-    @Value("${const.shen_he.unchecked}")
-    private int UNCHECKED;//未审核
-    @Value("${const.shen_he.checked}")
-    private int CHECKED;//审核通过
-    @Value("${const.shen_he.off_shelf}")
-    private int OFF_SHELF;//下架
-    @Value("${const.redis.prefix.essay}")
-    private String ESSAY_PREFIX;//redis中essay的前缀
-    @Value("${const.redis.prefix.video}")
-    private String VIDEO_PREFIX;//redis中video的前缀
+
+    /**常量**/
+    private static final int UNCHECKED = 0;//未审核
+    private static final int CHECKED = 1;//审核通过
+    private static final int OFF_SHELF = 2;//下架
+    private static final String ESSAY_PREFIX = "updates:photoUpdate:";//redis中essay的前缀
+    private static final String VIDEO_PREFIX = "updates:videoUpdate:";//redis中video的前缀
 
 
     @Transactional
@@ -191,7 +191,7 @@ public class UpdateServiceImpl implements UpdateService {
             String videoUrl = System.currentTimeMillis() + video.getOriginalFilename();
             minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
             //插入video表
-            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, "0", title, pid, 0, 0));
+            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, 0, title, pid, 0, 0));
             //插入update表
             int new_id = updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
                     JSON.toJSONString(new HashMap<>()));
@@ -289,12 +289,20 @@ public class UpdateServiceImpl implements UpdateService {
             videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
             videoVo.setPlayNum(video.getPlayNum());
             videoVo.setDmNum(video.getDmNum());
-            videoVo.setTotalTime(video.getTotalTime());
+            videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
             videoVo.setTitle(video.getTitle());
             videoVos.add(videoVo);
         }
         return videoVos;
     }
 
-
+    @Override
+    public Update findVideoUpdateByVid(int id) {
+        try {
+            return updatesDao.findByVid(id);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

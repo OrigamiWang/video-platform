@@ -19,10 +19,14 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
+
+
+
         <dependency>
             <groupId>szu</groupId>
             <artifactId>common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>szu</groupId>
             <artifactId>admin</artifactId>

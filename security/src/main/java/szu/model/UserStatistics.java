@@ -1,5 +1,6 @@
 package szu.model;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -22,5 +23,11 @@ public class UserStatistics implements Serializable {
 
     @ApiModelProperty(value = "获赞数量")
     private Integer like;
+
+    @ApiModelProperty("投稿视频数量")
+    private Integer videoNum;
+
+    @ApiModelProperty("视频总播放量")
+    private Integer videoTotalPlay;
 
 }

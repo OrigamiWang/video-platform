@@ -48,35 +48,7 @@
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
-<!--        mahout依赖-->
-        <dependency>
-            <groupId>org.apache.mahout</groupId>
-            <artifactId>mahout-examples</artifactId>
-            <version>0.11.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jdk.tools</artifactId>
-                    <groupId>jdk.tools</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-data-mongodb</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-<!--        mongodb依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
+
 
     </dependencies>
 

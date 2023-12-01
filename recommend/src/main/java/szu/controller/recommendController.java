@@ -34,14 +34,14 @@ public class recommendController {
      * 增加得分
      * @param uid 当前登录的用户id
      * @param updateId 动态id
-     * @param score 得分：（观看：1 点赞：2 投币：3 收藏：4）
+     * @param score 得分：(观看：+1 ,点赞：+2 ,投币：+3 ,收藏：+4)
      * @return
      */
     @PostMapping("/plusScore/{uid}/{updateId}/{score}")
     @ApiOperation("增加得分")
     public CommonResult<ResultCode> plusScore(@PathVariable("uid") @ApiParam("当前登录的用户id") Integer uid,
                                               @PathVariable("updateId") @ApiParam("动态id") Integer updateId,
-                                              @PathVariable("score") @ApiParam("得分：(观看：1 点赞：2 投币：3 收藏：4)") Integer score){
+                                              @PathVariable("score") @ApiParam("得分：(观看：+1 ,点赞：+2 ,投币：+3 ,收藏：+4)") Float score){
         log.info("增加得分：uid：{}，updateId：{}，score：{}",uid,updateId,score);
         recommendService.plusScore(uid,updateId,score);
         return CommonResult.success(ResultCode.SUCCESS);
@@ -53,4 +53,10 @@ public class recommendController {
         return CommonResult.success(integers);
     }
 
+    @GetMapping("/getRecommend/{uid}/{updateId}")
+    public CommonResult<List<Integer>> getRecommendByUpdateId(@PathVariable("uid") Integer uid,
+                                                              @PathVariable("updateId") Integer updateId) throws IOException, TasteException {
+        List<Integer> integers = recommendService.recommendUpdateListByUpdateId(uid,updateId);
+        return CommonResult.success(integers);
+    }
 }

@@ -2,6 +2,7 @@ package szu.model;
 
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,13 +16,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document(collection = "videoScore")
+@AllArgsConstructor
 public class VideoScore {
     @Id
     private String id;
-    @ApiModelProperty("用户id")
-    private Integer uid;
     @ApiModelProperty("动态id")
     private Integer updateId;
     @ApiModelProperty("评分（观看：1 点赞：2 投币：3 收藏：4）")
     private Float score;
+
+    public VideoScore(){
+        this.score = 0f;
+    }
+
 }

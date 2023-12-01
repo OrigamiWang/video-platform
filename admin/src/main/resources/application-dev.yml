@@ -52,6 +52,7 @@ redis:
   user_prefix: "login_user_"
   login_pin: "login_pin_"
   register_pin: "register_pin_"
+  auth_pin: "auth_pin_"
 
 const: #常量，原本使用注入方法，但是因别的模块需要使用，所以改为类内常量
   shen_he: #审核状态码，0：未审核，1：审核通过，2：已下架

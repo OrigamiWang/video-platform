@@ -1,6 +1,7 @@
 package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,17 +15,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document("partitionScore")
+@AllArgsConstructor
 public class PartitionScore {
     @Id
     private String id;
-    @ApiModelProperty("用户id")
-    private Integer uid;
+
     @ApiModelProperty("分区id")
     private Integer pid;
     @ApiModelProperty("分区得分")
-    private Integer score;
+    private Float score;
 
     public PartitionScore(){
-        this.score = 0;
+        this.score = 0f;
     }
 }

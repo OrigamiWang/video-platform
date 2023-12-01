@@ -26,6 +26,9 @@ spring:
 mybatis:
   mapper-locations:
     - classpath:dao/*.xml
+    - classpath*:com/**/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true  # ??????
 
 
 redis:

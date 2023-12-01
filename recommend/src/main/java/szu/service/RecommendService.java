@@ -20,10 +20,10 @@ public interface RecommendService {
      * 增加得分
      * @param uid 当前登录的用户id
      * @param updateId 动态id
-     * @param score 得分：（观看：1 点赞：2 投币：3 收藏：4）
+     * @param score 得分：(观看：+1 点赞：+2 投币：+3 收藏：+4)
      * @return
      */
-    void plusScore(Integer uid, Integer updateId, Integer score);
+    void plusScore(Integer uid, Integer updateId, Float score);
 
     /**
      * 推荐视频
@@ -33,9 +33,10 @@ public interface RecommendService {
 
     /**
      * 根据当前观看的视频推荐新的
+     * @param uid
      * @param updateId
      * @return
      */
-    List<Integer> recommendUpdateListByUpdateId(Integer updateId);
+    List<Integer> recommendUpdateListByUpdateId(Integer uid, Integer updateId) throws TasteException;
 
 }

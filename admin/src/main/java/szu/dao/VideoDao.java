@@ -50,10 +50,10 @@ public interface VideoDao {
     void updateVideoByVid(Video video);
 
     /**
-     * 根据动态id更新视频源
-     * @param uid
+     * 根据视频id更新视频源
+     * @param vid
      */
-    void updateVideoSource(Integer uid, String url);
+    void updateVideoSource(Integer vid, String url);
 
     /**
      * 根据视频id更新视频简介信息

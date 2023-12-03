@@ -1,4 +1,4 @@
-CREATE TABLE `update`
+CREATE TABLE `updates`
 (
     `id`       int           NOT NULL AUTO_INCREMENT COMMENT '动态id',
     `uid`      int           NOT NULL COMMENT '发布者的用户id',
@@ -10,7 +10,5 @@ CREATE TABLE `update`
     `urls`     varchar(1024) DEFAULT NULL COMMENT '多媒体urls的json',
     `pid`      int           NOT NULL COMMENT '分区id',
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`uid`) REFERENCES `user` (`id`),
-    FOREIGN KEY (`pid`) REFERENCES `update_partition` (`id`)
 );
 

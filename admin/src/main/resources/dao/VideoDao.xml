@@ -59,15 +59,15 @@
                 </set>
             where id = #{id};
     </update>
-<!--    void updateVideoSource(Integer uid, String url);-->
+<!--    void updateVideoSource(Integer vid, String url);-->
     <update id="updateVideoSource">
-        update updates
+        update video
                 <set>
                     <if test="url != null">
                         url = #{url}
                     </if>
                 </set>
-        where updates.id = #{uid};
+        where video.id = #{vid};
     </update>
 <!--    void updateVideoContent(Integer id, String content);-->
     <update id="updateVideoContent">

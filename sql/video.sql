@@ -1,6 +1,6 @@
 CREATE TABLE `video` (
                          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '视频id',
-                         `url` varchar(255) NOT NULL DEFAULT 'www.test.jpg' COMMENT '封面url',
+                         `url` varchar(255) NOT NULL DEFAULT 'www.test.jpg' COMMENT '视频url',
                          `play_num` int(11) NOT NULL DEFAULT '0' COMMENT '播放数量',
                          `dm_num` int(11) NOT NULL DEFAULT '0' COMMENT '弹幕数量',
                          `total_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '总时长',

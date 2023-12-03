@@ -32,7 +32,7 @@
         WHERE phone = #{phone};
     </select>
 
-<!--    User getUserByEmail(@Param("email") String email);-->
+    <!--    User getUserByEmail(@Param("email") String email);-->
     <select id="getUserByEmail" resultMap="UserMap">
         SELECT *
         FROM `user`

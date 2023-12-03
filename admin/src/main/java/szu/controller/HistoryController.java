@@ -1,5 +1,6 @@
 package szu.controller;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -9,9 +10,16 @@ import szu.common.api.CommonResult;
 import szu.dto.HisQueryDto;
 import szu.dto.HistoryDto;
 import szu.model.History;
+import szu.model.Update;
+import szu.model.Video;
 import szu.service.HistoryService;
+import szu.service.UpdateService;
+import szu.service.UserInfoService;
+import szu.vo.HistoryVo;
+import szu.vo.UserInfo;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +36,10 @@ public class HistoryController {
 
     @Resource
     private HistoryService historyService;
+    @Resource
+    private UpdateService updateService;
+    @Resource
+    private UserInfoService userInfoService;
 
 
     @RequestMapping(method = RequestMethod.POST)
@@ -55,5 +67,43 @@ public class HistoryController {
             @ApiParam("开始条数") @RequestParam("cntStart") Integer cntStart,
             @ApiParam("结束条数") @RequestParam("cntEnd") Integer cntEnd) {
         return CommonResult.success(historyService.getRecentHistory(hisQueryDto, cntStart, cntEnd));
+    }
+
+    /**
+     * 获取最近20条历史记录,用于历史记录列表，zyd临时添加
+     */
+    @GetMapping(value = "/list")
+    @ApiOperation("获取最近20条历史记录")
+    public CommonResult<List<HistoryVo>> getRecentHistoryList(
+            @ApiParam("历史记录对应的用户和类型") @RequestBody HisQueryDto hisQueryDto) {
+        //现在只有视频，所以不用判断类型
+        List<History> historyList = historyService.getRecentHistory(hisQueryDto, 1, 20);
+        // 通过vid查uid
+        List<HistoryVo> historyVoList = new ArrayList<>();
+        for (History history : historyList) {
+            Update videoUpdateByVid = updateService.findVideoUpdateByVid(history.getMediaId());
+            Video videoByVid = updateService.findVideoByVid(history.getMediaId());
+            if (videoUpdateByVid == null||videoByVid==null) {
+                System.out.println("视频不存在,vid:"+history.getMediaId());
+                continue;
+            }
+            UserInfo up = userInfoService.getUserInfoByUid(videoUpdateByVid.getUid());
+            if (up == null) {
+                System.out.println("up主不存在,uid:"+videoUpdateByVid.getUid());
+                continue;
+            }
+            //json转url数组，取第一个
+            String[] coverUrls = JSON.parseObject(videoUpdateByVid.getUrls(), String[].class);
+            String coverUrl;
+            if (coverUrls.length == 0) {
+                coverUrl = "";
+            } else {
+                coverUrl = coverUrls[0];
+            }
+            HistoryVo historyVo = new HistoryVo(history.getMediaId(), history.getWatchedAt().toString(),
+                    history.getHisTime().toString(),videoByVid.getTitle(), up.getName(), coverUrl);
+            historyVoList.add(historyVo);
+        }
+        return CommonResult.success(historyVoList);
     }
 }

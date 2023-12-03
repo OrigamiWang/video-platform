@@ -23,6 +23,8 @@
         <module>security</module>
         <module>manage</module>
         <module>comment</module>
+        <module>star</module>
+        <module>recommend</module>
     </modules>
 
 

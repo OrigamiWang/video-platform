@@ -30,80 +30,20 @@ services:
 
 volumes:
   mysql-conf:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mysql/conf"
   mysql-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mysql/data"
   mysql-logs:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mysql/logs"
 
   redis-conf:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/redis/conf"
   redis-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/redis/data"
   redis-logs:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/redis/logs"
 
   mongo-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mongo/data"
   mongo-conf:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mongo/conf"
   mongo-logs:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/mongo/logs"
 
   minio-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/minio/data"
   minio-conf:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/minio/conf"
   minio-logs:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "${PROJECT_ROOT}/minio/logs"
 
 networks:
   video-platform:

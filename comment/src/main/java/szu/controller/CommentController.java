@@ -10,6 +10,8 @@ import szu.common.api.ListResult;
 import szu.common.api.ResultCode;
 import szu.model.Comment;
 import szu.service.CommentService;
+import szu.service.LikeService;
+import szu.vo.CommentVo;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -28,6 +30,9 @@ public class CommentController {
 
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private LikeService likeService;
 
     /**
      * 添加评论
@@ -51,21 +56,22 @@ public class CommentController {
 
     /**
      * 根据foreignId分页获取指定区域的评论，根据点赞数排序
-     *
      * @param foreignId 要获取评论的动态id
      * @param page      当前页
      * @param size      每页大小
+     * @param uid 当前登录的用户的id
      * @return
      */
-    @GetMapping("/listRootComment/{foreignId}/{page}/{size}")
+    @GetMapping("/listRootComment/{foreignId}/{page}/{size}/{uid}")
     @ApiOperation("分页获取评论")
-    public CommonResult<ListResult<Comment>> listCommentByPages(@PathVariable("foreignId") @ApiParam("要获取评论的动态id") Integer foreignId,
+    public CommonResult<ListResult<CommentVo>> listCommentByPages(@PathVariable("uid") @ApiParam("当前登录的用户的id") Integer uid,
+                                          @PathVariable("foreignId") @ApiParam("要获取评论的动态id") Integer foreignId,
                                           @PathVariable("page") @ApiParam("当前页") int page,
                                           @PathVariable("size") @ApiParam("每页大小") int size,
                                           @RequestParam @ApiParam("排序字段") String sortBy){
-        log.info("要获取的评论区域，{},page:{},size:{}",foreignId,page,size);
+        log.info("uid，{} 要获取的评论区域，{},page:{},size:{}",uid,foreignId,page,size);
         Long total = commentService.countCommentsByForeignId(foreignId);
-        List<Comment> commentsByForeignIdAndPages = commentService.getCommentsByForeignIdAndPages(foreignId, page, size, sortBy);
+        List<CommentVo> commentsByForeignIdAndPages = commentService.getCommentsByForeignIdAndPages(uid,foreignId, page, size, sortBy);
         return CommonResult.success(new ListResult<>(commentsByForeignIdAndPages, total));
     }
 
@@ -75,16 +81,18 @@ public class CommentController {
      * @param pid  要获取子评论根评论id
      * @param page 当前页
      * @param size 每页大小
+     * @param uid 当前登录用户id
      * @return
      */
-    @GetMapping("/listChildrenComment/{pid}/{page}/{size}")
+    @GetMapping("/listChildrenComment/{pid}/{page}/{size}/{uid}")
     @ApiOperation("分页获取对应根评论下的子评论")
-    public CommonResult<ListResult<Comment>> listChildrenCommentByPages(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid,
+    public CommonResult<ListResult<CommentVo>> listChildrenCommentByPages(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid,
                                                          @PathVariable("page") @ApiParam("当前页") int page,
-                                                         @PathVariable("size") @ApiParam("每页大小") int size) {
-        log.info("pid：{}，page：{}，size：{}", pid, page, size);
+                                                         @PathVariable("size") @ApiParam("每页大小") int size,
+                                                         @PathVariable("uid") @ApiParam("当前登录用户id") Integer uid) {
+        log.info("pid：{}，page：{}，size：{}，uid：{}", pid, page, size,uid);
         Long total = commentService.countChildCommentsByPid(pid);
-        List<Comment> childrenCommentByPages = commentService.listChildrenCommentByPages(pid, page, size);
+        List<CommentVo> childrenCommentByPages = commentService.listChildrenCommentByPages(pid, page, size,uid);
         return CommonResult.success(new ListResult<>(childrenCommentByPages, total));
     }
 
@@ -110,14 +118,19 @@ public class CommentController {
      *
      * @param flag 1：点赞  -1：取消点赞
      * @param pid  点赞的根评论的id
+     * @param uid 当前登录用户id
+     * @param pUid 被点赞的评论的用户的id
      * @return
      */
-    @PostMapping("/likeRoot/{flag}/{pid}")
+    @PostMapping("/likeRoot/{flag}/{pid}/{uid}/{pUid}")
     @ApiOperation("点赞根评论")
     public CommonResult<ResultCode> likeRootComment(@PathVariable("flag") @ApiParam("点赞或取消点赞（1：点赞  -1：取消点赞）") Integer flag,
-                                        @PathVariable("pid") @ApiParam("点赞的根评论的id") String pid){
-        log.info("点赞根评论：{}，点赞的根评论的id：{}",flag,pid);
+                                        @PathVariable("pid") @ApiParam("点赞的根评论的id") String pid,
+                                        @PathVariable("uid") @ApiParam("当前登录用户id") Integer uid,
+                                        @PathVariable("pUid") @ApiParam("被点赞的评论的用户的id") Integer pUid){
+        log.info("uid，{} 点赞根评论：{}，点赞的根评论的id：{}",uid,flag,pid);
         commentService.likeRootComment(flag,pid);
+        likeService.like(uid,pid,pUid,flag);
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
@@ -127,15 +140,20 @@ public class CommentController {
      * @param flag 1：点赞  -1：取消点赞
      * @param pid  点赞的对应的根评论id
      * @param cid  点赞的子评论id
+     * @param uid 当前登录用户id
+     * @param pUid 被点赞的评论的用户的id
      * @return
      */
-    @PostMapping("/likeChildren/{flag}/{pid}/{cid}")
+    @PostMapping("/likeChildren/{flag}/{pid}/{cid}/{uid}/{pUid}")
     @ApiOperation("点赞子评论")
     public CommonResult<ResultCode> likeChildrenComment(@PathVariable("flag") @ApiParam("点赞或取消点赞（1：点赞  -1：取消点赞）") Integer flag,
                                             @PathVariable("pid") @ApiParam("点赞的对应的根评论id")String pid,
-                                            @PathVariable("cid") @ApiParam("点赞的子评论id") String cid){
+                                            @PathVariable("cid") @ApiParam("点赞的子评论id") String cid,
+                                            @PathVariable("uid") @ApiParam("当前登录用户id") Integer uid,
+                                            @PathVariable("pUid") @ApiParam("被点赞的评论的用户的id") Integer pUid){
         log.info("点赞子评论：{},点赞的对应的根评论id：{},点赞的子评论id：{}",flag,pid,cid);
         commentService.likeChildrenComment(flag,pid,cid);
+        likeService.like(uid,cid,pUid,flag);
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
@@ -170,12 +188,20 @@ public class CommentController {
         return CommonResult.success(ResultCode.SUCCESS);
     }
 
-/**
- * 根据foreignId和foreignType获取指定区域的评论
- *
- * @param foreignId   评论的对象id
- * @param foreignType 评论的对象类型(1:动态评论 2:视频评论)
- * @return
- */
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    @PostMapping("/toTopComment/{pid}/{flag}")
+    @ApiOperation("置顶评论:1：置顶 0：取消置顶")
+    public CommonResult<ResultCode> toTopComment(@PathVariable("pid") @ApiParam("要置顶的评论id（只能为根评论）") String pid,
+                                                 @PathVariable("flag") @ApiParam("置顶或取消置顶") Integer flag){
+        log.info("置顶评论,pid:{},flag:{}",pid,flag);
+        commentService.toTopComment(pid,flag);
+        return CommonResult.success(ResultCode.SUCCESS);
+    }
+
 
 }

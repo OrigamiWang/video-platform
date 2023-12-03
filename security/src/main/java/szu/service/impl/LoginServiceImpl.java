@@ -14,6 +14,7 @@ import szu.dto.RegisterDto;
 import szu.model.User;
 import szu.service.LoginService;
 import szu.service.MailService;
+import szu.service.UserService;
 import szu.util.PinUtil;
 import szu.util.UuidUtil;
 
@@ -39,6 +40,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Resource
     private PermissionDao permissionDao;
+    @Resource
+    private UserService userService;
 
     @Resource
     private MailService mailService;
@@ -74,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
                     return CommonResult.failed("该手机号已经被注册！");
                 }
                 // 创建用户
-                loginDao.registerByPhone(name, phone, pswd);
+                loginDao.registerByPhone(name, phone, ShaUtil.encode(pswd));
                 break;
             }
             case 2: {
@@ -95,7 +98,11 @@ public class LoginServiceImpl implements LoginService {
                     return CommonResult.failed("该邮箱已经被注册！");
                 }
                 // 创建用户
-                loginDao.registerByEmail(name, email);
+//                loginDao.registerByEmail(name, email);
+                User userTmp = new User();
+                userTmp.setName(name);
+                userTmp.setEmail(email);
+                userService.insert(userTmp);
                 break;
             }
             default:

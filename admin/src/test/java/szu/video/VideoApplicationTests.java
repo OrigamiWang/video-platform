@@ -1,10 +1,28 @@
 package szu.video;
 
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import org.apache.http.HttpHost;
+//import org.elasticsearch.client.RestClient;
+//import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,14 +30,40 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.WebApplicationContext;
-import szu.model.Update;
+import szu.AdminApplication;
+import szu.common.api.ListResult;
+import szu.dao.UpdateDao;
+import szu.dao.UserDao;
+import szu.dao.UserInfoDao;
+import szu.dao.VideoDao;
+import szu.dto.VideoSearchParams;
+import szu.model.*;
+import szu.service.RedisWithMysql;
+import szu.service.VideoService;
+import szu.util.EsUtil;
+import szu.util.TimeUtil;
+import szu.vo.VideoVo;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,13 +71,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(classes = AdminApplication.class)
 @AutoConfigureMockMvc
 class VideoApplicationTests {
-
-
     @Autowired
     private MockMvc mockMvc;
+
+
+    @Resource
+    private RedisWithMysql redisWithMysql;
 
     @Test//测试发布动态接口
     public void testPublish() throws Exception {
@@ -97,7 +143,5 @@ class VideoApplicationTests {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-
-
 
 }

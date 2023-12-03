@@ -10,10 +10,10 @@
         <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP"/>
         <result column="urls" property="urls" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into `updates`(vid, uid, content, status, upload_time, urls)
-        values (#{vid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR},
-                #{status,jdbcType=INTEGER}, #{uploadTime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="szu.model.Update">
+        insert into `updates`(vid, uid, content, status, urls)
+        values (#{vid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER},
+                #{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{urls,jdbcType=VARCHAR})
     </insert>
     <update id="update">
         update `updates`(vid, uid, content, status, upload_time, urls)

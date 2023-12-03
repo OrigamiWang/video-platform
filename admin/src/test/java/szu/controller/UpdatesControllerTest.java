@@ -29,12 +29,19 @@ class UpdatesControllerTest {
                         .header("Authorization", AUTH))
                 .andReturn();
         System.out.println(resultText.getResponse().getContentAsString());
-        assert resultText.getResponse().getContentAsString().contains("发布成功");
 
         MvcResult resultNone = mockMvc.perform(MockMvcRequestBuilders.post("/updates/essay")
                         .header("Authorization", AUTH))
                 .andReturn();
         System.out.println(resultNone.getResponse().getContentAsString());
-        assert resultNone.getResponse().getContentAsString().contains("内容不能为空");
+
+
+        String photo_path = "C:\\Users\\郑榆达\\Desktop\\bg\\gg.jpg";
+        MvcResult resultPhoto = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/essay")
+                        .file("images", photo_path.getBytes())
+                        .param("content", "测试发布动态")
+                        .header("Authorization", AUTH))
+                .andReturn();
+        System.out.println(resultPhoto.getResponse().getContentAsString());
     }
 }

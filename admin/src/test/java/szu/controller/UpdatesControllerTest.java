@@ -104,4 +104,11 @@ class UpdatesControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    @Test
+void getHomePage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/updates/homePage")
+                        .param("pageSize", "10"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
 }

@@ -272,6 +272,7 @@ public class UpdateServiceImpl implements UpdateService {
         //计算有多少个视频
         List<Integer> ids = videoDao.selectAllId();
         int videoNum = ids.size();
+        if (videoNum == 0) return new ArrayList<>();
         //获取pageSize个随机int
         int[] randomNums = new int[pageSize];
         for (int i = 0; i < pageSize; i++) {

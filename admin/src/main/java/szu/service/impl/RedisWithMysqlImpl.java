@@ -1,5 +1,6 @@
 package szu.service.impl;
 
+
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -86,7 +87,6 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
         }
 
     }
-
 
     /**
      * 将update及其关联的信息放入redis

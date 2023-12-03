@@ -49,7 +49,6 @@
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
 
-
     </dependencies>
 
     <build>

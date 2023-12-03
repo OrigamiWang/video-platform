@@ -1,5 +1,6 @@
 package szu.dao;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import szu.model.User;
 

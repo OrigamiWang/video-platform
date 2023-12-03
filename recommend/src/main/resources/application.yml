@@ -1,9 +1,9 @@
 server:
-  port: 8084
+  port: 8085
 
 spring:
   application:
-    name: video-platform-Star
+    name: video-platform-Recommend
   profiles: 
     active: dev
 
@@ -14,9 +14,3 @@ mybatis:
     - classpath*:com/**/mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true  # ??????
-
-redis:
-  user_prefix: "login_user_"
-  login_pin: "login_pin_"
-  register_pin: "register_pin_"
-  auth_pin: "auth_pin_"

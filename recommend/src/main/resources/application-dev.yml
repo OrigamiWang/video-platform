@@ -3,6 +3,7 @@ spring:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: 123456
+
     druid:
       initial-size: 5 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
@@ -12,23 +13,17 @@ spring:
       stat-view-servlet: #访问监控网页的登录用户名和密码
         login-username: druid
         login-password: druid
-
   redis:
     host: localhost
     port: 6379
 #    password: 123456
     database: 9
-#  rabbitmq:
-#    host: 192.168.227.128
-#    port: 5672
-#    virtual-host: /
-#    username: ljx #
-#    password: 123321
-#    listener:
-#      simple:
-#        prefetch: 1
-  elasticsearch:
-    uris: http://112.124.33.233:9200
+
+  data:
+    mongodb:
+      host: 127.0.0.1
+      database: videoPlatform
+      port: 27017
 
   mail:
     host: smtp.qq.com
@@ -45,13 +40,11 @@ spring:
     protocol: smtp
     port: 587
     from: 2241375541@qq.com
-#  elasticsearch:
-#    uris:
 
 logging:
   level:
     root: info
-    szu.admin: debug
+    szu.Comment: debug
 
 minio:
   endpoint: http://127.0.0.1:9000

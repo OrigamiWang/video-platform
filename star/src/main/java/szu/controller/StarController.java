@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
@@ -108,6 +110,55 @@ public class StarController {
         return CommonResult.success(videoIdsListResult);
     }
 
+    /**
+     * 获取当前观看的视频被当前用户收藏在哪个收藏夹下
+     * @param uid 当前登录的用户的id
+     * @param updateId 当前观看视频的动态id
+     * @return
+     */
+    @GetMapping("/listStared/{uid}/{updateId}")
+    @ApiOperation("获取当前观看的视频被当前用户收藏在哪个收藏夹下")
+    public CommonResult<ListResult<String>> listStared(@PathVariable("uid") @ApiParam("当前登录的用户的id") Integer uid,
+                                                          @PathVariable("updateId") @ApiParam("当前观看视频的动态id") Integer updateId){
+        log.info("获取当前观看的视频被当前用户收藏在哪个收藏夹下,uid:{},updateId:{}",uid,updateId);
+        List<String> staredList = starService.listStared(uid,updateId);
+
+        return CommonResult.success(new ListResult<>(staredList,(long)staredList.size()));
+    }
+
+    /**
+     * 删除收藏的视频
+     * @param sid 收藏夹id
+     * @param updateId 要删除的视频的动态id
+     * @return
+     */
+    @DeleteMapping("/removeStarVideo/{sid}/{updateId}")
+    @ApiOperation("删除收藏的视频")
+    public CommonResult<ResultCode> removeStarVideo(@PathVariable("sid") @ApiParam("收藏夹id") String sid,
+                                                    @PathVariable("updateId") @ApiParam("要删除的视频的动态id") Integer updateId){
+        log.info("删除收藏的视频，sid：{}，updateId：{}",sid,updateId);
+        if(starService.removeStarVideo(sid,updateId)){
+            return CommonResult.success(ResultCode.SUCCESS);
+        }else{
+            return CommonResult.success(ResultCode.FAILED);
+        }
+    }
+
+    /**
+     * 删除收藏夹
+     * @param sid 收藏夹id
+     * @return
+     */
+    @DeleteMapping("/removeStar/{sid}")
+    @ApiOperation("删除收藏夹")
+    public CommonResult<ResultCode> removeStar(@PathVariable("sid") @ApiParam("收藏夹id") String sid){
+        log.info("删除收藏夹，sid：{}",sid);
+        if(starService.removeStar(sid)){
+            return CommonResult.success(ResultCode.SUCCESS);
+        }else{
+            return CommonResult.success(ResultCode.FAILED);
+        }
+    }
 
 
 }

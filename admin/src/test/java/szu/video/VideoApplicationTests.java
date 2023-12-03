@@ -40,6 +40,7 @@ import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
 import szu.model.*;
+import szu.service.RedisWithMysql;
 import szu.service.VideoService;
 import szu.util.EsUtil;
 import szu.util.TimeUtil;
@@ -76,6 +77,9 @@ class VideoApplicationTests {
     @Autowired
     private MockMvc mockMvc;
 
+
+    @Resource
+    private RedisWithMysql redisWithMysql;
 
     @Test//测试发布动态接口
     public void testPublish() throws Exception {

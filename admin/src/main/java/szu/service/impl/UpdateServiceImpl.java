@@ -71,7 +71,7 @@ public class UpdateServiceImpl implements UpdateService {
 
             //调用dao层插入数据库
             Update new_ud = new Update(0, 0, uid, content, UNCHECKED,
-                    null, null);
+                    null, JSON.toJSONString(urls));
             //插入update表
             if (updatesDao.insert(new_ud)!=1) throw new Exception();
             //TODO 通知管理员审核

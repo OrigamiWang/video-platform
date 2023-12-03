@@ -1,9 +1,6 @@
 package szu.video;
 
-import cn.hutool.json.JSONParser;
-import cn.hutool.json.JSONUtil;
 import org.junit.jupiter.api.Test;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -11,17 +8,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import szu.AdminApplication;
 import szu.dao.VideoDao;
-import szu.listener.MQConstant;
-import szu.model.Video;
-import szu.service.RedisWithMysql;
 import szu.util.EsUtil;
 
 import javax.annotation.Resource;
 
-import java.io.IOException;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = AdminApplication.class)

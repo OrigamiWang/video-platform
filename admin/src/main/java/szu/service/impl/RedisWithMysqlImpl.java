@@ -1,5 +1,7 @@
 package szu.service.impl;
 
+import cn.hutool.Hutool;
+import cn.hutool.core.util.RandomUtil;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -111,6 +113,8 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
             //User表
             User userById = userInfoDao.getUserById(update.getUid());
             redisService.hSet(key,"upName",userById.getName());
+            long exTime = RandomUtil.randomInt(1800,7200);
+            redisService.expire(key, exTime);//时间的单位是秒
         }else{
             String key = "updates:videoUpdate:"+ update.getId();
             //video表
@@ -143,6 +147,9 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
             //User表
             User userById = userInfoDao.getUserById(update.getUid());
             redisService.hSet(key,"upName",userById.getName());
+            //设置三十分钟到两小时之间的过期时间
+            long exTime = RandomUtil.randomInt(1800,7200);
+            redisService.expire(key, exTime);//时间的单位是秒
         }
     }
 

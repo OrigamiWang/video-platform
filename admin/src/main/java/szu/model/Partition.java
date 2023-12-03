@@ -1,11 +1,11 @@
 package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.Getter;
 
 import java.io.Serializable;
-
-@Getter
+@Data
 public class Partition implements Serializable {
     @ApiModelProperty(value = "分区id")
     private Integer id;

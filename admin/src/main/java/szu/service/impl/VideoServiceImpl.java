@@ -1,7 +1,5 @@
 package szu.service.impl;
 
-import io.micrometer.core.instrument.search.Search;
-import org.elasticsearch.action.search.SearchRequest;
 import org.springframework.stereotype.Service;
 import szu.common.api.ListResult;
 import szu.dao.UserInfoDao;
@@ -27,9 +25,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoDetailVo getVideoDetail(Integer id) {
-        //TODO 查询video表与用户表，组装vo返回
-        VideoDetailVo videoDetailVo = videoDao.getVideoDetail(id);
-        return videoDetailVo;
+        return videoDao.getVideoDetail(id);
     }
 
     @Override

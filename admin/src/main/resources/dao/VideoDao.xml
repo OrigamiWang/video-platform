@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="szu.dao.VideoDao">
+    <resultMap id="VideoDetailMap" type="szu.vo.VideoDetailVo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="play_num" property="playNum"/>
+        <result column="upload_time" property="uploadTime"/>
+        <result column="dm_num" property="dmNUm"/>
+        <result column="like_num" property="like"/>
+        <result column="coin_num" property="coin"/>
+        <result column="share_num" property="share"/>
+        <result column="star_num" property="star"/>
+        <result column="name" property="upName"/>
+        <result column="follow" property="follow"/>
+    </resultMap>
+<!--    VideoDetailVo getVideoDetail(Integer id);-->
+    <select id="getVideoDetail" resultMap="VideoDetailMap">
+        SELECT
+            v.id,v.title, v.play_num, up.upload_time, v.dm_num, uh.like_num, v.coin_num, uh.share_num, v.star_num, us.name, uss.follow
+        from updates up
+                 left join video v on up.vid = v.id
+                 left join user us on up.uid = us.id
+                 left join update_heat uh on up.id = uh.update_id
+                 left join user_statistics uss on up.uid = uss.uid
+        where up.id = #{id};
+    </select>
+
+<!--    void updateVideoByVid(Video video);-->
+    <update id="updateVideoByVid">
+        update video
+                <set>
+                    <if test="url != null">
+                        url = #{url},
+                    </if>
+                    <if test="playNum != null">
+                        play_num = #{playNum},
+                    </if>
+                    <if test="dmNum != null">
+                        dm_num = #{dmNum},
+                    </if>
+                    <if test="totalTime != null">
+                        total_time = #{totalTime},
+                    </if>
+                    <if test="title != null">
+                        title = #{title},
+                    </if>
+                    <if test="pid != null">
+                        pid = #{pid},
+                    </if>
+                    <if test="starNum != null">
+                        star_num = #{starNum},
+                    </if>
+                    <if test="coinNum != null">
+                        coin_num = #{coinNum},
+                    </if>
+                </set>
+            where id = #{id};
+    </update>
+<!--    void updateVideoSource(Integer uid, String url);-->
+    <update id="updateVideoSource">
+        update updates
+                <set>
+                    <if test="url != null">
+                        url = #{url}
+                    </if>
+                </set>
+        where updates.id = #{uid};
+    </update>
+<!--    void updateVideoContent(Integer id, String content);-->
+    <update id="updateVideoContent">
+        update updates
+        <set>
+            <if test="content != null">
+                content = #{content}
+            </if>
+        </set>
+        where updates.vid = #{id};
+    </update>
+<!--    void updateVideoHeatByUpdatesId(UpdateHeat updateHeat);-->
+    <update id="updateVideoHeatByUpdatesId">
+        update update_heat
+        <set>
+            <if test="likeNum != null">
+                like_num = #{likeNum},
+            </if>
+            <if test="commentNum != null">
+                comment_num = #{commentNum},
+            </if>
+            <if test="shareNum != null">
+                share_num = #{shareNum},
+            </if>
+        </set>
+        where update_heat.update_id = #{updateId};
+    </update>
+
+
+</mapper>

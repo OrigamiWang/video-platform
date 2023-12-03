@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import szu.dao.UserDao;
 import szu.model.User;
 import szu.model.UserDetail;
 import szu.model.UserStatistics;
@@ -19,7 +20,7 @@ import javax.annotation.Resource;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = ManageApplication.class)
+@SpringBootTest(classes = SecurityApplication.class)
 @AutoConfigureMockMvc
 public class TestUserController {
 

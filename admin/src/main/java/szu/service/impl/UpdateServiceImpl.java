@@ -231,10 +231,10 @@ public class UpdateServiceImpl implements UpdateService {
     public Video findVideoByVid(int vid) {
         Map<Object, Object> objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
         if (objectMap == null) {
-            Video video = videoDao.findById(vid);
-            if (video == null) return null;//数据库中没有该视频
-            syncService.updateRedisByVideoId(vid);
-            return video;
+            if(!syncService.updateRedisByVideoId(vid)) return null;
+            else{
+                objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
+            }
         }
         return JSON.parseObject(JSON.toJSONString(objectMap), Video.class);
     }
@@ -283,7 +283,7 @@ public class UpdateServiceImpl implements UpdateService {
             Video video = findVideoByVid(id);
             Update update = updatesDao.findByVid(id);
             VideoVo videoVo = new VideoVo();
-            videoVo.setId(id);
+            videoVo.setId(update.getId());
             videoVo.setUrl(video.getUrl());
             videoVo.setUploadTime(update.getUploadTime());
             videoVo.setUpName(userInfoDao.getNameById(update.getUid()));

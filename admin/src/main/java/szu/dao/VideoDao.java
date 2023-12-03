@@ -2,6 +2,7 @@ package szu.dao;
 
 import org.apache.ibatis.annotations.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import szu.model.UpdateHeat;
 import szu.model.Video;
 import szu.model.VideoSearchDoc;
 import szu.vo.VideoDetailVo;
@@ -30,13 +31,39 @@ public interface VideoDao {
      * 获取所有VideoSearchDoc对象，存入es用
      * @return
      */
-    @Select("SELECT up.id, up.upload_time, us.name, v.title, v.url, v.play_num, v.dm_num, v.total_time, v.pid, v.starNum " +
+    @Select("select up.id, up.upload_time, us.name, v.title, v.url, v.play_num, v.dm_num, v.total_time, v.pid, v.star_num " +
             "from updates up " +
             "left join video v on up.vid = v.id " +
             "left join user us on up.uid = us.id")
     List<VideoSearchDoc> selectAllVideoSearchDoc();
 
-    @Select("")
+    /**
+     * 根据动态id获取视频详情
+     * @param id
+     * @return
+     */
     VideoDetailVo getVideoDetail(Integer id);
+
+    /**
+     * 根据vid更新video表的视频信息
+     */
+    void updateVideoByVid(Video video);
+
+    /**
+     * 根据动态id更新视频源
+     * @param uid
+     */
+    void updateVideoSource(Integer uid, String url);
+
+    /**
+     * 根据视频id更新视频简介信息
+     */
+    void updateVideoContent(Integer id, String content);
+
+    /**
+     * 根据动态id更新视频点赞数、评论数、分享数
+     */
+    void updateVideoHeatByUpdatesId(UpdateHeat updateHeat);
+
 }
 

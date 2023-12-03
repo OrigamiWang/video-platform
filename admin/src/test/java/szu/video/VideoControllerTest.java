@@ -138,4 +138,15 @@ public class VideoControllerTest {
 //        videoDao.updateVideoByVid(video);
 //        rabbitTemplate.convertAndSend(MQConstant.VIDEO_EXCHANGE,MQConstant.VIDEO_UPDATE_KEY, video.getId()+"");
 //    }
+
+    @Resource
+    EsUtil esUtil;
+//    @Test
+//    void testecs() throws IOException {
+//        esUtil.initVideoIndices();
+//    }
+//    @Test
+//    void testecs() throws IOException {
+//        esUtil.initUserIndices();
+//    }
 }

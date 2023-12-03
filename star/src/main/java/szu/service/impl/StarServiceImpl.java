@@ -1,5 +1,6 @@
 package szu.service.impl;
 
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -148,6 +149,66 @@ public class StarServiceImpl implements StarService {
             starVos.add(starVo);
         }
         return starVos;
+    }
+
+    /**
+     * 获取当前观看的视频被当前用户收藏在哪个收藏夹下
+     * @param uid 当前登录的用户的id
+     * @param updateId 当前观看视频的动态id
+     * @return
+     */
+    @Override
+    public List<String> listStared(Integer uid, Integer updateId) {
+        if(uid<=0||updateId<=0) throw new IllegalArgumentException();
+        Query query = Query.query(Criteria.where("uid").is(uid));
+        List<Star> stars = mongoTemplate.find(query, Star.class);
+        List<String> staredList = new ArrayList<>();
+        for (Star star : stars) {
+            List<StarVideo> starVideos = star.getStarVideos();
+            for (StarVideo starVideo : starVideos) {
+                if(starVideo.getUpdateId()==updateId){
+                    staredList.add(star.getId());
+                    break;
+                }
+            }
+        }
+        return staredList;
+    }
+
+    /**
+     * 删除收藏的视频
+     * @param sid 收藏夹id
+     * @param updateId 要删除的视频的动态id
+     * @return
+     */
+    @Override
+    public boolean removeStarVideo(String sid, Integer updateId) {
+        if(sid==null) throw new NullPointerException();
+        if("".equals(sid)||updateId<=0) throw new IllegalArgumentException();
+        Query query = Query.query(Criteria.where("_id").is(sid));
+        Update update = new Update();
+        //创建要删除的条件
+        Document doc = new Document();
+        //删除收藏夹中对应的视频
+        doc.put("updateId", updateId);
+        update.pull("starVideos", doc);
+        update.inc("starNum",-1);
+        mongoTemplate.updateFirst(query,update,Star.class);
+        return true;
+    }
+
+    /**
+     * 删除收藏夹
+     * @param sid 收藏夹id
+     * @return
+     */
+    @Override
+    public boolean removeStar(String sid) {
+        if(sid==null) throw new NullPointerException();
+        if("".equals(sid)) throw new IllegalArgumentException();
+        Query query = Query.query(Criteria.where("_id").is(sid));
+        mongoTemplate.remove(query,Star.class);
+        return true;
     }
 
     /**

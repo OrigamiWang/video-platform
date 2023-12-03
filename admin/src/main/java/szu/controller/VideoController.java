@@ -9,9 +9,7 @@ import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
 import szu.service.VideoService;
-import szu.model.Video;
 import szu.vo.VideoDetailVo;
-import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,10 +23,9 @@ public class VideoController {
     private VideoService videoService;
 
 
-    @GetMapping("/page/{id}")
-    @ApiOperation("获取视频详情（点开视频详情页），传入路径参数vid")
-    public CommonResult<VideoDetailVo> getPage(@PathVariable @ApiParam("动态id") Integer id){
-        //TODO 获取推荐视频列表
+    @GetMapping("/detail/{id}")
+    @ApiOperation("获取视频详情（点开视频详情页），传入路径参数id")
+    public CommonResult<VideoDetailVo> getVideoDetail(@PathVariable @ApiParam("动态id") Integer id){
         VideoDetailVo videoVo = videoService.getVideoDetail(id);
         if(videoVo == null){
             return CommonResult.failed("视频不存在");

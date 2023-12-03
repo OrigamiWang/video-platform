@@ -46,4 +46,27 @@ public interface StarService {
      * @return
      */
     List<StarVo> listStarContentBySidByPage(String sid, Integer page, Integer size);
+
+    /**
+     * 获取当前观看的视频被当前用户收藏在哪个收藏夹下
+     * @param uid 当前登录的用户的id
+     * @param updateId 当前观看视频的动态id
+     * @return
+     */
+    List<String> listStared(Integer uid, Integer updateId);
+
+    /**
+     * 删除收藏的视频
+     * @param sid 收藏夹id
+     * @param updateId 要删除的视频的动态id
+     * @return
+     */
+    boolean removeStarVideo(String sid, Integer updateId);
+
+    /**
+     * 删除收藏夹
+     * @param sid 收藏夹id
+     * @return
+     */
+    boolean removeStar(String sid);
 }

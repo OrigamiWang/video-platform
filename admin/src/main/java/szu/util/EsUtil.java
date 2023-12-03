@@ -128,7 +128,7 @@ public class EsUtil {
     }
 
     /**
-     * 根据用户昵称查询投稿，用于个人首页
+     * 根据用户昵称查询投稿，用于个人主页展示
      *
      */
     public ListResult<VideoVo> searchVideoByName(String name, Integer sort, Integer page, Integer size){
@@ -204,16 +204,16 @@ public class EsUtil {
                 case 0:
                     break;
                 case 1:
-                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").lt("600"));//小于10分钟（不包括10分钟）
+                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").lt(600));//小于10分钟（不包括10分钟）
                     break;
                 case 2:
-                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gte("600").lt("1800"));//10-30分钟（左闭右开）
+                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gte(600).lt(1800));//10-30分钟（左闭右开）
                     break;
                 case 3:
-                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gte("1800").lt("3600"));//30到60分钟
+                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gte(1800).lt(3600));//30到60分钟
                 break;
                 case 4:
-                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gt("3600"));//60分钟以上
+                    boolQuery.filter(QueryBuilders.rangeQuery("totalTime").gt(3600));//60分钟以上
                     break;
             }
             if(pid != 0){
@@ -235,7 +235,7 @@ public class EsUtil {
                     request.source().sort("startNum", SortOrder.DESC);//最多收藏
             }
             request.source().from((page-1) * size).size(size)
-                    .highlighter(new HighlightBuilder().field("all").requireFieldMatch(false));
+                    .highlighter(new HighlightBuilder().field("title").requireFieldMatch(false));
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
             return handleHighLightResponse(response);
         } catch (IOException e) {
@@ -282,10 +282,11 @@ public class EsUtil {
             VideoVo videoVo = new VideoVo();
             BeanUtils.copyProperties(videoSearchDoc, videoVo);
             videoVo.setUpName(videoSearchDoc.getName());
+            videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(videoSearchDoc.getTotalTime()));
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
             if (!CollectionUtils.isEmpty(highlightFields)) {
                 // 根据字段名获取高亮
-                HighlightField highlightField = highlightFields.get("all");
+                HighlightField highlightField = highlightFields.get("title");
                 if (highlightField != null) {
                     // 获取高亮
                     String title = highlightField.getFragments()[0].string();
@@ -353,7 +354,7 @@ public class EsUtil {
                     new SuggestBuilder().addSuggestion(
                             "searchSuggest", SuggestBuilders.completionSuggestion("suggestion")
                                     .skipDuplicates(true)
-                                    .prefix(key, Fuzziness.ONE)
+                                    .prefix(key, Fuzziness.AUTO)
                                     .size(10)
                     )
             );
@@ -372,4 +373,7 @@ public class EsUtil {
             throw new RuntimeException(e);
         }
     }
+
+
+    //TODO 同步数据库与ES索引
 }

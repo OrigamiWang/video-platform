@@ -6,12 +6,14 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Time;
 
 @Data
 @AllArgsConstructor
 @ApiModel("video实体类（数据库字段）")
+@NoArgsConstructor
 public class Video {
     @ApiModelProperty("视频id")
     private int id;

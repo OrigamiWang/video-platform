@@ -14,10 +14,4 @@ public class AdminApplication {
         SpringApplication.run(AdminApplication.class, args);
     }
 
-    @Bean
-    public RestHighLevelClient client(){
-        return new RestHighLevelClient(RestClient.builder(
-                HttpHost.create("http://192.168.227.128:9200")
-        ));
-    }
 }

@@ -1,12 +1,14 @@
 package szu.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
 public class Update implements Serializable {
     @ApiModelProperty(value = "动态id")
     private Integer id;

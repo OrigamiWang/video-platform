@@ -16,19 +16,8 @@ spring:
   redis:
     host: localhost
     port: 6379
-#    password: 123456
+    password: 123456
     database: 9
-#  rabbitmq:
-#    host: 192.168.227.128
-#    port: 5672
-#    virtual-host: /
-#    username: ljx #
-#    password: 123321
-#    listener:
-#      simple:
-#        prefetch: 1
-  elasticsearch:
-    uris: http://112.124.33.233:9200
 
   mail:
     host: smtp.qq.com
@@ -62,7 +51,6 @@ minio:
 redis:
   user_prefix: "login_user_"
   login_pin: "login_pin_"
-  register_pin: "register_pin_"
   auth_pin: "auth_pin_"
 
 const: #常量，原本使用注入方法，但是因别的模块需要使用，所以改为类内常量

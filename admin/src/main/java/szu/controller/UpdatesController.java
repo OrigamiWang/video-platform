@@ -1,10 +1,12 @@
 package szu.controller;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,9 @@ public class UpdatesController {
     @Resource
     private RedisService redisService;
 
+    @Value("${redis.user_prefix}")
+    private String USER_PREFIX;
+
     @PostMapping("/essay")
     @ApiOperation("发布图文动态")
     @ApiResponse(code = 200, message = "发布成功")
@@ -43,7 +48,7 @@ public class UpdatesController {
             @RequestParam(value = "images", required = false) MultipartFile[] images,//图片
             @RequestHeader(value = "Authorization") String token
     ) {
-        User user = (User) redisService.get(token);
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -59,7 +64,7 @@ public class UpdatesController {
             updatesService.publishEssay(user.getId(), content, images);
             return CommonResult.success("发布成功");
         } catch (Exception e) {
-            return CommonResult.failed("发布失败");
+            return CommonResult.failed(e.getMessage());
         }
     }
 
@@ -90,7 +95,7 @@ public class UpdatesController {
     public CommonResult<String> deleteEssayById(@RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -118,7 +123,7 @@ public class UpdatesController {
             @RequestHeader(value = "Authorization") String token
     ) {
         //TOKEN校验,对比要修改的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -156,7 +161,7 @@ public class UpdatesController {
             @ApiParam(value = "视频文件", required = true) @RequestParam("video") MultipartFile video,//视频
             @RequestHeader(value = "Authorization") String token
     ) {
-        User user = (User) redisService.get(token);
+        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -187,7 +192,7 @@ public class UpdatesController {
     public CommonResult<String> deleteVideoById(@RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }

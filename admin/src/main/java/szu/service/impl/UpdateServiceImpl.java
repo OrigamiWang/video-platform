@@ -15,12 +15,8 @@ import szu.service.UpdateService;
 import szu.util.TimeUtil;
 import szu.vo.VideoVo;
 
-
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +41,9 @@ public class UpdateServiceImpl implements UpdateService {
     @Value("${minio.bucket-name}")
     private String bucketName;//minio桶名
 
-    /**常量**/
+    /**
+     * 常量
+     **/
     private static final int UNCHECKED = 0;//未审核
     private static final int CHECKED = 1;//审核通过
     private static final int OFF_SHELF = 2;//下架
@@ -72,15 +70,16 @@ public class UpdateServiceImpl implements UpdateService {
             }
 
             //调用dao层插入数据库
-            int id = updatesDao.insert(0, uid, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
-                    JSON.toJSONString(urls));
-
+            Update new_ud = new Update(0, 0, uid, content, UNCHECKED,
+                    null, JSON.toJSONString(urls));
+            //插入update表
+            if (updatesDao.insert(new_ud)!=1) throw new Exception();
             //TODO 通知管理员审核
             //新建一个update_heat记录
-            updateHeatDao.insert(id, 0, 0, 0);
+            updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException("Publish essay failed", e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
     }
@@ -92,7 +91,7 @@ public class UpdateServiceImpl implements UpdateService {
         try {
             //获取原动态信息
             Update updatesOriginal = findEssayById(id);
-            if (updatesOriginal == null) return;//动态不存在
+            if (updatesOriginal == null) return;//动态不存在，返回
             //删除原来的图片
             String[] urls = JSON.parseObject(updatesOriginal.getUrls(), String[].class);
             for (String url : urls) {
@@ -192,12 +191,13 @@ public class UpdateServiceImpl implements UpdateService {
             minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
             //插入video表
             int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, 0, title, pid, 0, 0));
+            Update new_ud = new Update(0, vid, id, content, UNCHECKED,
+                    null, null);
             //插入update表
-            int new_id = updatesDao.insert(vid, id, content, UNCHECKED, new Timestamp(System.currentTimeMillis()).toString(),
-                    JSON.toJSONString(new HashMap<>()));
+            if (updatesDao.insert(new_ud)!=1) throw new Exception();
             //TODO 通知管理员审核
             //新建一个update_heat记录
-            updateHeatDao.insert(new_id, 0, 0, 0);
+            updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Publish video failed", e);
@@ -300,7 +300,7 @@ public class UpdateServiceImpl implements UpdateService {
     public Update findVideoUpdateByVid(int id) {
         try {
             return updatesDao.findByVid(id);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }

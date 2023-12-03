@@ -2,25 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.UpdateDao">
     <resultMap id="BaseResultMap" type="szu.model.Update">
-        <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="uid" jdbcType="INTEGER" property="uid"/>
-        <result column="content" jdbcType="VARCHAR" property="content"/>
-        <result column="status" jdbcType="INTEGER" property="status"/>
-        <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime"/>
-        <result column="urls" jdbcType="VARCHAR" property="urls"/>
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="vid" property="vid" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP"/>
+        <result column="urls" property="urls" jdbcType="VARCHAR"/>
     </resultMap>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into `updates` (uid, content, status, upload_time, urls)
-        values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
-                #{uploadTime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})
+        insert into `updates`(vid, uid, content, status, upload_time, urls)
+        values (#{vid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER}, #{uploadTime,jdbcType=TIMESTAMP}, #{urls,jdbcType=VARCHAR})
     </insert>
     <update id="update">
-        update `updates`
-        set uid = #{uid,jdbcType=INTEGER},
-            content = #{content,jdbcType=VARCHAR},
-            status = #{status,jdbcType=INTEGER},
-            upload_time = #{uploadTime,jdbcType=TIMESTAMP},
-            urls = #{urls,jdbcType=VARCHAR}
+        update `updates`(vid, uid, content, status, upload_time, urls)
+        set vid = #{vid,jdbcType=INTEGER}, uid = #{uid,jdbcType=INTEGER}, content = #{content,jdbcType=VARCHAR}, status = #{status,jdbcType=INTEGER}, upload_time = #{uploadTime,jdbcType=TIMESTAMP}, urls = #{urls,jdbcType=VARCHAR}
         where id = #{id,jdbcType=INTEGER}
     </update>
     <delete id="deleteById">

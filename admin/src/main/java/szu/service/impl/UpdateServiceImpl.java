@@ -15,10 +15,8 @@ import szu.service.UpdateService;
 import szu.util.TimeUtil;
 import szu.vo.VideoVo;
 
-
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +78,7 @@ public class UpdateServiceImpl implements UpdateService {
             updateHeatDao.insert(id, 0, 0, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException("Publish essay failed", e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
     }
@@ -92,7 +90,7 @@ public class UpdateServiceImpl implements UpdateService {
         try {
             //获取原动态信息
             Update updatesOriginal = findEssayById(id);
-            if (updatesOriginal == null) return;//动态不存在
+            if (updatesOriginal == null) return;//动态不存在，返回
             //删除原来的图片
             String[] urls = JSON.parseObject(updatesOriginal.getUrls(), String[].class);
             for (String url : urls) {

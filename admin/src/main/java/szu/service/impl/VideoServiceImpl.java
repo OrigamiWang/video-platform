@@ -1,7 +1,5 @@
 package szu.service.impl;
 
-import io.micrometer.core.instrument.search.Search;
-import org.elasticsearch.action.search.SearchRequest;
 import org.springframework.stereotype.Service;
 import szu.common.api.ListResult;
 import szu.dao.UserInfoDao;

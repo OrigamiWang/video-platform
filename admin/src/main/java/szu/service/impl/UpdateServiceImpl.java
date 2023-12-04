@@ -208,10 +208,11 @@ public class UpdateServiceImpl implements UpdateService {
             //minio中的视频文件和封面文件存在，将原object移入新的object
             minioService.moveObject(bucketName, oldPath, videoFilePath);
             minioService.moveObject(bucketName, oldCoverPath, videoHomePagePath);
+            Video new_vd = new Video(0, videoFilePath, 0, 0, 0, title, pid, 0, 0);
             //插入video表
-            int vid = videoDao.insert(new Video(0, videoFilePath, 0, 0, 0, title, pid, 0, 0));
+            if (videoDao.insert(new_vd) != 1) throw new Exception();
             //插入update表
-            Update new_ud = new Update(0, vid, uid, content, UNCHECKED,
+            Update new_ud = new Update(0, new_vd.getId(), uid, content, UNCHECKED,
                     null, JSON.toJSONString(new String[]{videoHomePagePath}));
             if (updatesDao.insert(new_ud) != 1) throw new Exception();
             //TODO 通知管理员审核
@@ -248,7 +249,19 @@ public class UpdateServiceImpl implements UpdateService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Transactional
+    @Override
+    public String changeVideoCover(MultipartFile image, Integer uid) {
+        try {
+            String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            minioService.uploadFile(bucketName, pathOfHomePage, image.getInputStream());
+            //返回存储路径
+            return pathOfHomePage;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Transactional

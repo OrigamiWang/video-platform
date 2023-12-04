@@ -115,20 +115,25 @@ class UpdatesControllerTest {
     void publishVideo() throws Exception {
 //        发布视频
         String videoPath = "src/main/resources/video_test/CIMG0485.AVI";
+        String photoPath = "E:\\我的图片\\buffer\\CIMG0507.JPG";
         File file = new File(videoPath);
         MockMultipartFile f1 = new MockMultipartFile("video", file.getName(),
                 "video/mp4", new FileInputStream(file));
+        MockMultipartFile f2 = new MockMultipartFile("image", new File(photoPath).getName(),
+                "image/jpg", new FileInputStream(new File(photoPath)));
         //body中放置视频文件
         MvcResult result1 = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/uploadMedia")
                         .file(f1)
                         .header("Authorization", AUTH))
                 .andReturn();
-//        从结果中获取视频的url
-        String url = result1.getResponse().getContentAsString();
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/changeVideoCover")
+                        .file(f2)
+                        .header("Authorization", AUTH))
+                .andExpect(MockMvcResultMatchers.status().isOk());
 //
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/video")
                         .param("title", "测试发布视频")
-                        .param("pid", "1")
                         .param("content", "测试发布视频")
                         .header("Authorization", AUTH))
                 .andReturn();

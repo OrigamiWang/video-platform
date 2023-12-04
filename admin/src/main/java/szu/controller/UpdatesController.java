@@ -105,7 +105,12 @@ public class UpdatesController {
         updatesService.deleteEssayById(id);
         return CommonResult.success("操作成功");
     }
-
+    @GetMapping("/homePage")
+    @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
+    @ApiResponse(code = 200, message = "VideoVo List")
+    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
+        return CommonResult.success(updatesService.getHomePage(pageSize));
+    }
 
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片，暂时也可以用来获取视频资源")
@@ -157,7 +162,7 @@ public class UpdatesController {
     public CommonResult<String> publishVideo(
             @ApiParam(value = "视频标题", required = true) @RequestParam("title") String title,//标题
             @ApiParam(value = "动态的正文，长度1~1024", required = true) @RequestParam("content") String content,//内容
-            @ApiParam(value = "视频分区id") @RequestParam("pid") int pid,
+            @ApiParam(value = "视频分区id,如果不发这个，默认为1，代表未分区",required = false) @RequestParam("pid") Integer pid,
             @RequestHeader(value = "Authorization") String token
     ) {
         User user = (User) redisService.get(USER_PREFIX + token);
@@ -171,7 +176,8 @@ public class UpdatesController {
         if (title == null || title.isEmpty()) {
             return CommonResult.failed("标题不能为空");
         }
-        if (pid < 1) {
+        if (pid==null) pid=1;
+        else if (pid < 1) {
             return CommonResult.failed("分区id不能小于1");
         }
         try {
@@ -187,7 +193,7 @@ public class UpdatesController {
     @PostMapping("/uploadMedia")
     @ApiOperation("上传视频,返回视频截取封面的url")
     @ApiResponse(code = 200, message = "发布成功")
-    public CommonResult<String> uploadVideo(MultipartFile video, @RequestHeader(value = "Authorization") String token) {
+    public CommonResult<String> uploadVideo(@ApiParam("name=video，视频文件") @RequestBody MultipartFile video, @RequestHeader(value = "Authorization") String token) {
         try {
             User user = (User) redisService.get(USER_PREFIX + token);
             if (user == null) {
@@ -200,6 +206,24 @@ public class UpdatesController {
         }
     }
 
+    @PostMapping("/changeVideoCover")
+    @ApiOperation("更换视频封面，适用于生成的封面不满意，想自己更换的情况")
+    @ApiResponse(code = 200, message = "成功")
+    public CommonResult<String> changeVideoCover(@ApiParam("name=image，图片") @RequestBody MultipartFile image, @RequestHeader(value = "Authorization") String token) {
+        try {
+            User user = (User) redisService.get(USER_PREFIX + token);
+            if (user == null) {
+                return CommonResult.failed("请先登录");
+            }
+            if (image == null) {
+                return CommonResult.failed("图片不能为空");
+            }
+            String url = updatesService.changeVideoCover(image, user.getId());
+            return CommonResult.success(url);
+        } catch (Exception e) {
+            return CommonResult.failed("上传失败");
+        }
+    }
 
     @DeleteMapping("/video")
     @ApiOperation("删除指定视频动态")
@@ -246,10 +270,5 @@ public class UpdatesController {
         return CommonResult.success(updatesService.getPartitions());
     }
 
-    @GetMapping("/homePage")
-    @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
-    @ApiResponse(code = 200, message = "VideoVo List")
-    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
-        return CommonResult.success(updatesService.getHomePage(pageSize));
-    }
+
 }

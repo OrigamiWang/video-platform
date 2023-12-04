@@ -76,4 +76,5 @@ public interface UpdateService {
     Update findVideoUpdateByVid(int id);//获取指定id的视频,返回Update
 
     String uploadVideo(MultipartFile video,int uid);
+    String changeVideoCover(MultipartFile image, Integer uid);
 }

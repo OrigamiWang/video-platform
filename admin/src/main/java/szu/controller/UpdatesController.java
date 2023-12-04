@@ -152,16 +152,15 @@ public class UpdatesController {
     }
 
     @PostMapping("/video")
-    @ApiOperation("发布视频动态")
-    @ApiResponse(code = 200, message = "发布成功")
+    @ApiOperation("发布视频动态,返回msg结果信息")
+    @ApiResponse(code = 200, message = "结果信息")
     public CommonResult<String> publishVideo(
             @ApiParam(value = "视频标题", required = true) @RequestParam("title") String title,//标题
             @ApiParam(value = "动态的正文，长度1~1024", required = true) @RequestParam("content") String content,//内容
             @ApiParam(value = "视频分区id") @RequestParam("pid") int pid,
-            @ApiParam(value = "视频文件", required = true) @RequestParam("video") MultipartFile video,//视频
             @RequestHeader(value = "Authorization") String token
     ) {
-        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -172,19 +171,35 @@ public class UpdatesController {
         if (title == null || title.isEmpty()) {
             return CommonResult.failed("标题不能为空");
         }
-        if (video == null || video.isEmpty()) {
-            return CommonResult.failed("视频不能为空");
-        }
         if (pid < 1) {
             return CommonResult.failed("分区id不能小于1");
         }
         try {
-            updatesService.publishVideo(user.getId(), title, content, pid, video);
-            return CommonResult.success("发布成功");
+            String msg = updatesService.publishVideo(user.getId(), title, content, pid);
+            if (msg.equals("发布成功"))
+                return CommonResult.success(msg);
+            return CommonResult.failed(msg);
         } catch (Exception e) {
             return CommonResult.failed("发布失败");
         }
     }
+
+    @PostMapping("/uploadMedia")
+    @ApiOperation("上传视频,返回视频截取封面的url")
+    @ApiResponse(code = 200, message = "发布成功")
+    public CommonResult<String> uploadVideo(MultipartFile video, @RequestHeader(value = "Authorization") String token) {
+        try {
+            User user = (User) redisService.get(USER_PREFIX + token);
+            if (user == null) {
+                return CommonResult.failed("请先登录");
+            }
+            String url = updatesService.uploadVideo(video, user.getId());
+            return CommonResult.success(url);
+        } catch (Exception e) {
+            return CommonResult.failed("上传失败");
+        }
+    }
+
 
     @DeleteMapping("/video")
     @ApiOperation("删除指定视频动态")
@@ -203,26 +218,27 @@ public class UpdatesController {
         return CommonResult.success("操作成功");
     }
 
-    //    @PostMapping("/partition")
-//    @ApiOperation("添加动态分区")
-//    public CommonResult<String> addPartition(@RequestParam("name") String name) {
-//        updatesService.addPartition(name);
-//        return CommonResult.success("添加成功");
-//    }
-//
-//    @PutMapping("/partition")
-//    @ApiOperation("修改动态分区")
-//    public CommonResult<String> updatePartition(@RequestParam("id") int id, @RequestParam("name") String name) {
-//        updatesService.updatePartition(id, name);
-//        return CommonResult.success("修改成功");
-//    }
-//
-//    @DeleteMapping("/partition")
-//    @ApiOperation("删除动态分区")
-//    public CommonResult<String> deletePartition(@RequestParam("id") int id) {
-//        updatesService.deletePartitionById(id);
-//        return CommonResult.success("删除成功");
-//    }
+    @PostMapping("/partition")
+    @ApiOperation("添加动态分区")
+    public CommonResult<String> addPartition(@RequestParam("name") String name) {
+        updatesService.addPartition(name);
+        return CommonResult.success("添加成功");
+    }
+
+    @PutMapping("/partition")
+    @ApiOperation("修改动态分区")
+    public CommonResult<String> updatePartition(@RequestParam("id") int id, @RequestParam("name") String name) {
+        updatesService.updatePartition(id, name);
+        return CommonResult.success("修改成功");
+    }
+
+    @DeleteMapping("/partition")
+    @ApiOperation("删除动态分区")
+    public CommonResult<String> deletePartition(@RequestParam("id") int id) {
+        updatesService.deletePartitionById(id);
+        return CommonResult.success("删除成功");
+    }
+
     @GetMapping("/partition")
     @ApiOperation("获取所有视频分区")
     @ApiResponse(code = 200, message = "Partition的List")

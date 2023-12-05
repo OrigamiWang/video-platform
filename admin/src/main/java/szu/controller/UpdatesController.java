@@ -1,10 +1,12 @@
 package szu.controller;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,9 @@ public class UpdatesController {
     @Resource
     private RedisService redisService;
 
+    @Value("${redis.user_prefix}")
+    private String USER_PREFIX;
+
     @PostMapping("/essay")
     @ApiOperation("发布图文动态")
     @ApiResponse(code = 200, message = "发布成功")
@@ -43,7 +48,7 @@ public class UpdatesController {
             @RequestParam(value = "images", required = false) MultipartFile[] images,//图片
             @RequestHeader(value = "Authorization") String token
     ) {
-        User user = (User) redisService.get(token);
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -59,7 +64,7 @@ public class UpdatesController {
             updatesService.publishEssay(user.getId(), content, images);
             return CommonResult.success("发布成功");
         } catch (Exception e) {
-            return CommonResult.failed("发布失败");
+            return CommonResult.failed(e.getMessage());
         }
     }
 
@@ -90,7 +95,7 @@ public class UpdatesController {
     public CommonResult<String> deleteEssayById(@RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -100,7 +105,12 @@ public class UpdatesController {
         updatesService.deleteEssayById(id);
         return CommonResult.success("操作成功");
     }
-
+    @GetMapping("/homePage")
+    @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
+    @ApiResponse(code = 200, message = "VideoVo List")
+    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
+        return CommonResult.success(updatesService.getHomePage(pageSize));
+    }
 
     @GetMapping("/getImage")
     @ApiOperation("获取指定图片，暂时也可以用来获取视频资源")
@@ -118,7 +128,7 @@ public class UpdatesController {
             @RequestHeader(value = "Authorization") String token
     ) {
         //TOKEN校验,对比要修改的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) JSON.parse((String) redisService.get(USER_PREFIX + token));
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -147,16 +157,15 @@ public class UpdatesController {
     }
 
     @PostMapping("/video")
-    @ApiOperation("发布视频动态")
-    @ApiResponse(code = 200, message = "发布成功")
+    @ApiOperation("发布视频动态,返回msg结果信息")
+    @ApiResponse(code = 200, message = "结果信息")
     public CommonResult<String> publishVideo(
             @ApiParam(value = "视频标题", required = true) @RequestParam("title") String title,//标题
             @ApiParam(value = "动态的正文，长度1~1024", required = true) @RequestParam("content") String content,//内容
-            @ApiParam(value = "视频分区id") @RequestParam("pid") int pid,
-            @ApiParam(value = "视频文件", required = true) @RequestParam("video") MultipartFile video,//视频
+            @ApiParam(value = "视频分区id,如果不发这个，默认为1，代表未分区",required = false) @RequestParam("pid") Integer pid,
             @RequestHeader(value = "Authorization") String token
     ) {
-        User user = (User) redisService.get(token);
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -167,17 +176,52 @@ public class UpdatesController {
         if (title == null || title.isEmpty()) {
             return CommonResult.failed("标题不能为空");
         }
-        if (video == null || video.isEmpty()) {
-            return CommonResult.failed("视频不能为空");
-        }
-        if (pid < 1) {
+        if (pid==null) pid=1;
+        else if (pid < 1) {
             return CommonResult.failed("分区id不能小于1");
         }
         try {
-            updatesService.publishVideo(user.getId(), title, content, pid, video);
-            return CommonResult.success("发布成功");
+            String msg = updatesService.publishVideo(user.getId(), title, content, pid);
+            if (msg.equals("发布成功"))
+                return CommonResult.success(msg);
+            return CommonResult.failed(msg);
         } catch (Exception e) {
             return CommonResult.failed("发布失败");
+        }
+    }
+
+    @PostMapping("/uploadMedia")
+    @ApiOperation("上传视频,返回视频截取封面的url")
+    @ApiResponse(code = 200, message = "发布成功")
+    public CommonResult<String> uploadVideo(@ApiParam("name=video，视频文件") @RequestBody MultipartFile video, @RequestHeader(value = "Authorization") String token) {
+        try {
+            User user = (User) redisService.get(USER_PREFIX + token);
+            if (user == null) {
+                return CommonResult.failed("请先登录");
+            }
+            String url = updatesService.uploadVideo(video, user.getId());
+            return CommonResult.success(url);
+        } catch (Exception e) {
+            return CommonResult.failed("上传失败");
+        }
+    }
+
+    @PostMapping("/changeVideoCover")
+    @ApiOperation("更换视频封面，适用于生成的封面不满意，想自己更换的情况")
+    @ApiResponse(code = 200, message = "成功")
+    public CommonResult<String> changeVideoCover(@ApiParam("name=image，图片") @RequestBody MultipartFile image, @RequestHeader(value = "Authorization") String token) {
+        try {
+            User user = (User) redisService.get(USER_PREFIX + token);
+            if (user == null) {
+                return CommonResult.failed("请先登录");
+            }
+            if (image == null) {
+                return CommonResult.failed("图片不能为空");
+            }
+            String url = updatesService.changeVideoCover(image, user.getId());
+            return CommonResult.success(url);
+        } catch (Exception e) {
+            return CommonResult.failed("上传失败");
         }
     }
 
@@ -187,7 +231,7 @@ public class UpdatesController {
     public CommonResult<String> deleteVideoById(@RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
-        User user = (User) redisService.get(token);
+        User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
@@ -198,26 +242,27 @@ public class UpdatesController {
         return CommonResult.success("操作成功");
     }
 
-    //    @PostMapping("/partition")
-//    @ApiOperation("添加动态分区")
-//    public CommonResult<String> addPartition(@RequestParam("name") String name) {
-//        updatesService.addPartition(name);
-//        return CommonResult.success("添加成功");
-//    }
-//
-//    @PutMapping("/partition")
-//    @ApiOperation("修改动态分区")
-//    public CommonResult<String> updatePartition(@RequestParam("id") int id, @RequestParam("name") String name) {
-//        updatesService.updatePartition(id, name);
-//        return CommonResult.success("修改成功");
-//    }
-//
-//    @DeleteMapping("/partition")
-//    @ApiOperation("删除动态分区")
-//    public CommonResult<String> deletePartition(@RequestParam("id") int id) {
-//        updatesService.deletePartitionById(id);
-//        return CommonResult.success("删除成功");
-//    }
+    @PostMapping("/partition")
+    @ApiOperation("添加动态分区")
+    public CommonResult<String> addPartition(@RequestParam("name") String name) {
+        updatesService.addPartition(name);
+        return CommonResult.success("添加成功");
+    }
+
+    @PutMapping("/partition")
+    @ApiOperation("修改动态分区")
+    public CommonResult<String> updatePartition(@RequestParam("id") int id, @RequestParam("name") String name) {
+        updatesService.updatePartition(id, name);
+        return CommonResult.success("修改成功");
+    }
+
+    @DeleteMapping("/partition")
+    @ApiOperation("删除动态分区")
+    public CommonResult<String> deletePartition(@RequestParam("id") int id) {
+        updatesService.deletePartitionById(id);
+        return CommonResult.success("删除成功");
+    }
+
     @GetMapping("/partition")
     @ApiOperation("获取所有视频分区")
     @ApiResponse(code = 200, message = "Partition的List")
@@ -225,10 +270,5 @@ public class UpdatesController {
         return CommonResult.success(updatesService.getPartitions());
     }
 
-    @GetMapping("/homePage")
-    @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
-    @ApiResponse(code = 200, message = "VideoVo List")
-    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
-        return CommonResult.success(updatesService.getHomePage(pageSize));
-    }
+
 }

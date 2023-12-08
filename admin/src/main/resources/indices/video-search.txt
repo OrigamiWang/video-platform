@@ -51,16 +51,16 @@
         "type": "keyword",
         "index": false
       },
-      "play_num":{
+      "playNum":{
         "type": "integer"
       },
-      "dm_num":{
+      "dmNum":{
         "type": "integer"
       },
-      "total_time":{
+      "totalTime":{
         "type": "long"
       },
-      "upload_time":{
+      "uploadTime":{
         "type": "date"
       },
       "pid":{
@@ -75,9 +75,9 @@
         "search_analyzer": "ik_smart"
       },
       "suggestion":{
-        "type": "completion",
-        "analyzer": "suggest_analyzer",
-        "search_analyzer": "keyword"
+          "type": "completion",
+          "analyzer": "suggest_analyzer",
+          "search_analyzer": "keyword"
       }
     }
   }

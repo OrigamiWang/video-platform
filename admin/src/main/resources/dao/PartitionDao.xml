@@ -6,11 +6,11 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
   </resultMap>
   <insert id="insert">
-    insert into update_partition (name)
+    insert into `partition` (name)
     values (#{name,jdbcType=VARCHAR})
   </insert>
   <update id="update">
-    update update_partition
+    update `partition`
     <set>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
@@ -19,13 +19,13 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <delete id="deleteById">
-    delete from update_partition where id = #{id}
+    delete from `partition` where id = #{id}
   </delete>
     <select id="findAll" resultMap="BaseResultMap">
-        select * from update_partition
+        select * from `partition`
     </select>
   <select id="findById" resultMap="BaseResultMap">
-    select * from update_partition where id = #{id}
+    select * from `partition` where id = #{id}
   </select>
 
 </mapper>

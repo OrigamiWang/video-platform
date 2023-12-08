@@ -27,6 +27,7 @@ mybatis:
   mapper-locations:
     - classpath:dao/*.xml
     - classpath*:com/**/mapper/*.xml
+  type-aliases-package: szu.model
   configuration:
     map-underscore-to-camel-case: true  # ??????
 
@@ -36,7 +37,6 @@ redis:
   login_pin: "login_pin_"
   register_pin: "register_pin_"
   auth_pin: "auth_pin_"
-
 
 mail:
   phone: 13880970270

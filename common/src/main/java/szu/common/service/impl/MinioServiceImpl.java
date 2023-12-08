@@ -72,13 +72,13 @@ public class MinioServiceImpl implements MinioService {
             if (!doesObjectExist(bucketName, objectName)) {
                 return true;
             }
-
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
             return true;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             return false;
         }
     }
+
 
     public boolean doesObjectExist(String bucketName, String objectName) throws ServerException,
             InsufficientDataException,
@@ -95,6 +95,26 @@ public class MinioServiceImpl implements MinioService {
             InternalException {
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+        }
+    }
+
+    @Override
+    public boolean ifFileExist(String bucketName, String objectName) {
+        try {
+            return doesObjectExist(bucketName, objectName);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void moveObject(String bucketName, String srcObjectName, String destObjectName) {
+        try {
+            minioClient.copyObject(CopyObjectArgs.builder().bucket(bucketName).object(destObjectName)
+                    .source(CopySource.builder().bucket(bucketName).object(srcObjectName).build()).build());
+//            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(srcObjectName).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }

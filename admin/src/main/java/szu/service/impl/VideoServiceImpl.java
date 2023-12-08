@@ -25,9 +25,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoDetailVo getVideoDetail(Integer id) {
-        //TODO 查询video表与用户表，组装vo返回
-        VideoDetailVo videoDetailVo = videoDao.getVideoDetail(id);
-        return videoDetailVo;
+        return videoDao.getVideoDetail(id);
     }
 
     @Override

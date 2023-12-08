@@ -51,4 +51,10 @@ class MinioTest {
         String objectName = "bm.jpg";
         minioService.deleteFile(bucketName, objectName);
     }
+
+    @Test
+    void deleteData(){
+        minioService.deleteFile("video-platform.updates", "video_cover_cache/7.jpg");
+    }
+
 }

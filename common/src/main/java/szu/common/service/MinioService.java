@@ -4,6 +4,12 @@ import java.io.InputStream;
 
 public interface MinioService {
     boolean uploadFile(String bucketName, String objectName, InputStream stream);
+
     byte[] downloadFile(String bucketName, String objectName);
+
     boolean deleteFile(String bucketName, String objectName);
+
+    boolean ifFileExist(String bucketName, String objectName);
+
+    void moveObject(String bucketName, String srcObjectName, String destObjectName);
 }

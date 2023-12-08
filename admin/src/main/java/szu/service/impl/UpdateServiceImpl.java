@@ -12,6 +12,7 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
+import szu.util.JavaCvUtil;
 import szu.util.TimeUtil;
 import szu.vo.VideoVo;
 
@@ -40,6 +41,17 @@ public class UpdateServiceImpl implements UpdateService {
     private RedisWithMysqlImpl syncService;
     @Value("${minio.bucket-name}")
     private String bucketName;//minio桶名
+    @Value("${const.minio.prefix.video-cache}")
+    private String PREFIX_VIDEO_CACHE;
+    @Value("${const.minio.prefix.video}")
+    private String PREFIX_VIDEO;
+    @Value("${const.minio.prefix.video-cover-cache}")
+    private String PREFIX_VIDEO_COVER_CACHE;
+    @Value("${const.minio.prefix.video-cover}")
+    private String PREFIX_VIDEO_COVER;
+    @Value("${const.redis.prefix.video-format-cache}")
+    private String PREFIX_VIDEO_FORMAT_CACHE;
+
 
     /**
      * 常量
@@ -71,9 +83,9 @@ public class UpdateServiceImpl implements UpdateService {
 
             //调用dao层插入数据库
             Update new_ud = new Update(0, 0, uid, content, UNCHECKED,
-                    null, null);
+                    null, JSON.toJSONString(urls));
             //插入update表
-            if (updatesDao.insert(new_ud)!=1) throw new Exception();
+            if (updatesDao.insert(new_ud) != 1) throw new Exception();
             //TODO 通知管理员审核
             //新建一个update_heat记录
             updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
@@ -180,27 +192,75 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Transactional
     @Override
-    public void publishVideo(Integer id, String title, String content, Integer pid, MultipartFile video) {
+    public String publishVideo(Integer uid, String title, String content, Integer pid) {
         //先插入video表，获取vid；再插入update表
-
         try {
-            //TODO 剪视频第一帧作为封面，上传minio
-            // ffmpeg
-            //上传视频
-            String videoUrl = System.currentTimeMillis() + video.getOriginalFilename();
-            minioService.uploadFile(bucketName, videoUrl, video.getInputStream());
+            String format = (String) redisService.get(PREFIX_VIDEO_FORMAT_CACHE + uid);
+            if (format == null) return "视频文件缺失或视频过期";
+            //获取视频的文件路径和封面路径
+            String oldPath = PREFIX_VIDEO_CACHE + uid;
+            String oldCoverPath = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            String videoFilePath = PREFIX_VIDEO + uid + "_" + System.currentTimeMillis() + "." + format;
+            String videoHomePagePath = PREFIX_VIDEO_COVER + uid + "_" + System.currentTimeMillis() + ".jpg";
+            if (!minioService.ifFileExist(bucketName, oldPath)
+                    || !minioService.ifFileExist(bucketName, oldCoverPath))
+                return "视频文件缺失或视频过期,请重新上传";
+            //minio中的视频文件和封面文件存在，将原object移入新的object
+            minioService.moveObject(bucketName, oldPath, videoFilePath);
+            minioService.moveObject(bucketName, oldCoverPath, videoHomePagePath);
+            Video new_vd = new Video(0, videoFilePath, 0, 0, 0, title, pid, 0, 0);
             //插入video表
-            int vid = videoDao.insert(new Video(0, videoUrl, 0, 0, 0, title, pid, 0, 0));
-            Update new_ud = new Update(0, vid, id, content, UNCHECKED,
-                    null, null);
+            if (videoDao.insert(new_vd) != 1) throw new Exception();
             //插入update表
-            if (updatesDao.insert(new_ud)!=1) throw new Exception();
+            Update new_ud = new Update(0, new_vd.getId(), uid, content, UNCHECKED,
+                    null, JSON.toJSONString(new String[]{videoHomePagePath}));
+            if (updatesDao.insert(new_ud) != 1) throw new Exception();
             //TODO 通知管理员审核
             //新建一个update_heat记录
             updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
+
+            return "发布成功";
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Publish video failed", e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public String uploadVideo(MultipartFile video, int uid) {
+        try {
+            String videoPath = PREFIX_VIDEO_CACHE + uid;
+            String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            //redis 存视频的编码格式
+            String format = video.getOriginalFilename().substring(video.getOriginalFilename().lastIndexOf(".") + 1);
+            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid, format, 43200);
+
+            //存入minio,如果有之前上传的视频，会被覆盖
+            minioService.uploadFile(bucketName, videoPath, video.getInputStream());
+            //生成封面,并存入minio
+            MultipartFile snapshot = JavaCvUtil.snapshot(video.getInputStream());
+            if (snapshot == null) {
+                throw new RuntimeException("生成封面失败");
+            }
+            minioService.uploadFile(bucketName, pathOfHomePage, snapshot.getInputStream());
+            //返回存储路径
+            return pathOfHomePage;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public String changeVideoCover(MultipartFile image, Integer uid) {
+        try {
+            String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            minioService.uploadFile(bucketName, pathOfHomePage, image.getInputStream());
+            //返回存储路径
+            return pathOfHomePage;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -231,10 +291,10 @@ public class UpdateServiceImpl implements UpdateService {
     public Video findVideoByVid(int vid) {
         Map<Object, Object> objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
         if (objectMap == null) {
-            Video video = videoDao.findById(vid);
-            if (video == null) return null;//数据库中没有该视频
-            syncService.updateRedisByVideoId(vid);
-            return video;
+            if (!syncService.updateRedisByVideoId(vid)) return null;
+            else {
+                objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
+            }
         }
         return JSON.parseObject(JSON.toJSONString(objectMap), Video.class);
     }
@@ -272,6 +332,7 @@ public class UpdateServiceImpl implements UpdateService {
         //计算有多少个视频
         List<Integer> ids = videoDao.selectAllId();
         int videoNum = ids.size();
+        if (videoNum == 0) return new ArrayList<>();
         //获取pageSize个随机int
         int[] randomNums = new int[pageSize];
         for (int i = 0; i < pageSize; i++) {
@@ -283,7 +344,7 @@ public class UpdateServiceImpl implements UpdateService {
             Video video = findVideoByVid(id);
             Update update = updatesDao.findByVid(id);
             VideoVo videoVo = new VideoVo();
-            videoVo.setId(id);
+            videoVo.setId(update.getId());
             videoVo.setUrl(video.getUrl());
             videoVo.setUploadTime(update.getUploadTime());
             videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
@@ -305,4 +366,6 @@ public class UpdateServiceImpl implements UpdateService {
             return null;
         }
     }
+
+
 }

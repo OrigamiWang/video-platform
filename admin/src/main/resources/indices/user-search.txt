@@ -45,12 +45,11 @@
       "fan":{
         "type": "integer"
       },
-      "video_num":{
+      "videoNum":{
         "type": "integer"
       },
       "level":{
-        "type": "integer",
-        "index": false
+        "type": "integer"
       }
     }
   }

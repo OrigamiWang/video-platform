@@ -6,6 +6,7 @@ import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
 import szu.model.User;
+import szu.model.UserSearchDoc;
 import szu.service.VideoService;
 import szu.util.EsUtil;
 import szu.vo.VideoDetailVo;
@@ -32,11 +33,21 @@ public class VideoServiceImpl implements VideoService {
     public ListResult search(VideoSearchParams params) {
         int classificationId = params.getClassificationId();//判断是搜视频还是搜作者
         if(classificationId == 0){
-           return esUtil.searchVideo(params);
+            return esUtil.searchVideo(params);
         }else if(classificationId == 1){
             return esUtil.searchUser(params);
         }
         return null;
+    }
+
+    @Override
+    public ListResult<VideoVo> searchVideo(VideoSearchParams params) {
+        return esUtil.searchVideo(params);
+    }
+
+    @Override
+    public ListResult<UserSearchDoc> searchUser(VideoSearchParams params) {
+        return esUtil.searchUser(params);
     }
 
     //根据用户的昵称查询他的投稿

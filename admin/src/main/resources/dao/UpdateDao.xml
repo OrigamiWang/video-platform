@@ -1,84 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="szu.dao.UpdateDao">
-  <resultMap id="BaseResultMap" type="szu.model.Update">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="uid" jdbcType="INTEGER" property="uid" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="content" jdbcType="VARCHAR" property="content" />
-    <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="type" jdbcType="INTEGER" property="type" />
-    <result column="dateTime" jdbcType="TIMESTAMP" property="datetime" />
-    <result column="urls" jdbcType="VARCHAR" property="urls" />
-    <result column="pid" jdbcType="INTEGER" property="pid" />
-  </resultMap>
-  <insert id="insert">
-      insert into `update` (uid, title, content, status, type, dateTime, urls, pid)
-      values (#{uid,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
-              #{status,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{datetime,jdbcType=TIMESTAMP},
-              #{urls,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER})
-  </insert>
-  <update id="update">
-    update `update`
-    <set>
-      <if test="uid != null">
-        uid = #{uid,jdbcType=INTEGER},
-      </if>
-      <if test="title != null">
-        title = #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="content != null">
-        content = #{content,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        status = #{status,jdbcType=INTEGER},
-      </if>
-      <if test="type != null">
-        type = #{type,jdbcType=INTEGER},
-      </if>
-      <if test="datetime != null">
-        dateTime = #{datetime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="urls != null">
-        urls = #{urls,jdbcType=VARCHAR},
-      </if>
-      <if test="pid != null">
-        pid = #{pid,jdbcType=INTEGER},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <delete id="deleteById">
-    delete from `update`
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-  <select id="findAll" resultMap="BaseResultMap">
-    select *
-    from `update`
-    order by id desc
-  </select>
-  <select id="findByType" resultMap="BaseResultMap">
-    select
-    *
-    from `update`
-    where type = #{type,jdbcType=INTEGER}
-  </select>
-  <select id="findByUid" resultMap="BaseResultMap">
-    select
-    *
-    from `update`
-    where uid = #{uid,jdbcType=INTEGER}
-  </select>
-  <select id="findByPid" resultMap="BaseResultMap">
-    select
-    *
-    from `update`
-    where pid = #{pid,jdbcType=INTEGER}
-  </select>
-  <select id="findById" resultMap="BaseResultMap">
-      select *
-      from `update`
-      where id = #{id,jdbcType=INTEGER}
-  </select>
+    <resultMap id="BaseResultMap" type="szu.model.Update">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="vid" property="vid" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP"/>
+        <result column="urls" property="urls" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="szu.model.Update">
+        insert into `updates`(vid, uid, content, status, urls)
+        values (#{vid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER},
+                #{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{urls,jdbcType=VARCHAR})
+    </insert>
+    <update id="update">
+        update `updates`(vid, uid, content, status, upload_time, urls)
+        set vid = #{vid,jdbcType=INTEGER}, uid = #{uid,jdbcType=INTEGER}, content = #{content,jdbcType=VARCHAR}, status = #{status,jdbcType=INTEGER}, upload_time = #{uploadTime,jdbcType=TIMESTAMP}, urls = #{urls,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <delete id="deleteById">
+        delete
+        from `updates`
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByVid">
+        delete
+        from `updates`
+        where uid = #{uid,jdbcType=INTEGER}
+    </delete>
+    <select id="findInPage" resultMap="BaseResultMap">
+        select *
+        from `updates`
+    </select>
+    <select id="findByUid" resultMap="BaseResultMap">
+        select *
+        from `updates`
+        where uid = #{uid,jdbcType=INTEGER}
+    </select>
+    <select id="findById" resultMap="BaseResultMap">
+        select *
+        from `updates`
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="findAll" resultType="szu.model.Update">
+        select *
+        from `updates`
+    </select>
+    <select id="findByVid" resultType="szu.model.Update">
+        select *
+        from `updates`
+        where vid = #{vid,jdbcType=INTEGER}
+    </select>
 
 </mapper>

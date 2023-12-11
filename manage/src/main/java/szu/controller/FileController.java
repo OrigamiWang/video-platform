@@ -30,6 +30,7 @@ public class FileController {
     public CommonResult<String> upload(MultipartFile file){
         log.info("文件上传,{}", file);
         try {
+
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 
@@ -37,6 +38,7 @@ public class FileController {
             String uuid = UUID.randomUUID().toString();
             uuid = uuid.replaceAll("-", "");
             String objectName = uuid + extension;
+//            String objectName = originalFilename;
 
             //后期将文件名修改为 user/userId/fileTye/文件名.fileType
 

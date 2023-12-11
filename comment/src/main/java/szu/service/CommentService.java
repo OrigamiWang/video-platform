@@ -2,6 +2,7 @@ package szu.service;
 
 
 import szu.model.Comment;
+import szu.vo.CommentVo;
 
 
 import java.util.List;
@@ -17,17 +18,7 @@ public interface CommentService {
      * 添加评论
      * @param comment
      */
-
-//    void addComment(Comment01 comment);
     void addComment(Comment comment);
-
-//    /**
-//     * 根据foreignId和foreignType获取指定区域的评论
-//     * @param foreignId
-//     * @param foreignType
-//     * @return
-//     */
-//    List<Comment01> getCommentsByForeignIdAndForeignType(Integer foreignId, Integer foreignType);
 
     /**
      * 根据foreignId获取评论总数
@@ -36,8 +27,8 @@ public interface CommentService {
      */
     Long countCommentsByForeignId(Integer foreignId);
 
-    default List<Comment> getCommentsByForeignIdAndPages(Integer foreignId, int page, int size) {
-        return getCommentsByForeignIdAndPages(foreignId, page, size,"likeNum");
+    default List<CommentVo> getCommentsByForeignIdAndPages(Integer uid, Integer foreignId, int page, int size) {
+        return getCommentsByForeignIdAndPages(uid,foreignId, page, size,"likeNum");
     }
 
     /**
@@ -47,7 +38,7 @@ public interface CommentService {
      * @param size 每页大小
      * @return
      */
-    List<Comment> getCommentsByForeignIdAndPages(Integer foreignId, int page, int size, String sortBy);
+    List<CommentVo> getCommentsByForeignIdAndPages(Integer uid, Integer foreignId, int page, int size, String sortBy);
 
     /**
      * 根据id获取子评论总数
@@ -58,12 +49,14 @@ public interface CommentService {
 
     /**
      * 分页获取对应根评论下的子评论
-     * @param pid 要获取子评论根评论id
+     *
+     * @param pid  要获取子评论根评论id
      * @param page 当前页
      * @param size 每页大小
+     * @param uid 当前登录用户id
      * @return
      */
-    List<Comment> listChildrenCommentByPages(String pid, int page, int size);
+    List<CommentVo> listChildrenCommentByPages(String pid, int page, int size,Integer uid);
 
     /**
      * 回复评论
@@ -105,4 +98,11 @@ public interface CommentService {
      */
     void deleteChildComment(String pid, String cid);
 
+    /**
+     * 置顶评论
+     * @param pid 要置顶的评论id（只能为根评论）
+     * @param flag 置顶或取消置顶，1：置顶 0：取消置顶
+     * @return
+     */
+    void toTopComment(String pid,Integer flag);
 }

@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8083
 
 spring:
   application:
@@ -11,7 +11,13 @@ mybatis:
   mapper-locations:
     - classpath:dao/*.xml
     - classpath*:com/**/mapper/*.xml
+  type-aliases-package: szu.model
+  configuration:
+    map-underscore-to-camel-case: true
 
 
 redis:
   user_prefix: "login_user_"
+  login_pin: "login_pin_"
+  register_pin: "register_pin_"
+

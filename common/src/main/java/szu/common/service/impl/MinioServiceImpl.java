@@ -3,22 +3,13 @@ package szu.common.service.impl;
 import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import szu.common.exception.ApiException;
-import szu.common.exception.Asserts;
 import szu.common.service.MinioService;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.TimeUnit;
 
 public class MinioServiceImpl implements MinioService {
     @Autowired
@@ -71,52 +62,6 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
-    @Override
-    public InputStream getFileStream(String bucketName, String objectName) throws Exception {
-        // 判断 bucket 是否存在
-        BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder()
-                .bucket(bucketName)
-                .build();
-        if (!minioClient.bucketExists(bucketExistsArgs)) {
-            return null;
-        }
-        // 获取内容
-        GetObjectArgs args = GetObjectArgs.builder()
-                .bucket(bucketName)
-                .object(objectName)
-                .build();
-        return minioClient.getObject(args);
-    }
-
-    @Override
-    public ResponseEntity<Resource> viewImage(String bucketName, String path) {
-        // 获取图片数据流
-        InputStream stream;
-        try {
-            stream = getFileStream(bucketName, path);
-        } catch (Exception e) {
-            throw new ApiException("内部错误");
-        }
-        Asserts.notNull(stream, "图片不存在");
-
-        // 判断文件类型
-        org.springframework.http.MediaType mediaType = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
-        String contentTypeFromName = URLConnection.getFileNameMap().getContentTypeFor(path);
-        if (contentTypeFromName != null) {
-            mediaType = org.springframework.http.MediaType.parseMediaType(contentTypeFromName);
-        }
-
-        // 设置 Http 缓存
-        String ccValue = CacheControl.maxAge(7, TimeUnit.DAYS)
-                .noTransform()
-                .cachePublic()
-                .getHeaderValue();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, ccValue)
-                .contentType(mediaType)
-                .body(new InputStreamResource(stream));
-    }
-
     /***
      * 删除文件,如果删除成功或文件不存在则返回true
      */
@@ -127,13 +72,13 @@ public class MinioServiceImpl implements MinioService {
             if (!doesObjectExist(bucketName, objectName)) {
                 return true;
             }
-
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
             return true;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             return false;
         }
     }
+
 
     public boolean doesObjectExist(String bucketName, String objectName) throws ServerException,
             InsufficientDataException,
@@ -150,6 +95,26 @@ public class MinioServiceImpl implements MinioService {
             InternalException {
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+        }
+    }
+
+    @Override
+    public boolean ifFileExist(String bucketName, String objectName) {
+        try {
+            return doesObjectExist(bucketName, objectName);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void moveObject(String bucketName, String srcObjectName, String destObjectName) {
+        try {
+            minioClient.copyObject(CopyObjectArgs.builder().bucket(bucketName).object(destObjectName)
+                    .source(CopySource.builder().bucket(bucketName).object(srcObjectName).build()).build());
+//            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(srcObjectName).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }

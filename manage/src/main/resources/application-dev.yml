@@ -12,6 +12,11 @@ spring:
       stat-view-servlet: #访问监控网页的登录用户名和密码
         login-username: druid
         login-password: druid
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 9
 
   mail:
     host: smtp.qq.com
@@ -39,6 +44,7 @@ redis:
   user_prefix: "login_user_"
   login_pin: "login_pin_"
   register_pin: "register_pin_"
+  auth_pin: "auth_pin_"
 
 minio:
   endpoint: http://127.0.0.1:9000

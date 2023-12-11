@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: abc123
+    password: 123456
     druid:
       initial-size: 5 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
@@ -12,6 +12,30 @@ spring:
       stat-view-servlet: #访问监控网页的登录用户名和密码
         login-username: druid
         login-password: druid
+
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 9
+
+  mail:
+    host: smtp.qq.com
+    username: 2241375541@qq.com
+    password: nufzskdyiofzecee
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    port: 587
+    from: 2241375541@qq.com
+#  elasticsearch:
+#    uris:
 
 logging:
   level:
@@ -23,3 +47,26 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket-name: video-platform.updates
+
+redis:
+  user_prefix: "login_user_"
+  login_pin: "login_pin_"
+  auth_pin: "auth_pin_"
+
+const: #常量，原本使用注入方法，但是因别的模块需要使用，所以改为类内常量
+  shen_he: #审核状态码，0：未审核，1：审核通过，2：已下架
+    unchecked: 0
+    checked: 1
+    off_shelf: 2
+  redis: #redis key前缀
+    prefix:
+      essay: "updates:photoUpdate:"
+      video: "updates:videoUpdate:"
+      video-format-cache: "updates:videoFormatCache:"
+  minio:
+    prefix:
+      video-cache: "video_cache/"
+      video-cover-cache: "video_cover_cache/"
+      video: "video/"
+      video-cover: "video_cover/"
+

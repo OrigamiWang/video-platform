@@ -2,7 +2,6 @@ package szu.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
-import szu.model.Update;
 import szu.model.UpdateExample;
 
 public interface UpdateMapper {

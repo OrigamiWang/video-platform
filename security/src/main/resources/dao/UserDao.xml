@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="szu.dao.UserDao">
+
+    <!--    List<User> selectAllUser();-->
+    <select id="selectAllUser" resultType="user">
+        SELECT *
+        FROM user
+    </select>
+
+<!--    void insert(User user);-->
+    <insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="id">
+        insert into user (`name`, `email`)
+            values
+        (#{name}, #{email});
+    </insert>
+
+
+<!--    void updateUserById(User user);-->
+    <update id="updateUserById" parameterType="user">
+        update user
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="level != null">
+                `level` = #{level},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="phone != null">
+                `phone` = #{phone},
+            </if>
+            <if test="password != null">
+                `password` = #{password},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!--    void updateUserStatistics(UserStatistics userStatistics);-->
+    <update id="updateUserStatistics" parameterType="userStatistics">
+        update user_statistics
+        <set>
+            <if test="fan != null">
+                `fan` = #{fan},
+            </if>
+            <if test="follow != null">
+                `follow` = #{follow},
+            </if>
+            <if test="like != null">
+                `like` = #{like},
+            </if>
+            <if test="videoNum != null">
+                `video_num` = #{#videoNum},
+            </if>
+            <if test="videoTotalPlay != null">
+                `video_total_play` = #{videoTotalPlay},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
+
+<!--    void updateUserDetail(UserDetail userDetail);-->
+    <update id="updateUserDetail" parameterType="userDetail">
+        update user_detail
+        <set>
+            <if test="gender != null">
+                `gender` = #{gender},
+            </if>
+            <if test="exp != null">
+                `exp` = #{exp},
+            </if>
+            <if test="ip != null">
+                `ip` = #{ip},
+            </if>
+            <if test="info != null">
+                `info` = #{info},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
+
+</mapper>

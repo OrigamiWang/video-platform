@@ -232,18 +232,25 @@ public class UpdateServiceImpl implements UpdateService {
         try {
             String videoPath = PREFIX_VIDEO_CACHE + uid;
             String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
-            //redis 存视频的编码格式
-            String format = video.getOriginalFilename().substring(video.getOriginalFilename().lastIndexOf(".") + 1);
-            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid, format, 43200);
 
-            //存入minio,如果有之前上传的视频，会被覆盖
-            minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //生成封面,并存入minio
             MultipartFile snapshot = JavaCvUtil.snapshot(video.getInputStream());
             if (snapshot == null) {
                 throw new RuntimeException("生成封面失败");
             }
             minioService.uploadFile(bucketName, pathOfHomePage, snapshot.getInputStream());
+
+            //TODO 转换视频格式
+            video = JavaCvUtil.convertAviToM3u8(video.getInputStream());
+            if (video == null
+                    || video.isEmpty()
+                    || video.getOriginalFilename() == null)
+                throw new RuntimeException("转换视频格式失败");
+            //redis 存视频的编码格式
+            String format = video.getOriginalFilename().substring(video.getName().lastIndexOf(".") + 1);
+            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid,format, 43200);
+            //存入minio,如果有之前上传的视频，会被覆盖
+            minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //返回存储路径
             return pathOfHomePage;
         } catch (Exception e) {

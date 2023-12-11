@@ -1,13 +1,16 @@
 package szu.service.impl;
 
 import org.springframework.stereotype.Service;
+import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
+import szu.model.Barrage;
 import szu.model.User;
 import szu.service.VideoService;
 import szu.util.EsUtil;
+import szu.vo.BarrageVo;
 import szu.vo.VideoDetailVo;
 import szu.vo.VideoVo;
 
@@ -52,5 +55,21 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public List<String> searchSuggest(String key) {
         return esUtil.suggest(key);
+    }
+
+    @Override
+    public List<BarrageVo> getBarrageByVid(int vid) {
+        return videoDao.getBarrageByVid(vid);
+    }
+
+    @Override
+    public void saveBarrage(Barrage barrage) {
+        videoDao.saveBarrage(barrage);
+    }
+
+    @Override
+    public List<Barrage> getBarrageListByVid(int vid, int page, int size) {
+        int offset = (page - 1) * size;
+        return videoDao.getBarrageListByVid(vid, offset, size);
     }
 }

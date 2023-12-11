@@ -2,16 +2,21 @@ package szu.controller;
 
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
+import szu.model.Barrage;
 import szu.service.VideoService;
+import szu.vo.BarrageVo;
 import szu.vo.VideoDetailVo;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -61,6 +66,26 @@ public class VideoController {
         return videoService.searchSuggest(key);
     }
 
-
-
+    @GetMapping("/getVideoSource")
+    public CommonResult<String> getVideoSource(){
+        return null;
+    }
+    @ApiModelProperty("获取视频的弹幕数组，封装给danmu的")
+    @GetMapping("/getBarrageVoByVid")
+    public CommonResult<List<BarrageVo>> getBarrageByVid(@RequestParam @ApiParam("视频id") int vid){
+        List<BarrageVo> barrageVoList = videoService.getBarrageByVid(vid);
+        return CommonResult.success(barrageVoList);
+    }
+    @ApiModelProperty("保存弹幕信息")
+    @PostMapping("/saveBarrage")
+    public CommonResult saveBarrage(@RequestBody Barrage barrage){
+        videoService.saveBarrage(barrage);
+        return CommonResult.success("保存成功");
+    }
+    @ApiModelProperty("获取视频右侧折叠的弹幕列表")
+    @GetMapping("/getBarrageList")
+    public CommonResult<List<Barrage>> getBarrageListByVid(@RequestParam @ApiParam("视频id") int vid, @RequestParam @ApiParam("页码") int page, @RequestParam @ApiParam("每页数量") int size){
+        List<Barrage> barrageList = videoService.getBarrageListByVid(vid, page, size);
+        return CommonResult.success(barrageList);
+    }
 }

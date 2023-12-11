@@ -6,11 +6,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.annotation.RequestParam;
 import szu.AdminApplication;
+import szu.common.api.CommonResult;
+import szu.common.api.ListResult;
 import szu.dao.VideoDao;
+import szu.model.Barrage;
 import szu.util.EsUtil;
+import szu.vo.BarrageVo;
+import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
+
+import java.io.IOException;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -140,4 +149,26 @@ public class VideoControllerTest {
 //    void testecs() throws IOException {
 //        esUtil.initUserIndices();
 //    }
+
+    @Test
+    void testGetBarrage(){
+        List<BarrageVo> barrageByVid = videoDao.getBarrageByVid(1);
+        System.out.println(barrageByVid);
+    }
+    @Test
+    void testInsertBarrage(){
+        Barrage barrage = new Barrage();
+        barrage.setVid(1);
+        barrage.setUid(1);
+        barrage.setColor("#ff00ff");
+        barrage.setTime(10);
+        barrage.setText("测试弹幕");
+        videoDao.saveBarrage(barrage);
+    }
+
+    @Test
+    void testGetBarrageListByVid() throws IOException {
+        List<Barrage> barrageListByVid = videoDao.getBarrageListByVid(1, 0, 5);
+        System.out.println(barrageListByVid);
+    }
 }

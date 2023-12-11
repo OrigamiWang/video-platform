@@ -1,4 +1,4 @@
-CREATE TABLE `history` (
+`user_msg`CREATE TABLE `history` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL COMMENT '用户索引',
     `media_type` INT NOT NULL COMMENT '媒体类型',
@@ -45,18 +45,21 @@ VALUES(1, 0, 1, '00:01:21'),
 (1, 0, 1, '00:01:21'),
 (1, 0, 1, '00:01:21');
 
-UPDATE history SET watched_at = '00:00:05'
-WHERE user_id = 1
-AND media_id = 2
-AND media_type = 0
+update history set watched_at = '00:00:05'
+where user_id = 1
+and media_id = 2
+and media_type = 0
 
 -- 约定：
 -- 0: video
 -- 1: update
 -- 2: reserved type(eg: live)
 
-SELECT * FROM history
-WHERE user_id = 1
-AND media_type = 0
-ORDER BY his_time DESC
-LIMIT 0, 20
+select * from history
+where user_id = 1
+and media_type = 0
+order by his_time DESC
+limit 0, 20
+
+select * from history
+limit 5, 5

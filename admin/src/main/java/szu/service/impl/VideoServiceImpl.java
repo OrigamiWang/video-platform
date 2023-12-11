@@ -3,15 +3,20 @@ package szu.service.impl;
 import org.springframework.stereotype.Service;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
+import szu.dao.UpdateDao;
 import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
 import szu.model.Barrage;
+import szu.model.Update;
 import szu.model.User;
+import szu.model.UserSearchDoc;
+import szu.model.Video;
 import szu.service.VideoService;
 import szu.util.EsUtil;
 import szu.vo.BarrageVo;
 import szu.vo.VideoDetailVo;
+import szu.vo.VideoInfoVo;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
@@ -25,6 +30,8 @@ public class VideoServiceImpl implements VideoService {
     private UserInfoDao userInfoDao;
     @Resource
     private VideoDao videoDao;
+    @Resource
+    private UpdateDao updateDao;
 
     @Override
     public VideoDetailVo getVideoDetail(Integer id) {
@@ -32,14 +39,36 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
+    public VideoInfoVo getVideoInfoById(Integer vid) {
+        Update update = updateDao.findByVid(vid);
+        User user = userInfoDao.getUserById(update.getUid());
+        Video video = videoDao.findById(vid);
+        VideoInfoVo videoInfoVo = new VideoInfoVo();
+        videoInfoVo.setVideo(video);
+        videoInfoVo.setUser(user);
+        videoInfoVo.setUpdate(update);
+        return videoInfoVo;
+    }
+
+    @Override
     public ListResult search(VideoSearchParams params) {
         int classificationId = params.getClassificationId();//判断是搜视频还是搜作者
         if(classificationId == 0){
-           return esUtil.searchVideo(params);
+            return esUtil.searchVideo(params);
         }else if(classificationId == 1){
             return esUtil.searchUser(params);
         }
         return null;
+    }
+
+    @Override
+    public ListResult<VideoVo> searchVideo(VideoSearchParams params) {
+        return esUtil.searchVideo(params);
+    }
+
+    @Override
+    public ListResult<UserSearchDoc> searchUser(VideoSearchParams params) {
+        return esUtil.searchUser(params);
     }
 
     //根据用户的昵称查询他的投稿

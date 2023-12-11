@@ -1,19 +1,23 @@
 package szu.service;
 
-import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
 import szu.model.Barrage;
 import szu.vo.BarrageVo;
+import szu.model.UserSearchDoc;
 import szu.vo.VideoDetailVo;
+import szu.vo.VideoInfoVo;
 import szu.vo.VideoVo;
 
 import java.util.List;
 
 public interface VideoService {
     VideoDetailVo getVideoDetail(Integer id);
+    VideoInfoVo getVideoInfoById(Integer id);
 
     ListResult search(VideoSearchParams params);
+    ListResult<VideoVo> searchVideo(VideoSearchParams params);
+    ListResult<UserSearchDoc> searchUser(VideoSearchParams params);
 
     /**
      * 用户个人主页的投稿展示

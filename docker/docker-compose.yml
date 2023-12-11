@@ -52,3 +52,19 @@ services:
     environment:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: Sz8u#_Vid5eo_#Plat9form!*Minio
+
+  # Elasticsearch 7.12.1
+  elasticsearch:
+    image: elasticsearch:7.12.1
+    container_name: video-platform-elasticsearch
+    restart: unless-stopped
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-plugins:/usr/share/elasticsearch/plugins
+      - elasticsearch-conf:/usr/share/elasticsearch/config
+      - elasticsearch-logs:/usr/share/elasticsearch/logs
+    environment:
+      TZ: Asia/Shanghai
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      # ELASTIC_PASSWORD: Sz8u#_Vid5eo_#Plat9form!*Elasticsearch

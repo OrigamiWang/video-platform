@@ -70,12 +70,12 @@ public class HistoryController {
     }
 
     /**
-     * 获取最近20条历史记录,用于历史记录列表，zyd临时添加
+     * 获取最近历史记录,用于历史记录列表
      */
     @GetMapping(value = "/list")
-    @ApiOperation("获取最近20条历史记录")
+    @ApiOperation("获取最近历史记录,用于历史记录列表")
     public CommonResult<List<HistoryVo>> getRecentHistoryList(
-            @ApiParam("历史记录对应的用户和类型") @RequestBody HisQueryDto hisQueryDto) {
+            @ApiParam("历史记录对应的用户") @RequestBody HisQueryDto hisQueryDto) {
         //现在只有视频，所以不用判断类型
         List<History> historyList = historyService.getRecentHistory(hisQueryDto, 1, 20);
         // 通过vid查uid

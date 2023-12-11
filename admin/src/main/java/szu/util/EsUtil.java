@@ -35,6 +35,7 @@ import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -133,7 +134,7 @@ public class EsUtil {
      */
     public ListResult<VideoVo> searchVideoByName(String name, Integer sort, Integer page, Integer size){
         SearchRequest request = new SearchRequest(INDICES_FOR_VIDEO);
-        request.source().query(QueryBuilders.termsQuery("name", name));
+        request.source().query(QueryBuilders.termQuery("name", name));
         if(sort == 1){
             request.source().sort("playNum", SortOrder.DESC);
         }else if(sort == 2){
@@ -193,7 +194,7 @@ public class EsUtil {
         try {
             int page = params.getPage();
             int size = params.getSize();
-            String key= params.getKey();
+            String key = URLDecoder.decode(params.getKey(), StandardCharsets.UTF_8);
             int time = params.getTime();//视频时长id
             int pid = params.getPid();//分区id
             int sortBy = params.getSortBy();//排序id
@@ -348,6 +349,7 @@ public class EsUtil {
     }
 
     public List<String> suggest(String key) {
+        key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         try {
             SearchRequest request = new SearchRequest(INDICES_FOR_VIDEO);
             request.source().suggest(

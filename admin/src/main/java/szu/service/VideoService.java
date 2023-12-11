@@ -4,12 +4,14 @@ import szu.common.api.ListResult;
 import szu.dto.VideoSearchParams;
 import szu.model.UserSearchDoc;
 import szu.vo.VideoDetailVo;
+import szu.vo.VideoInfoVo;
 import szu.vo.VideoVo;
 
 import java.util.List;
 
 public interface VideoService {
     VideoDetailVo getVideoDetail(Integer id);
+    VideoInfoVo getVideoInfoById(Integer id);
 
     ListResult search(VideoSearchParams params);
     ListResult<VideoVo> searchVideo(VideoSearchParams params);

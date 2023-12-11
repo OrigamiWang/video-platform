@@ -11,6 +11,7 @@ import szu.dto.VideoSearchParams;
 import szu.model.UserSearchDoc;
 import szu.service.VideoService;
 import szu.vo.VideoDetailVo;
+import szu.vo.VideoInfoVo;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
@@ -29,6 +30,16 @@ public class VideoController {
     @ApiOperation("获取视频详情（点开视频详情页），传入路径参数id")
     public CommonResult<VideoDetailVo> getVideoDetail(@PathVariable @ApiParam("动态id") Integer id){
         VideoDetailVo videoVo = videoService.getVideoDetail(id);
+        if(videoVo == null){
+            return CommonResult.failed("视频不存在");
+        }
+        return CommonResult.success(videoVo);
+    }
+
+    @GetMapping("/info/{id}")
+    @ApiOperation("获取视频预览信息，传入路径参数id")
+    public CommonResult<VideoInfoVo> getVideoInfo(@PathVariable @ApiParam("视频id") Integer id){
+        VideoInfoVo videoVo = videoService.getVideoInfoById(id);
         if(videoVo == null){
             return CommonResult.failed("视频不存在");
         }

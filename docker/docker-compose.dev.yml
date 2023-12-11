@@ -27,6 +27,13 @@ services:
     networks:
       video-platform:
         ipv4_address: 10.11.12.104
+  elasticsearch:
+    ports:
+      - "9200:9200" # ES控制端口
+      - "9300:9300" # ES主从端口
+    networks:
+      video-platform:
+        ipv4_address: 10.11.12.105
 
 volumes:
   mysql-conf:
@@ -44,6 +51,11 @@ volumes:
   minio-data:
   minio-conf:
   minio-logs:
+
+  elasticsearch-data:
+  elasticsearch-conf:
+  elasticsearch-logs:
+  elasticsearch-plugins:
 
 networks:
   video-platform:

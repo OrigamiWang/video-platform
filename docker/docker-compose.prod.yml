@@ -27,6 +27,13 @@ services:
     networks:
       video-platform:
         ipv4_address: 10.11.12.104
+  elasticsearch:
+    ports:
+      - "9200:9200" # ES控制端口
+      - "9300:9300" # ES主从端口
+    networks:
+      video-platform:
+        ipv4_address: 10.11.12.105
 
 volumes:
   mysql-conf:
@@ -104,6 +111,31 @@ volumes:
       type: "none"
       o: "bind"
       device: "${PROJECT_ROOT}/minio/logs"
+
+  elasticsearch-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PROJECT_ROOT}/elasticsearch/data"
+  elasticsearch-plugins:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PROJECT_ROOT}/elasticsearch/plugins"
+  elasticsearch-conf:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PROJECT_ROOT}/elasticsearch/conf"
+  elasticsearch-logs:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PROJECT_ROOT}/elasticsearch/logs"
 
 networks:
   video-platform:

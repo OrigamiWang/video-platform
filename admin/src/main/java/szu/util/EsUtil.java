@@ -35,6 +35,7 @@ import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -348,6 +349,7 @@ public class EsUtil {
     }
 
     public List<String> suggest(String key) {
+        key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         try {
             SearchRequest request = new SearchRequest(INDICES_FOR_VIDEO);
             request.source().suggest(

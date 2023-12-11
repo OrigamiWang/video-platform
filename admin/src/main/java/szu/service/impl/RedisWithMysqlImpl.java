@@ -1,10 +1,7 @@
 package szu.service.impl;
 
-import cn.hutool.Hutool;
 import cn.hutool.core.util.RandomUtil;
 
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import szu.common.service.RedisService;
 import szu.dao.*;
@@ -12,9 +9,7 @@ import szu.model.*;
 import szu.service.RedisWithMysql;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName: RedisWithMysqlImpl
@@ -101,7 +96,7 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
             redisService.hSet(key,"uid", update.getUid());
             redisService.hSet(key,"content", update.getContent());
             redisService.hSet(key,"status", update.getStatus());
-            redisService.hSet(key,"uploadTime", update.getUploadTime());
+            redisService.hSet(key,"uploadTime", update.getUploadTime().toString());
             redisService.hSet(key,"urls", update.getUrls());
 
             //update_heat表
@@ -135,7 +130,7 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
 
             //update表
             redisService.hSet(key,"uid", update.getUid());
-            redisService.hSet(key,"uploadTime", update.getUploadTime());
+            redisService.hSet(key,"uploadTime", update.getUploadTime().toString());
             redisService.hSet(key,"coverUrl", update.getUrls());
 
             //update_heat表

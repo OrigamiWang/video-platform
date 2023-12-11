@@ -290,7 +290,7 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public Video findVideoByVid(int vid) {
         Map<Object, Object> objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);
-        if (objectMap == null) {
+        if (objectMap == null || objectMap.isEmpty()) {
             if (!syncService.updateRedisByVideoId(vid)) return null;
             else {
                 objectMap = redisService.hGetAll(VIDEO_PREFIX + vid);

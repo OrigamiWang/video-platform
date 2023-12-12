@@ -12,14 +12,17 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
+import szu.util.FileUtil;
 import szu.util.JavaCvUtil;
 import szu.util.TimeUtil;
+import szu.util.VideoUtil;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
@@ -239,16 +242,20 @@ public class UpdateServiceImpl implements UpdateService {
                 throw new RuntimeException("生成封面失败");
             }
             minioService.uploadFile(bucketName, pathOfHomePage, snapshot.getInputStream());
+            // 将文件保存在本地
+            String filePath = FileUtil.saveUploadedFile(video);
+            int bitrate = VideoUtil.getBitRate(filePath);
+            System.out.println("bitrate = " + bitrate);
+            String outputFilePath = System.getProperty("user.dir")
+                    + "\\admin\\src\\main\\resources\\temp\\output\\";
 
-            //TODO 转换视频格式
-            video = JavaCvUtil.convertAviToM3u8(video.getInputStream());
-            if (video == null
-                    || video.isEmpty()
-                    || video.getOriginalFilename() == null)
-                throw new RuntimeException("转换视频格式失败");
+            String fileName = video.getOriginalFilename() + "_" + System.currentTimeMillis();
+            VideoUtil.selectByOriginalBitrate(fileName, filePath, outputFilePath, bitrate);
+            // TODO mpd和m4s的文件名，文件上传至minio
             //redis 存视频的编码格式
-            String format = video.getOriginalFilename().substring(video.getName().lastIndexOf(".") + 1);
-            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid,format, 43200);
+            String format = Objects.requireNonNull(video.getOriginalFilename())
+                    .substring(video.getName().lastIndexOf(".") + 1);
+            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid, format, 43200);
             //存入minio,如果有之前上传的视频，会被覆盖
             minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //返回存储路径

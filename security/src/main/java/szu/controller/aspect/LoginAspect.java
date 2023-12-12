@@ -1,4 +1,4 @@
-package szu.aspect;
+package szu.controller.aspect;
 
 import io.micrometer.core.instrument.util.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

@@ -2,9 +2,12 @@ package szu.dao;
 
 import org.apache.ibatis.annotations.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import szu.common.api.CommonResult;
+import szu.model.Barrage;
 import szu.model.UpdateHeat;
 import szu.model.Video;
 import szu.model.VideoSearchDoc;
+import szu.vo.BarrageVo;
 import szu.vo.VideoDetailVo;
 
 import java.util.List;
@@ -64,6 +67,13 @@ public interface VideoDao {
      * 根据动态id更新视频点赞数、评论数、分享数
      */
     void updateVideoHeatByUpdatesId(UpdateHeat updateHeat);
+    @Select("select `text`, `time`, `color`, `mode` from barrage where vid = #{vid}")
+    List<BarrageVo> getBarrageByVid(int vid);
 
+    @Insert("insert into `barrage` (vid, uid, text, color, time, mode) values (#{vid}, #{uid}, #{text}, #{color}, #{time}, #{mode})")
+    void saveBarrage(Barrage barrage);
+
+    @Select("select `uid`, `time`, `text`, `send_time` from barrage where vid = #{vid} ORDER BY send_time LIMIT #{offset}, #{size};")
+    List<Barrage> getBarrageListByVid(int vid, int offset, int size);
 }
 

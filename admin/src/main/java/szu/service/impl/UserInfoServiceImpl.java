@@ -39,4 +39,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         return userInfo;
     }
+
+    @Override
+    public Integer getUidByName(String upName) {
+        return null;
+    }
 }

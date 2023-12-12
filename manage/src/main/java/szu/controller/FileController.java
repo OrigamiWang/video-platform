@@ -37,8 +37,8 @@ public class FileController {
             //通过uuid创建唯一的文件名
             String uuid = UUID.randomUUID().toString();
             uuid = uuid.replaceAll("-", "");
-            String objectName = uuid + extension;
-//            String objectName = originalFilename;
+//            String objectName = uuid + extension;
+            String objectName = originalFilename;
 
             //后期将文件名修改为 user/userId/fileTye/文件名.fileType
 

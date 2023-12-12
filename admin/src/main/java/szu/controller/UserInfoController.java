@@ -46,4 +46,10 @@ public class UserInfoController {
         if(res == null) return CommonResult.failed("用户不存在");
         return CommonResult.success(res);
     }
+
+    @GetMapping("/get-uid-by-name")
+    public Integer getUidByName(@RequestParam String upName){
+        return userInfoService.getUidByName(upName);
+    }
+
 }

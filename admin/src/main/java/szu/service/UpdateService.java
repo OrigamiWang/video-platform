@@ -1,5 +1,7 @@
 package szu.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import szu.model.Partition;
 import szu.model.Update;
@@ -77,4 +79,6 @@ public interface UpdateService {
 
     String uploadVideo(MultipartFile video,int uid);
     String changeVideoCover(MultipartFile image, Integer uid);
+
+    ResponseEntity<Resource> previewVideoCover(int uid);
 }

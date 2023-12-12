@@ -11,16 +11,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import szu.common.api.CommonResult;
+import szu.common.service.MinioService;
 import szu.common.service.RedisService;
 import szu.model.Partition;
 import szu.model.Update;
 import szu.model.User;
 import szu.service.UpdateService;
+import szu.util.AuthUtil;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @Author: zyd
@@ -35,6 +38,8 @@ public class UpdatesController {
     private UpdateService updatesService;
     @Resource
     private RedisService redisService;
+    @Resource
+    private MinioService minioService;
 
     @Value("${redis.user_prefix}")
     private String USER_PREFIX;
@@ -204,6 +209,14 @@ public class UpdatesController {
         } catch (Exception e) {
             return CommonResult.failed("上传失败");
         }
+    }
+
+    @GetMapping("/previewVideoCover")
+    @ApiOperation("预览视频封面")
+    @ApiResponse(code = 200, message = "成功")
+    public ResponseEntity<org.springframework.core.io.Resource> previewVideoCover() {
+        Optional<User> currentUser = AuthUtil.getCurrentUser();
+        return currentUser.map(user -> updatesService.previewVideoCover(user.getId())).orElse(null);
     }
 
     @PostMapping("/changeVideoCover")

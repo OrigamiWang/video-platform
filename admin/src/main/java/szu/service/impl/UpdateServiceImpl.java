@@ -2,6 +2,7 @@ package szu.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -251,6 +252,17 @@ public class UpdateServiceImpl implements UpdateService {
         }
     }
 
+    @Override
+    public ResponseEntity<org.springframework.core.io.Resource> previewVideoCover(int uid) {
+        try {
+            String path = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            //返回存储路径
+            return minioService.viewImage(bucketName, path);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Transactional
     @Override
     public String changeVideoCover(MultipartFile image, Integer uid) {
@@ -341,6 +353,7 @@ public class UpdateServiceImpl implements UpdateService {
         //获取这些动态与视频,拼接vo
         List<VideoVo> videoVos = new ArrayList<>();
         for (int id : ids) {
+            if (videoVos.size() == pageSize) break;
             Video video = findVideoByVid(id);
             Update update = updatesDao.findByVid(id);
             VideoVo videoVo = new VideoVo();

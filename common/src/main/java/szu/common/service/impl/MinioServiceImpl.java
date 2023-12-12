@@ -2,15 +2,24 @@ package szu.common.service.impl;
 
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.http.Method;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import szu.common.service.MinioService;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MinioServiceImpl implements MinioService {
     @Autowired
     private MinioClient minioClient;
@@ -116,5 +125,46 @@ public class MinioServiceImpl implements MinioService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public String createPreviewLink(String bucketName, String objectName) {
+        try {
+            return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(objectName).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return "";
+    }
+
+    @Override
+    public ResponseEntity<org.springframework.core.io.Resource> viewImage(String bucketName, String objectName) {
+        // 获取图片数据流
+        InputStream stream;
+        try {
+            stream = minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
+            if (stream == null) throw new Exception("not_found");
+        } catch (Exception e) {
+            // 获取图片失败
+            log.warn("查看图片异常，错误：{}", e.getMessage());
+            return ResponseEntity.of(java.util.Optional.empty(  ));
+        }
+
+        // 判断文件类型
+        org.springframework.http.MediaType mediaType = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+        String contentTypeFromName = URLConnection.getFileNameMap().getContentTypeFor(objectName);
+        if (contentTypeFromName != null) {
+            mediaType = org.springframework.http.MediaType.parseMediaType(contentTypeFromName);
+        }
+
+        // 设置 Http 缓存
+        String ccValue = CacheControl.maxAge(7, TimeUnit.DAYS)
+                .noTransform()
+                .cachePublic()
+                .getHeaderValue();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CACHE_CONTROL, ccValue)
+                .contentType(mediaType)
+                .body(new InputStreamResource(stream));
     }
 }

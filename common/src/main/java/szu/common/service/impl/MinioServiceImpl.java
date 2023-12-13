@@ -2,6 +2,7 @@ package szu.common.service.impl;
 
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import szu.common.service.MinioService;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public class MinioServiceImpl implements MinioService {
     @Autowired
@@ -59,6 +61,19 @@ public class MinioServiceImpl implements MinioService {
             return bytes;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             return null;
+        }
+    }
+
+    @Override
+    public void downloadFile(String bucketName, String objectName, String destFileName) {
+        try {
+            checkBucket(bucketName);
+            if (!doesObjectExist(bucketName, objectName)) {
+                return;
+            }
+            minioClient.downloadObject(DownloadObjectArgs.builder().bucket(bucketName).object(objectName).filename(destFileName).build());
+        } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            System.out.println(e.getMessage());
         }
     }
 

@@ -13,14 +13,17 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
+import szu.util.FileUtil;
 import szu.util.JavaCvUtil;
 import szu.util.TimeUtil;
+import szu.util.VideoUtil;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
@@ -233,18 +236,29 @@ public class UpdateServiceImpl implements UpdateService {
         try {
             String videoPath = PREFIX_VIDEO_CACHE + uid;
             String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
-            //redis 存视频的编码格式
-            String format = video.getOriginalFilename().substring(video.getOriginalFilename().lastIndexOf(".") + 1);
-            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid, format, 43200);
 
-            //存入minio,如果有之前上传的视频，会被覆盖
-            minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //生成封面,并存入minio
             MultipartFile snapshot = JavaCvUtil.snapshot(video.getInputStream());
             if (snapshot == null) {
                 throw new RuntimeException("生成封面失败");
             }
             minioService.uploadFile(bucketName, pathOfHomePage, snapshot.getInputStream());
+            // 将文件保存在本地
+            String filePath = FileUtil.saveUploadedFile(video);
+            int bitrate = VideoUtil.getBitRate(filePath);
+            System.out.println("bitrate = " + bitrate);
+            String outputFilePath = System.getProperty("user.dir")
+                    + "\\admin\\src\\main\\resources\\temp\\output\\";
+
+            String fileName = video.getOriginalFilename() + "_" + System.currentTimeMillis();
+            VideoUtil.selectByOriginalBitrate(fileName, filePath, outputFilePath, bitrate);
+            // TODO mpd和m4s的文件名，文件上传至minio
+            //redis 存视频的编码格式
+            String format = Objects.requireNonNull(video.getOriginalFilename())
+                    .substring(video.getName().lastIndexOf(".") + 1);
+            redisService.set(PREFIX_VIDEO_FORMAT_CACHE + uid, format, 43200);
+            //存入minio,如果有之前上传的视频，会被覆盖
+            minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //返回存储路径
             return pathOfHomePage;
         } catch (Exception e) {

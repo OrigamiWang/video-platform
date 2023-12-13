@@ -1,8 +1,8 @@
 package szu.util;
 
-import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,7 +48,7 @@ public class JavaCvUtil {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(bi, "jpg", out);
             // 转换为MultipartFile
-            return convertToMultipartFile(out);
+            return convertToMultipartFile(out, "snapshot.jpg", "image/jpeg", "snapshot");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -62,21 +62,115 @@ public class JavaCvUtil {
         return null;
     }
 
-    private static MultipartFile convertToMultipartFile(ByteArrayOutputStream out) {
+    public static MultipartFile convertAviToM3u8(InputStream videoStream) {
+        //TODO
+        return null;
+//        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoStream);
+//        try {
+//            grabber.start();
+//
+//            File file = File.createTempFile("temp", ".m3u8");
+//            FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(file, grabber.getImageWidth(), grabber.getImageHeight());
+//            recorder.setAudioChannels(grabber.getAudioChannels());
+//            recorder.setFormat("hls");
+//            recorder.setOption("hls_time", "5");
+//            recorder.setOption("hls_list_size", "0");
+//            recorder.setOption("hls_flags", "delete_segments");
+//            recorder.setOption("hls_delete_threshold", "1");
+//            recorder.setOption("hls_segment_type", "mpegts");
+//            recorder.start();
+//
+//            Frame frame;
+//            while ((frame = grabber.grab()) != null) {
+//                recorder.record(frame);
+//            }
+//
+//            recorder.stop();
+//            grabber.stop();
+//            //输出file的大小
+//            System.out.println(file.length());
+//
+//            // Create a new MultipartFile with the converted content
+//            return convertToMultipartFile(file, "m3u8",
+//                    "application/x-mpegURL", "file");
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        } finally {
+//            try {
+//                grabber.stop();
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//            }
+//        }
+//        return null;
+    }
+
+    private static MultipartFile convertToMultipartFile(File file, String fileName, String contentType, String file1) {
         return new MultipartFile() {
             @Override
             public String getName() {
-                return "imageFile"; // 给定一个字段名
+                return file1; // 给定一个字段名
             }
 
             @Override
             public String getOriginalFilename() {
-                return "image.jpg"; // 给定一个文件名
+                return fileName; // 给定一个文件名
             }
 
             @Override
             public String getContentType() {
-                return "image/jpeg"; // 给定文件类型
+                return contentType; // 给定文件类型
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return file.length() == 0;
+            }
+
+            @Override
+            public long getSize() {
+                return file.length();
+            }
+
+            @NotNull
+            @Override
+            public byte[] getBytes() throws IOException {
+                return Files.readAllBytes(file.toPath());
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return new FileInputStream(file);
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+                Files.copy(file.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            @Override
+            public void transferTo(java.nio.file.Path dest) throws IOException, IllegalStateException {
+                Files.copy(file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+            }
+        };
+    }
+
+    private static MultipartFile convertToMultipartFile(ByteArrayOutputStream out,
+                                                        String fileName, String contentType, String fieldName) {
+        return new MultipartFile() {
+            @Override
+            public String getName() {
+                return fieldName; // 给定一个字段名
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return fileName; // 给定一个文件名
+            }
+
+            @Override
+            public String getContentType() {
+                return contentType; // 给定文件类型
             }
 
             @Override

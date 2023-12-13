@@ -118,7 +118,7 @@ class UpdatesControllerTest {
         String photoPath = "E:\\我的图片\\buffer\\CIMG0507.JPG";
         File file = new File(videoPath);
         MockMultipartFile f1 = new MockMultipartFile("video", file.getName(),
-                "video/mp4", new FileInputStream(file));
+                "video/*", new FileInputStream(file));
         MockMultipartFile f2 = new MockMultipartFile("image", new File(photoPath).getName(),
                 "image/jpg", new FileInputStream(new File(photoPath)));
         //body中放置视频文件
@@ -135,6 +135,7 @@ class UpdatesControllerTest {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/video")
                         .param("title", "测试发布视频")
                         .param("content", "测试发布视频")
+                        .param("pid", "1")
                         .header("Authorization", AUTH))
                 .andReturn();
     }

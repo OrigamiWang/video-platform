@@ -158,12 +158,12 @@ public class MinioServiceImpl implements MinioService {
         }
 
         // 设置 Http 缓存
-        String ccValue = CacheControl.maxAge(7, TimeUnit.DAYS)
-                .noTransform()
-                .cachePublic()
-                .getHeaderValue();
+//        String ccValue = CacheControl.maxAge(7, TimeUnit.DAYS)
+//                .noTransform()
+//                .cachePublic()
+//                .getHeaderValue();
         return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, ccValue)
+//                .header(HttpHeaders.CACHE_CONTROL, ccValue)
                 .contentType(mediaType)
                 .body(new InputStreamResource(stream));
     }

@@ -57,6 +57,8 @@
             <artifactId>javacv-platform</artifactId>
             <version>1.5.8</version>
         </dependency>
+
+
     </dependencies>
 
     <build>

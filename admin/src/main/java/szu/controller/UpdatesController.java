@@ -202,7 +202,6 @@ public class UpdatesController {
     public CommonResult<String> uploadVideo(@ApiParam("name=video，视频文件") @RequestBody MultipartFile video, @RequestHeader(value = "Authorization") String token) {
         try {
             User user = (User) redisService.get(USER_PREFIX + token);
-            user = new User(114514, "", 0, 0, "", "", "");
             if (user == null) {
                 return CommonResult.failed("请先登录");
             }
@@ -244,14 +243,17 @@ public class UpdatesController {
     @DeleteMapping("/video")
     @ApiOperation("删除指定视频动态")
     @ApiResponse(code = 200, message = "删除成功")
-    public CommonResult<String> deleteVideoById(@RequestParam("id") int id,
+    public CommonResult<String> deleteVideoById(@ApiParam("vid") @RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
         User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
-        if (!Objects.equals(user.getId(), updatesService.findEssayById(id).getUid())) {
+        if (!Objects.equals(user.getId(), updatesService.findVideoUpdateByVid(
+                updatesService.findVideoByVid(id
+                ).getId())
+                .getUid())) {
             return CommonResult.failed("无权删除");
         }
         updatesService.deleteVideoByVid(id);

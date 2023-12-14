@@ -21,33 +21,32 @@ public class VideoUtil {
 
 
     /**
-     * 通过原画帧数来选择压缩的帧数
+     * 处理视频
      */
-    public static void selectByOriginalBitrate(String fileName, String inputFileName, String outputFilePath, int originalBitrate) {
-        System.out.println("originalBitrate = " + originalBitrate);
-        long timestamp = System.currentTimeMillis();
+    public static void handleVideo(String fileName, String inputFileName,
+                                   String outputDir, int originalBitrate) {
         String outputFileName;
         // 原画
         outputFileName = fileName + "_original.mp4";
         System.out.println("outputFileName = " + outputFileName);
-        slice(fileName, inputFileName, "original");
+        slice(fileName, inputFileName, "original", outputDir);
 
         // 1080P
         Resolution resolution1080p = Resolution.RESOLUTION_1080P;
         int bitrate1080 = (int) (resolution1080p.getValue() * M);
         if (originalBitrate > bitrate1080) {
-            outputFileName = outputFilePath + fileName + "_1080p.mp4";
+            outputFileName = outputDir + fileName + "_1080p.mp4";
             encodeVideo(inputFileName, outputFileName, bitrate1080);
-            slice(fileName, inputFileName, P1080);
+            slice(fileName, inputFileName, P1080, outputDir);
         }
 
         // 720P
         Resolution resolution720p = Resolution.RESOLUTION_720P;
         int bitrate720 = (int) (resolution720p.getValue() * M);
         if (originalBitrate > bitrate720) {
-            outputFileName = outputFilePath + fileName +  "_720p.mp4";
+            outputFileName = outputDir + fileName + "_720p.mp4";
             encodeVideo(inputFileName, outputFileName, bitrate720);
-            slice(fileName, inputFileName, P720);
+            slice(fileName, inputFileName, P720, outputDir);
         }
 
 
@@ -58,8 +57,16 @@ public class VideoUtil {
         return Integer.parseInt(CommandUtil.exec(cmd));
     }
 
-    public static void slice(String fileName, String filePath, String resolution) {
-        String dirPath = filePath.substring(0, filePath.lastIndexOf('\\'));
+
+    /**
+     * 分段视频
+     *
+     * @param fileName   文件名(不带后缀)
+     * @param filePath   文件路径
+     * @param resolution 分辨率
+     * @param dirPath    输出文件夹
+     */
+    public static void slice(String fileName, String filePath, String resolution, String dirPath) {
         long timestamp = System.currentTimeMillis();
         // 初始化分段文件的名称模式
         String initSegmentName = dirPath + "\\init-stream_" + fileName + "_" + resolution + "_$RepresentationID$.m4s";
@@ -79,7 +86,7 @@ public class VideoUtil {
                 initSegmentName,
                 "-media_seg_name",
                 mediaSegmentName,
-                dirPath + "\\" + resolution + "_" + timestamp + ".mpd"
+                dirPath + "\\" + resolution + "_" + fileName + timestamp + ".mpd"
         };
         CommandUtil.execWithStream(cmd);
     }

@@ -4,6 +4,7 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
+import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
@@ -18,6 +19,7 @@ import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 @Slf4j
 public class MinioServiceImpl implements MinioService {
@@ -68,6 +70,19 @@ public class MinioServiceImpl implements MinioService {
             return bytes;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             return null;
+        }
+    }
+
+    @Override
+    public void downloadFile(String bucketName, String objectName, String destFileName) {
+        try {
+            checkBucket(bucketName);
+            if (!doesObjectExist(bucketName, objectName)) {
+                return;
+            }
+            minioClient.downloadObject(DownloadObjectArgs.builder().bucket(bucketName).object(objectName).filename(destFileName).build());
+        } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            System.out.println(e.getMessage());
         }
     }
 

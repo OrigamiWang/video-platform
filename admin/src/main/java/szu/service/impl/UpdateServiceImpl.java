@@ -12,10 +12,7 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
-import szu.util.FileUtil;
-import szu.util.JavaCvUtil;
-import szu.util.TimeUtil;
-import szu.util.VideoUtil;
+import szu.util.*;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
@@ -24,9 +21,13 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
+    @Resource
+    private EsUtil esUtil;
     @Resource
     private MinioService minioService;
     @Resource
@@ -265,6 +266,12 @@ public class UpdateServiceImpl implements UpdateService {
             //TODO 通知管理员审核
             //新建一个update_heat记录
             updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
+            //将新视频通过异步线程更新到es中
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(()->{
+                esUtil.insertNewVideoIntoEs(new_vd.getId());
+            });
+            executor.shutdown();
             return "发布成功";
         } catch (Exception e) {
             System.out.println(e.getMessage());

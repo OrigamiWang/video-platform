@@ -68,6 +68,7 @@ const: #常量，原本使用注入方法，但是因别的模块需要使用，
       essay: "updates:photoUpdate:"
       video: "updates:videoUpdate:"
       video-ori-name: "updates:videoOriName:" #在redis中存储用户上传到缓存区的所有视频，[url...url]
+      cover-format: "updates:coverFormat:"
   minio:
     prefix:
       video-cache: "video_cache/" #minio存储桶中的视频缓存文件夹

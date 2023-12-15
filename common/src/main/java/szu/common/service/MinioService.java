@@ -8,7 +8,7 @@ public interface MinioService {
     byte[] downloadFile(String bucketName, String objectName);
     void downloadFile(String bucketName, String objectName, String destFileName);
 
-    boolean deleteFile(String bucketName, String objectName);
+    void deleteFile(String bucketName, String objectName);
 
     boolean ifFileExist(String bucketName, String objectName);
 

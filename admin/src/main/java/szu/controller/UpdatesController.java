@@ -238,8 +238,7 @@ public class UpdatesController {
             return CommonResult.failed("请先登录");
         }
         if (!Objects.equals(user.getId(), updatesService.findVideoUpdateByVid(
-                updatesService.findVideoByVid(id
-                ).getId())
+                updatesService.findVideoByVid(id).getId())
                 .getUid())) {
             return CommonResult.failed("无权删除");
         }

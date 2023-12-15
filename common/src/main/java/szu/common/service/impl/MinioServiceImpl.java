@@ -2,7 +2,6 @@ package szu.common.service.impl;
 
 import io.minio.*;
 import io.minio.errors.*;
-import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import szu.common.service.MinioService;
 
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 public class MinioServiceImpl implements MinioService {
     @Autowired
@@ -29,6 +27,7 @@ public class MinioServiceImpl implements MinioService {
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName)
                     .stream(stream, -1, 5 * 1024 * 1024)
                     .build());
+            stream.close();
             return true;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             return false;
@@ -42,10 +41,10 @@ public class MinioServiceImpl implements MinioService {
     @Override
     public byte[] downloadFile(String bucketName, String objectName) {
         try {
-            checkBucket(bucketName);
-            if (!doesObjectExist(bucketName, objectName)) {
-                return null;
-            }
+//            checkBucket(bucketName);
+//            if (!doesObjectExist(bucketName, objectName)) {
+//                return null;
+//            }
             // 读取MinIO对象数据并返回
             InputStream is = new BufferedInputStream(minioClient
                     .getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build()));
@@ -60,6 +59,7 @@ public class MinioServiceImpl implements MinioService {
             }
             return bytes;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -67,10 +67,10 @@ public class MinioServiceImpl implements MinioService {
     @Override
     public void downloadFile(String bucketName, String objectName, String destFileName) {
         try {
-            checkBucket(bucketName);
-            if (!doesObjectExist(bucketName, objectName)) {
-                return;
-            }
+//            checkBucket(bucketName);
+//            if (!doesObjectExist(bucketName, objectName)) {
+//                return;
+//            }
             minioClient.downloadObject(DownloadObjectArgs.builder().bucket(bucketName).object(objectName).filename(destFileName).build());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             System.out.println(e.getMessage());
@@ -81,16 +81,11 @@ public class MinioServiceImpl implements MinioService {
      * 删除文件,如果删除成功或文件不存在则返回true
      */
     @Override
-    public boolean deleteFile(String bucketName, String objectName) {
+    public void deleteFile(String bucketName, String objectName) {
         try {
-            checkBucket(bucketName);
-            if (!doesObjectExist(bucketName, objectName)) {
-                return true;
-            }
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
-            return true;
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            return false;
+            System.out.println(e.getMessage());
         }
     }
 

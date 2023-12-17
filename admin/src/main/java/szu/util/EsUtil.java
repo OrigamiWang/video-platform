@@ -232,8 +232,10 @@ public class EsUtil {
                     break;
                 case 3:
                     request.source().sort("dmNum", SortOrder.DESC);//最多弹幕
+                    break;
                 case 4:
                     request.source().sort("startNum", SortOrder.DESC);//最多收藏
+                    break;
             }
             request.source().from((page-1) * size).size(size)
                     .highlighter(new HighlightBuilder().field("title").requireFieldMatch(false));

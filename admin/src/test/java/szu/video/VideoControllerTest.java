@@ -11,6 +11,7 @@ import szu.AdminApplication;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dao.VideoDao;
+import szu.model.VideoSearchDoc;
 import szu.model.Barrage;
 import szu.util.EsUtil;
 import szu.vo.BarrageVo;
@@ -126,19 +127,6 @@ public class VideoControllerTest {
 
 
 
-//    @Resource
-//    RabbitTemplate rabbitTemplate;
-//    @Test
-//    void testUpdateVideo() {
-//        System.out.println(Thread.currentThread().getId());
-//        System.out.println("进行测试");
-//        Video video = new Video();
-//        video.setId(3);
-//        video.setUrl("www.new.jpg");
-//        videoDao.updateVideoByVid(video);
-//        rabbitTemplate.convertAndSend(MQConstant.VIDEO_EXCHANGE,MQConstant.VIDEO_UPDATE_KEY, video.getId()+"");
-//    }
-
     @Resource
     EsUtil esUtil;
 //    @Test
@@ -170,5 +158,9 @@ public class VideoControllerTest {
     void testGetBarrageListByVid() throws IOException {
         List<Barrage> barrageListByVid = videoDao.getBarrageListByVid(1, 0, 5);
         System.out.println(barrageListByVid);
+    }
+    @Test
+    void testInsertNewVideo(){
+        esUtil.insertNewVideoIntoEs(18);
     }
 }

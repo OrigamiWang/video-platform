@@ -13,10 +13,7 @@ import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
 import szu.service.UpdateService;
-import szu.util.FileUtil;
-import szu.util.JavaCvUtil;
-import szu.util.TimeUtil;
-import szu.util.VideoUtil;
+import szu.util.*;
 import szu.vo.VideoVo;
 
 import javax.annotation.Resource;
@@ -25,9 +22,13 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
+    @Resource
+    private EsUtil esUtil;
     @Resource
     private MinioService minioService;
     @Resource
@@ -56,6 +57,10 @@ public class UpdateServiceImpl implements UpdateService {
     private String PREFIX_VIDEO_COVER;
     @Value("${const.redis.prefix.video-ori-name}")
     private String PREFIX_VIDEO_ORI_NAME;
+    @Value(("${const.redis.prefix.cover-format}"))
+    private String COVER_FORMAT;
+    private static final String VIDEO_CACHE_DIR = System.getProperty("user.dir")
+            + "\\src\\main\\resources\\video_cache\\";
     private static final String INPUT_ROOT_DIR = System.getProperty("user.dir")
             + "\\src\\main\\resources\\video_cache\\input\\";
     private static final String OUTPUT_ROOT_DIR = System.getProperty("user.dir")
@@ -206,39 +211,38 @@ public class UpdateServiceImpl implements UpdateService {
             String ori_name = (String) redisService.get(PREFIX_VIDEO_ORI_NAME + uid);
             /** 将封面移入正式存储区 **/
             //获取视频的文件路径和封面路径
-            String oldCoverPath = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
-            String videoHomePagePath = PREFIX_VIDEO_COVER + uid + "_" + System.currentTimeMillis() + ".jpg";
+            String coverFormat = (String) redisService.get(COVER_FORMAT+uid);
+            String oldCoverPath = PREFIX_VIDEO_COVER_CACHE + uid;
+            String videoHomePagePath = PREFIX_VIDEO_COVER + uid + "_" + System.currentTimeMillis() + "." + coverFormat;
             //将原object移入新的object
             minioService.moveObject(bucketName, oldCoverPath, videoHomePagePath);
 
             /** 将视频切片后移入正式存储区 **/
-            //先清空output+uid文件夹
-            File[] files1 = new File(OUTPUT_ROOT_DIR + uid).listFiles();
-            if (files1 != null) {
-                for (File file : files1) {
-                    file.delete();
-                }
-            }
-            // 将文件保存在本地
-            String filePath = INPUT_ROOT_DIR + uid;
-            touchDir(filePath);
-            filePath += "\\" + ori_name;
-            minioService.downloadFile(bucketName,
-                    PREFIX_VIDEO_CACHE + uid, filePath);
-            int bitrate = VideoUtil.getBitRate(filePath);
+            //确保输出文件夹为空
+            FileUtil.clearDir(OUTPUT_ROOT_DIR + uid);
+            // 将文件保存在本地,位置为：src/main/resources/video_cache/input/uid/视频名
+            String inputDir = INPUT_ROOT_DIR + uid;
             String outputDir = OUTPUT_ROOT_DIR + uid;
-            touchDir(outputDir);//确保创建文件夹
+            if (!FileUtil.touchDir(inputDir)) throw new RuntimeException("创建文件夹失败");
+            if (!FileUtil.touchDir(outputDir)) throw new RuntimeException("创建文件夹失败");
+            String videoFile = inputDir + "\\" + ori_name;
+            minioService.downloadFile(bucketName,
+                    PREFIX_VIDEO_CACHE + uid, videoFile);
+            //检测保存的视频是否存在
+            if(!FileUtil.checkFileExist(videoFile)) throw new RuntimeException("minio中的缓存视频不存在");
+            //切片并保存在本地，位置为：src/main/resources/video_cache/output/uid/时间戳+视频名/子文件名
+            int bitrate = VideoUtil.getBitRate(videoFile);
             String ori_name_without_suffix = ori_name.substring(0, ori_name.lastIndexOf("."));
             VideoUtil.handleVideo(ori_name_without_suffix,
-                    filePath, outputDir, bitrate);
+                    videoFile, outputDir, bitrate);
 
-            // 将文件夹的文件上传至minio
+            /**将文件夹的文件上传至minio**/
             File[] files = new File(outputDir).listFiles();
             if (files == null) {
-                throw new RuntimeException("文件夹为空");
+                throw new RuntimeException("文件夹为空，切片操作异常。");
             }
-            ArrayList<String> mpds = new ArrayList<>();
-            ArrayList<String> urls = new ArrayList<>();
+            ArrayList<String> mpds = new ArrayList<>();//保存mpd文件的url
+            ArrayList<String> urls = new ArrayList<>();//保存所有文件的url
             String video_stamp = System.currentTimeMillis() + "";
             for (File file : files) {//遍历文件夹，上传文件，保存格式为：uid/时间戳+文件名/子文件名
                 String obj = PREFIX_VIDEO + uid + "/" + video_stamp
@@ -251,10 +255,20 @@ public class UpdateServiceImpl implements UpdateService {
             //将urls写入本地同一文件夹下命名为urls.json
             String urlsJson = JSON.toJSONString(urls);
             String urlsJsonPath = OUTPUT_ROOT_DIR + uid + "\\urls.json";
+            //写入本地文件，然后上传至minio
             FileUtil.saveStringToFile(urlsJson, urlsJsonPath);
-            //将urls.json上传至minio
             minioService.uploadFile(bucketName, PREFIX_VIDEO + uid + "/" + video_stamp + "/urls.json",
                     new FileInputStream(urlsJsonPath));
+
+            //删除minio中的缓存文件
+            minioService.deleteFile(bucketName, PREFIX_VIDEO_CACHE + uid);
+            minioService.deleteFile(bucketName, PREFIX_VIDEO_COVER_CACHE + uid + ".jpg");
+            redisService.del(PREFIX_VIDEO_ORI_NAME + uid);
+            //删除本地文件
+            FileUtil.clearDir(INPUT_ROOT_DIR + uid);
+            FileUtil.clearDir(OUTPUT_ROOT_DIR+uid);
+            /**操作数据库**/
+            //clear redis
             Video new_vd = new Video(0, JSON.toJSONString(mpds),
                     0, 0, 0, title, pid, 0, 0);
             //插入video表
@@ -263,9 +277,15 @@ public class UpdateServiceImpl implements UpdateService {
             Update new_ud = new Update(0, new_vd.getId(), uid, content, UNCHECKED,
                     null, JSON.toJSONString(new String[]{videoHomePagePath}));
             if (updatesDao.insert(new_ud) != 1) throw new Exception();
-            //TODO 通知管理员审核
             //新建一个update_heat记录
             updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
+            //将新视频通过异步线程更新到es中
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(() -> {
+                esUtil.insertNewVideoIntoEs(new_vd.getId());
+            });
+            executor.shutdown();
+            //TODO 通知管理员审核
             return "发布成功";
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -277,8 +297,12 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public String uploadVideo(MultipartFile video, int uid) {
         try {
+            //仅接收mp4格式的视频
+            if (video.getOriginalFilename() == null || !video.getOriginalFilename().endsWith(".mp4")) {
+                throw new RuntimeException("仅接收mp4格式的视频");
+            }
             String videoPath = PREFIX_VIDEO_CACHE + uid;
-            String pathOfCover = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            String pathOfCover = PREFIX_VIDEO_COVER_CACHE + uid;
 
             //生成封面,并存入minio
             MultipartFile snapshot = JavaCvUtil.snapshot(video.getInputStream());
@@ -289,6 +313,7 @@ public class UpdateServiceImpl implements UpdateService {
             //将原视频上传minio
             //redis保存原视频名字
             redisService.set(PREFIX_VIDEO_ORI_NAME + uid, video.getOriginalFilename(), 43200);
+            redisService.set(COVER_FORMAT+uid,"jpg",43200);
             //存入minio,如果有之前上传的视频，会被覆盖
             minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //返回封面存储路径
@@ -321,8 +346,10 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public String changeVideoCover(MultipartFile image, Integer uid) {
         try {
-            String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid;
+            String format = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".")+1);
             minioService.uploadFile(bucketName, pathOfHomePage, image.getInputStream());
+            redisService.set(COVER_FORMAT+uid,format,43200);
             //返回存储路径
             return pathOfHomePage;
         } catch (Exception e) {

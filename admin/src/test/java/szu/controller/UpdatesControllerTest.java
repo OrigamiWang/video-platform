@@ -115,7 +115,7 @@ class UpdatesControllerTest {
     void publishVideo() throws Exception {
 //        发布视频
         String videoPath = "E:\\我的图片\\Video\\WeChat_20221102154811.mp4";
-        String photoPath = "E:\\我的图片\\buffer\\CIMG0507.JPG";
+        String photoPath = "E:\\我的图片\\icon\\face_happy.png";
         File file = new File(videoPath);
         MockMultipartFile f1 = new MockMultipartFile("video", file.getName(),
                 "video/*", new FileInputStream(file));
@@ -126,12 +126,12 @@ class UpdatesControllerTest {
                         .file(f1)
                         .header("Authorization", AUTH))
                 .andReturn();
-
+//
 //        mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/changeVideoCover")
 //                        .file(f2)
 //                        .header("Authorization", AUTH))
 //                .andExpect(MockMvcResultMatchers.status().isOk());
-//
+
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/video")
                         .param("title", "测试发布视频")
                         .param("content", "测试发布视频")
@@ -143,7 +143,7 @@ class UpdatesControllerTest {
     @Test
     void testDelete() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/updates/video")
-                        .param("id", "4")
+                        .param("id", "17")
                         .header("Authorization", AUTH))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

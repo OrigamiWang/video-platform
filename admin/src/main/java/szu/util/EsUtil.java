@@ -378,4 +378,16 @@ public class EsUtil {
 
 
     //TODO 同步数据库与ES索引
+    public boolean insertNewVideoIntoEs(int vid){
+        try {
+            VideoSearchDoc videoSearchDoc = videoDao.selectVideoSearchDocByVid(vid);
+            if(videoSearchDoc == null) return false;
+            IndexRequest request = new IndexRequest(INDICES_FOR_VIDEO).id(vid+"");
+            request.source(JSONUtil.toJsonStr(videoSearchDoc), XContentType.JSON);
+            client.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 }

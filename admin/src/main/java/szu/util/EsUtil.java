@@ -234,7 +234,7 @@ public class EsUtil {
                     request.source().sort("dmNum", SortOrder.DESC);//最多弹幕
                     break;
                 case 4:
-                    request.source().sort("startNum", SortOrder.DESC);//最多收藏
+                    request.source().sort("starNum", SortOrder.DESC);//最多收藏
                     break;
             }
             request.source().from((page-1) * size).size(size)

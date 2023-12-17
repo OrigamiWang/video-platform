@@ -10,6 +10,7 @@ import szu.model.User;
  * @Author: Origami
  * @Date: 2023/10/29 9:48
  */
+
 public interface LoginDao {
 
 

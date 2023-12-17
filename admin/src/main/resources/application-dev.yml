@@ -1,8 +1,4 @@
 spring:
-  servlet:
-    multipart:
-      max-file-size: 10240MB
-      max-request-size: 10240MB
   datasource:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
@@ -16,6 +12,12 @@ spring:
       stat-view-servlet: #访问监控网页的登录用户名和密码
         login-username: druid
         login-password: druid
+  servlet:
+    multipart:
+      max-request-size: -1 # 不做限制
+      max-file-size: -1
+      enabled: true
+
   elasticsearch:
     uris: 192.168.227.128:9200
 

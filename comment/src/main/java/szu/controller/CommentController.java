@@ -75,6 +75,12 @@ public class CommentController {
         return CommonResult.success(new ListResult<>(commentsByForeignIdAndPages, total));
     }
 
+    @GetMapping("/countChildrenComments/{pid}")
+    @ApiOperation("根据pid获取子评论总数")
+    public CommonResult<Integer> countChildrenCommentsByPid(@PathVariable("pid") @ApiParam("要获取子评论的根评论id") String pid) {
+        return CommonResult.success(commentService.countChildCommentsByPid(pid).intValue());
+    }
+
     /**
      * 分页获取对应根评论下的子评论
      *

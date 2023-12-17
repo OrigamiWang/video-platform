@@ -1,5 +1,6 @@
 package szu.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 public class Visit implements Serializable {
     @ApiModelProperty(value = "id")
     private Integer id;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "上次更新时间")
     private LocalDateTime lastUpdate;
     @ApiModelProperty(value = "访问接口，all为所有接口的总和")

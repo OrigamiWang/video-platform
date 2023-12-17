@@ -1,5 +1,6 @@
 package szu.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,6 +17,7 @@ public class VideoVo {
     private String url;
     @ApiModelProperty("视频作者名字")//uid从user表查
     private String upName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("视频上传时间")
     private LocalDateTime uploadTime;
     //以上是update表中可以查询

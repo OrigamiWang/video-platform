@@ -1,5 +1,6 @@
 package szu.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,8 +33,10 @@ public class StarVo implements Serializable {
     private Integer starNum;
     @ApiModelProperty("视频作者名称")
     private String upName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("视频上传时间")
     private LocalDateTime uploadTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("收藏时间")
     private LocalDateTime starDate;
 }

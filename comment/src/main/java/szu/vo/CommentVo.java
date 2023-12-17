@@ -28,6 +28,7 @@ public class CommentVo implements Serializable {
     private String content;   //评论内容
     private Integer foreignId;  //评论对象的id
     private String targetUsername;   //回复的用户
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;   //评论时间
     private Integer likeNum;  //点赞数量
     private Integer replyNum;  //回复数量

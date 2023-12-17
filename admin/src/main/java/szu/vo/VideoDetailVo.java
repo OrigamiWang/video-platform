@@ -1,5 +1,6 @@
 package szu.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class VideoDetailVo {
     private String title;
     @ApiModelProperty("视频播放量")
     private int playNum;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("视频上传时间")
     private LocalDateTime uploadTime;
     @ApiModelProperty("弹幕数量")

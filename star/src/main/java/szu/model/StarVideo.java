@@ -1,5 +1,6 @@
 package szu.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class StarVideo implements Serializable {
     @Serial
     private static final long serialVersionUID = 19826192849347L;
     private Integer updateId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime starDate;
 }

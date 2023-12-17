@@ -1,5 +1,6 @@
 package szu.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class StarContent {
     private Integer vid;  //视频id
     @ApiModelProperty("收藏夹id")
     private Integer sid;  //收藏夹id
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("收藏时间")
     private LocalDateTime starDate;  //收藏时间
 }

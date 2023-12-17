@@ -1,5 +1,6 @@
 package szu.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class Barrage {
     private String color;
     @ApiModelProperty("弹幕出现的视频播放时间，秒数")
     private int time;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("弹幕发送的现实时间")
     private LocalDateTime sendTime;
     @ApiModelProperty("弹幕模式，0滚动，1静止")

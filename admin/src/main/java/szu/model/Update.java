@@ -1,5 +1,6 @@
 package szu.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Update implements Serializable {
     @ApiModelProperty(value = "状态码")
     private Integer status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "时间")
     private LocalDateTime uploadTime;
 

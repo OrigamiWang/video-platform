@@ -182,7 +182,7 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public Update findEssayById(int id) {
         Map<Object, Object> objectMap = redisService.hGetAll(ESSAY_PREFIX + id);
-        if (objectMap == null) {
+        if (objectMap == null || objectMap.isEmpty()) {
             Update update = updatesDao.findById(id);
             if (update == null) return null;//数据库中没有该动态
             syncService.updateRedisByUpdateId(id);

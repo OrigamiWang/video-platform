@@ -211,7 +211,7 @@ public class UpdateServiceImpl implements UpdateService {
             String ori_name = (String) redisService.get(PREFIX_VIDEO_ORI_NAME + uid);
             /** 将封面移入正式存储区 **/
             //获取视频的文件路径和封面路径
-            String coverFormat = (String) redisService.get(COVER_FORMAT+uid);
+            String coverFormat = (String) redisService.get(COVER_FORMAT + uid);
             String oldCoverPath = PREFIX_VIDEO_COVER_CACHE + uid;
             String videoHomePagePath = PREFIX_VIDEO_COVER + uid + "_" + System.currentTimeMillis() + "." + coverFormat;
             //将原object移入新的object
@@ -219,7 +219,6 @@ public class UpdateServiceImpl implements UpdateService {
 
             /** 将视频切片后移入正式存储区 **/
             //确保输出文件夹为空
-            FileUtil.clearDir(OUTPUT_ROOT_DIR + uid);
             // 将文件保存在本地,位置为：src/main/resources/video_cache/input/uid/视频名
             String inputDir = INPUT_ROOT_DIR + uid;
             String outputDir = OUTPUT_ROOT_DIR + uid;
@@ -229,12 +228,9 @@ public class UpdateServiceImpl implements UpdateService {
             minioService.downloadFile(bucketName,
                     PREFIX_VIDEO_CACHE + uid, videoFile);
             //检测保存的视频是否存在
-            if(!FileUtil.checkFileExist(videoFile)) throw new RuntimeException("minio中的缓存视频不存在");
+            if (!FileUtil.checkFileExist(videoFile)) throw new RuntimeException("minio中的缓存视频不存在");
             //切片并保存在本地，位置为：src/main/resources/video_cache/output/uid/时间戳+视频名/子文件名
-            int bitrate = VideoUtil.getBitRate(videoFile);
-            String ori_name_without_suffix = ori_name.substring(0, ori_name.lastIndexOf("."));
-            VideoUtil.handleVideo(ori_name_without_suffix,
-                    videoFile, outputDir, bitrate);
+            JavaCvUtil.uploadVideoToM3U8(videoFile, outputDir+"\\");
 
             /**将文件夹的文件上传至minio**/
             File[] files = new File(outputDir).listFiles();
@@ -249,7 +245,7 @@ public class UpdateServiceImpl implements UpdateService {
                         + "/" + file.getName();
                 minioService.uploadFile(bucketName, obj
                         , new FileInputStream(file));
-                if (file.getName().endsWith(".mpd")) mpds.add(obj);//保存url,只需要mpd文件的url
+                if (file.getName().endsWith(".m3u8")) mpds.add(obj);//保存url,只需要mpd文件的url
                 urls.add(obj);//记录所有文件的url
             }
             //将urls写入本地同一文件夹下命名为urls.json
@@ -266,7 +262,7 @@ public class UpdateServiceImpl implements UpdateService {
             redisService.del(PREFIX_VIDEO_ORI_NAME + uid);
             //删除本地文件
             FileUtil.clearDir(INPUT_ROOT_DIR + uid);
-            FileUtil.clearDir(OUTPUT_ROOT_DIR+uid);
+            FileUtil.clearDir(OUTPUT_ROOT_DIR + uid);
             /**操作数据库**/
             //clear redis
             Video new_vd = new Video(0, JSON.toJSONString(mpds),
@@ -313,7 +309,7 @@ public class UpdateServiceImpl implements UpdateService {
             //将原视频上传minio
             //redis保存原视频名字
             redisService.set(PREFIX_VIDEO_ORI_NAME + uid, video.getOriginalFilename(), 43200);
-            redisService.set(COVER_FORMAT+uid,"jpg",43200);
+            redisService.set(COVER_FORMAT + uid, "jpg", 43200);
             //存入minio,如果有之前上传的视频，会被覆盖
             minioService.uploadFile(bucketName, videoPath, video.getInputStream());
             //返回封面存储路径
@@ -347,9 +343,9 @@ public class UpdateServiceImpl implements UpdateService {
     public String changeVideoCover(MultipartFile image, Integer uid) {
         try {
             String pathOfHomePage = PREFIX_VIDEO_COVER_CACHE + uid;
-            String format = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".")+1);
+            String format = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".") + 1);
             minioService.uploadFile(bucketName, pathOfHomePage, image.getInputStream());
-            redisService.set(COVER_FORMAT+uid,format,43200);
+            redisService.set(COVER_FORMAT + uid, format, 43200);
             //返回存储路径
             return pathOfHomePage;
         } catch (Exception e) {

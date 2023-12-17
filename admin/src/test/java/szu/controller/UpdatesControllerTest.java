@@ -13,8 +13,7 @@ import szu.AdminApplication;
 import szu.common.service.MinioService;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = {AdminApplication.class})
@@ -147,6 +146,5 @@ class UpdatesControllerTest {
                         .header("Authorization", AUTH))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
 
 }

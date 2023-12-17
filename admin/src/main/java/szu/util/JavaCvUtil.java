@@ -110,4 +110,56 @@ public class JavaCvUtil {
         };
 
     }
+
+    public static void uploadVideoToM3U8(String inputFile, String outputDir) throws Exception {
+       try {
+           String path1080 = outputDir + "1080" + ".m3u8";
+           String path720 = outputDir + "720" + ".m3u8";
+           String path360 = outputDir + "360" + ".m3u8";
+
+           new File(path1080).createNewFile();
+           ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:1080", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path1080);
+           pb.redirectErrorStream(true);
+           Process p = null;
+
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           String line;
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+
+           new File(path720).createNewFile();
+           pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:720", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path720);
+           pb.redirectErrorStream(true);
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+
+           new File(path360).createNewFile();
+           pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:360", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path360);
+           pb.redirectErrorStream(true);
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+       }catch (Exception ignored){
+           throw new Exception("视频转码失败");
+       }
+    }
 }

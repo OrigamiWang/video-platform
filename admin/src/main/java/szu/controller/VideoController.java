@@ -5,9 +5,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
+import szu.common.service.MinioService;
 import szu.dto.VideoSearchParams;
 import szu.model.Barrage;
 import szu.model.UserSearchDoc;
@@ -29,6 +31,8 @@ import java.util.List;
 public class VideoController {
     @Resource
     private VideoService videoService;
+    @Resource
+    private MinioService minioService;
 
 
     @GetMapping("/detail/{id}")
@@ -132,5 +136,18 @@ public class VideoController {
     public CommonResult<List<Barrage>> getBarrageListByVid(@RequestParam @ApiParam("视频id") int vid, @RequestParam @ApiParam("页码") int page, @RequestParam @ApiParam("每页数量") int size){
         List<Barrage> barrageList = videoService.getBarrageListByVid(vid, page, size);
         return CommonResult.success(barrageList);
+    }
+
+
+    @ApiOperation("获取视频文件流")
+    @GetMapping("/getVideo/{bucketName}/{objectName}")
+    public ResponseEntity<org.springframework.core.io.Resource> getVideo(@PathVariable @ApiParam("bucketName") String bucketName,
+                                                                         @PathVariable @ApiParam("objectName") String objectName) {
+        try {
+            return minioService.viewImage(bucketName, objectName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

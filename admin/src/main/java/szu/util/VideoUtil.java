@@ -119,7 +119,7 @@ public class VideoUtil {
     }
 
     public static void splitVideo(String inputFileName, String outputFileName) {
-        // ffmpeg -i test.mp4 -vcodec copy -an v1.mp4
+        // ffmpeg -i input.mp4 -vcodec copy -an v1.mp4
         String[] cmd = {
                 "ffmpeg",
                 "-i",
@@ -134,7 +134,7 @@ public class VideoUtil {
 
 
     public static void splitAudio(String inputFileName, String outputFileName) {
-        // ffmpeg -i test.mp4 -acodec copy -vn a1.mp4
+        // ffmpeg -i input.mp4 -acodec copy -vn a1.mp4
         String[] cmd = {
                 "ffmpeg",
                 "-i",

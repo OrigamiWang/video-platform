@@ -25,6 +25,7 @@ import szu.dao.CommentRepository;
 import szu.model.Comment;
 import szu.model.Like;
 import szu.service.CommentService;
+import szu.service.LikeService;
 import szu.vo.CommentVo;
 
 import javax.annotation.Resource;
@@ -47,6 +48,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Resource
     private CommentRepository commentRepository;
+
+    @Resource
+    private LikeService likeService;
 
     @Resource
     private MongoTemplate mongoTemplate;
@@ -73,6 +77,9 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentVo> getCommentVoListWithLike(Integer uid, List<Comment> commentList) {
         Query query = Query.query(Criteria.where("uid").is(uid)); //找到当前登录的用户的点赞列表
         Like like = mongoTemplate.findOne(query, Like.class);
+        if(like==null){  //如果没有like列表就创建一个
+            likeService.insertLikeUser(uid);
+        }
         HashMap<String, Integer> fidMap = like.getFidMap();
         List<CommentVo> commentVoList = new ArrayList<>();
         for (Comment comment : commentList) {

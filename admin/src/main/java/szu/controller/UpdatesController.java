@@ -114,8 +114,9 @@ public class UpdatesController {
     @GetMapping("/homePage")
     @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
     @ApiResponse(code = 200, message = "VideoVo List")
-    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize) {
-        return CommonResult.success(updatesService.getHomePage(pageSize));
+    public CommonResult<List<VideoVo>> getHomePage(@ApiParam("推送多少个视频") @RequestParam("pageSize") int pageSize,
+                                                   @ApiParam("推送给的用户的uid") @RequestParam("uid") int uid) {
+        return CommonResult.success(updatesService.getHomePage(pageSize,uid));
     }
 
     @GetMapping("/getImage")

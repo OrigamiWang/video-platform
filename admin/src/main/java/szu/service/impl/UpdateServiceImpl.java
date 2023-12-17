@@ -1,6 +1,7 @@
 package szu.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import szu.dao.*;
 import szu.model.Partition;
 import szu.model.Update;
 import szu.model.Video;
+import szu.service.RecommendService;
 import szu.service.UpdateService;
 import szu.util.*;
 import szu.vo.VideoVo;
@@ -19,6 +21,7 @@ import szu.vo.VideoVo;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +48,8 @@ public class UpdateServiceImpl implements UpdateService {
     private RedisService redisService;
     @Resource
     private RedisWithMysqlImpl syncService;
+    @Resource
+    private RecommendService recommendService;
     @Value("${minio.bucket-name}")
     private String bucketName;//minio桶名
     @Value("${const.minio.prefix.video-cache}")
@@ -421,16 +426,23 @@ public class UpdateServiceImpl implements UpdateService {
      * 面向前端
      */
     @Override
-    public List<VideoVo> getHomePage(int pageSize) {
+    public List<VideoVo> getHomePage(int pageSize,int uid) {
         //TODO 推荐算法
-        //计算有多少个视频
-        List<Integer> ids = videoDao.selectAllId();
-        int videoNum = ids.size();
-        if (videoNum == 0) return new ArrayList<>();
-        //获取pageSize个随机int
-        int[] randomNums = new int[pageSize];
-        for (int i = 0; i < pageSize; i++) {
-            randomNums[i] = ((int) (Math.random() * 10 * videoNum)) % videoNum;
+        List<Integer> ids;
+        try {
+            ids = recommendService.recommendUpdateList(uid);
+        } catch (IOException | TasteException e) {
+            throw new RuntimeException(e);
+        }
+        if(ids.isEmpty()){  //历史数据不够，随机推荐
+            ids = videoDao.selectAllId();
+            int videoNum = ids.size();
+            if (videoNum == 0) return new ArrayList<>();
+            //获取pageSize个随机int
+            int[] randomNums = new int[pageSize];
+            for (int i = 0; i < pageSize; i++) {
+                randomNums[i] = ((int) (Math.random() * 10 * videoNum)) % videoNum;
+            }
         }
         //获取这些动态与视频,拼接vo
         List<VideoVo> videoVos = new ArrayList<>();

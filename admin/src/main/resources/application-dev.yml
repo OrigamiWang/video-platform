@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10240MB
+      max-request-size: 10240MB
   datasource:
     url: jdbc:mysql://localhost:3306/video-platform?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
@@ -12,7 +16,8 @@ spring:
       stat-view-servlet: #访问监控网页的登录用户名和密码
         login-username: druid
         login-password: druid
-
+  elasticsearch:
+    uris: 192.168.227.128:9200
   redis:
     host: localhost
     port: 6379
@@ -62,11 +67,11 @@ const: #常量，原本使用注入方法，但是因别的模块需要使用，
     prefix:
       essay: "updates:photoUpdate:"
       video: "updates:videoUpdate:"
-      video-format-cache: "updates:videoFormatCache:"
+      video-ori-name: "updates:videoOriName:" #在redis中存储用户上传到缓存区的所有视频，[url...url]
+      cover-format: "updates:coverFormat:"
   minio:
     prefix:
-      video-cache: "video_cache/"
-      video-cover-cache: "video_cover_cache/"
-      video: "video/"
-      video-cover: "video_cover/"
-
+      video-cache: "video_cache/" #minio存储桶中的视频缓存文件夹
+      video-cover-cache: "video_cover_cache/" #minio存储桶中的封面缓存文件夹
+      video: "video/" #minio存储桶中的视频文件夹
+      video-cover: "video_cover/" #minio存储桶中的封面文件夹

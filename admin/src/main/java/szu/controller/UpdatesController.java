@@ -105,6 +105,7 @@ public class UpdatesController {
         updatesService.deleteEssayById(id);
         return CommonResult.success("操作成功");
     }
+
     @GetMapping("/homePage")
     @ApiOperation("获取首页视频动态的简略推送，返回拼接好的vo")
     @ApiResponse(code = 200, message = "VideoVo List")
@@ -162,7 +163,7 @@ public class UpdatesController {
     public CommonResult<String> publishVideo(
             @ApiParam(value = "视频标题", required = true) @RequestParam("title") String title,//标题
             @ApiParam(value = "动态的正文，长度1~1024", required = true) @RequestParam("content") String content,//内容
-            @ApiParam(value = "视频分区id,如果不发这个，默认为1，代表未分区",required = false) @RequestParam("pid") Integer pid,
+            @ApiParam(value = "视频分区id,如果不发这个，默认为1，代表未分区", required = false) @RequestParam("pid") Integer pid,
             @RequestHeader(value = "Authorization") String token
     ) {
         User user = (User) redisService.get(USER_PREFIX + token);
@@ -176,7 +177,7 @@ public class UpdatesController {
         if (title == null || title.isEmpty()) {
             return CommonResult.failed("标题不能为空");
         }
-        if (pid==null) pid=1;
+        if (pid == null) pid = 1;
         else if (pid < 1) {
             return CommonResult.failed("分区id不能小于1");
         }
@@ -202,6 +203,7 @@ public class UpdatesController {
             String url = updatesService.uploadVideo(video, user.getId());
             return CommonResult.success(url);
         } catch (Exception e) {
+            e.printStackTrace();
             return CommonResult.failed("上传失败");
         }
     }
@@ -228,14 +230,16 @@ public class UpdatesController {
     @DeleteMapping("/video")
     @ApiOperation("删除指定视频动态")
     @ApiResponse(code = 200, message = "删除成功")
-    public CommonResult<String> deleteVideoById(@RequestParam("id") int id,
+    public CommonResult<String> deleteVideoById(@ApiParam("vid") @RequestParam("id") int id,
                                                 @RequestHeader(value = "Authorization") String token) {
         //TOKEN校验,对比要删除的动态的uid和token的uid是否一致
         User user = (User) redisService.get(USER_PREFIX + token);
         if (user == null) {
             return CommonResult.failed("请先登录");
         }
-        if (!Objects.equals(user.getId(), updatesService.findEssayById(id).getUid())) {
+        if (!Objects.equals(user.getId(), updatesService.findVideoUpdateByVid(
+                updatesService.findVideoByVid(id).getId())
+                .getUid())) {
             return CommonResult.failed("无权删除");
         }
         updatesService.deleteVideoByVid(id);

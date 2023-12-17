@@ -38,6 +38,15 @@ public interface VideoDao {
     List<VideoSearchDoc> selectAllVideoSearchDoc();
 
     /**
+     * 根据新视频id查询新的VideoSearchDoc
+     */
+    @Select("select up.id, up.upload_time, us.name, v.title, v.url, v.play_num, v.dm_num, v.total_time, v.pid, v.star_num " +
+            "from updates up " +
+            "left join video v on up.vid = v.id " +
+            "left join user us on up.uid = us.id " +
+            "where v.id = #{vid}")
+    VideoSearchDoc selectVideoSearchDocByVid(int vid);
+    /**
      * 根据动态id获取视频详情
      * @param id
      * @return

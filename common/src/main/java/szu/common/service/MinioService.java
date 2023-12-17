@@ -6,8 +6,9 @@ public interface MinioService {
     boolean uploadFile(String bucketName, String objectName, InputStream stream);
 
     byte[] downloadFile(String bucketName, String objectName);
+    void downloadFile(String bucketName, String objectName, String destFileName);
 
-    boolean deleteFile(String bucketName, String objectName);
+    void deleteFile(String bucketName, String objectName);
 
     boolean ifFileExist(String bucketName, String objectName);
 

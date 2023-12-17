@@ -13,8 +13,7 @@ import szu.AdminApplication;
 import szu.common.service.MinioService;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = {AdminApplication.class})
@@ -114,11 +113,11 @@ class UpdatesControllerTest {
     @Test
     void publishVideo() throws Exception {
 //        发布视频
-        String videoPath = "src/main/resources/video_test/CIMG0485.AVI";
-        String photoPath = "E:\\我的图片\\buffer\\CIMG0507.JPG";
+        String videoPath = "E:\\我的图片\\Video\\WeChat_20221102154811.mp4";
+        String photoPath = "E:\\我的图片\\icon\\face_happy.png";
         File file = new File(videoPath);
         MockMultipartFile f1 = new MockMultipartFile("video", file.getName(),
-                "video/mp4", new FileInputStream(file));
+                "video/*", new FileInputStream(file));
         MockMultipartFile f2 = new MockMultipartFile("image", new File(photoPath).getName(),
                 "image/jpg", new FileInputStream(new File(photoPath)));
         //body中放置视频文件
@@ -126,18 +125,26 @@ class UpdatesControllerTest {
                         .file(f1)
                         .header("Authorization", AUTH))
                 .andReturn();
-
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/changeVideoCover")
-                        .file(f2)
-                        .header("Authorization", AUTH))
-                .andExpect(MockMvcResultMatchers.status().isOk());
 //
+//        mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/changeVideoCover")
+//                        .file(f2)
+//                        .header("Authorization", AUTH))
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.multipart("/updates/video")
                         .param("title", "测试发布视频")
                         .param("content", "测试发布视频")
+                        .param("pid", "1")
                         .header("Authorization", AUTH))
                 .andReturn();
     }
 
+    @Test
+    void testDelete() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/updates/video")
+                        .param("id", "17")
+                        .header("Authorization", AUTH))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
 }

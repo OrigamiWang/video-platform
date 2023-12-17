@@ -3,7 +3,6 @@ package szu.util;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -13,7 +12,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-@Component
 public class JavaCvUtil {
     /***
      * 获取视频的第一帧图片
@@ -48,7 +46,7 @@ public class JavaCvUtil {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(bi, "jpg", out);
             // 转换为MultipartFile
-            return convertToMultipartFile(out);
+            return convertToMultipartFile(out, "snapshot.jpg", "image/jpeg", "snapshot");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -62,21 +60,22 @@ public class JavaCvUtil {
         return null;
     }
 
-    private static MultipartFile convertToMultipartFile(ByteArrayOutputStream out) {
+    private static MultipartFile convertToMultipartFile(ByteArrayOutputStream out,
+                                                        String fileName, String contentType, String fieldName) {
         return new MultipartFile() {
             @Override
             public String getName() {
-                return "imageFile"; // 给定一个字段名
+                return fieldName; // 给定一个字段名
             }
 
             @Override
             public String getOriginalFilename() {
-                return "image.jpg"; // 给定一个文件名
+                return fileName; // 给定一个文件名
             }
 
             @Override
             public String getContentType() {
-                return "image/jpeg"; // 给定文件类型
+                return contentType; // 给定文件类型
             }
 
             @Override
@@ -110,5 +109,57 @@ public class JavaCvUtil {
             }
         };
 
+    }
+
+    public static void uploadVideoToM3U8(String inputFile, String outputDir) throws Exception {
+       try {
+           String path1080 = outputDir + "1080" + ".m3u8";
+           String path720 = outputDir + "720" + ".m3u8";
+           String path360 = outputDir + "360" + ".m3u8";
+
+           new File(path1080).createNewFile();
+           ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:1080", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path1080);
+           pb.redirectErrorStream(true);
+           Process p = null;
+
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           String line;
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+
+           new File(path720).createNewFile();
+           pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:720", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path720);
+           pb.redirectErrorStream(true);
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+
+           new File(path360).createNewFile();
+           pb = new ProcessBuilder("ffmpeg", "-i",
+                   inputFile, "-vf", "scale=-2:360", "-c:v", "libx264", "-c:a", "aac",
+                   "-hls_time", "10", "-hls_list_size", "0", "-f", "hls", path360);
+           pb.redirectErrorStream(true);
+           p = pb.start();
+           // 处理FFmpeg的输出信息
+           reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+           while ((line = reader.readLine()) != null) {
+               System.out.println(line);
+           }
+           p.waitFor();
+       }catch (Exception ignored){
+           throw new Exception("视频转码失败");
+       }
     }
 }

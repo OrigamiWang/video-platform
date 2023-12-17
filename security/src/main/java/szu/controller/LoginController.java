@@ -30,6 +30,7 @@ public class LoginController {
     private LoginService loginService;
 
 
+
     // validated = false: 不用校验
     @PostMapping("/register")
     public CommonResult<String> register(@RequestBody RegisterDto registerDto) {

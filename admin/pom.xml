@@ -57,6 +57,11 @@
             <artifactId>javacv-platform</artifactId>
             <version>1.5.8</version>
         </dependency>
+        <dependency>
+            <groupId>szu</groupId>
+            <artifactId>recommend</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

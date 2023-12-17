@@ -38,6 +38,10 @@ public class LikeServiceImpl implements LikeService {
         if(flag!=-1&&flag!=1) throw new IllegalArgumentException();
         if(fid==null||uid==null) throw new NullPointerException();
         Query query = Query.query(Criteria.where("uid").is(uid)); //找到当前登录的用户的点赞列表
+        Like like = mongoTemplate.findOne(query, Like.class);
+        if(like==null){  //如果没有like列表就创建一个
+            insertLikeUser(uid);
+        }
         Update update = new Update();
         if(flag == 1){
             update.set("fidMap."+fid,fUid); //利用$set完成更新操作如果没有就插入

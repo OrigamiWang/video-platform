@@ -219,11 +219,11 @@ public class CommentApplicationTests {
     private LikeService likeService;
     @Test
     void insertLikeUser(){
-        likeService.insertLikeUser(1);
+        likeService.insertLikeUser(2);
     }
     @Test
     void testLike(){
-        likeService.like(1,"2",2,-1);
+        likeService.like(3,"2",2,1);
     }
 
 }

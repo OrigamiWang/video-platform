@@ -325,8 +325,10 @@ public class EsUtil {
                     break;
                 case 3:
                     request.source().sort("level", SortOrder.DESC);//等级由高到低
+                    break;
                 case 4:
                     request.source().sort("level", SortOrder.ASC);//等级由低到高
+                    break;
             }
             request.source().from((page-1) * size).size(size);
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);

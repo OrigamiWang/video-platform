@@ -307,7 +307,7 @@ public class EsUtil {
         try {
             int page = params.getPage();
             int size = params.getSize();
-            String key= params.getKey();
+            String key = URLDecoder.decode(params.getKey(), StandardCharsets.UTF_8);
             int sortBy = params.getSortBy();
 
             SearchRequest request = new SearchRequest(INDICES_FOR_USER);

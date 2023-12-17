@@ -101,7 +101,7 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
             redisService.hSet(key,"uid", update.getUid());
             redisService.hSet(key,"content", update.getContent());
             redisService.hSet(key,"status", update.getStatus());
-            redisService.hSet(key,"uploadTime", update.getUploadTime());
+            redisService.hSet(key,"uploadTime", update.getUploadTime().toString());
             redisService.hSet(key,"urls", update.getUrls());
 
             //update_heat表
@@ -135,7 +135,7 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
 
             //update表
             redisService.hSet(key,"uid", update.getUid());
-            redisService.hSet(key,"uploadTime", update.getUploadTime());
+            redisService.hSet(key,"uploadTime", update.getUploadTime().toString());
             redisService.hSet(key,"coverUrl", update.getUrls());
 
             //update_heat表

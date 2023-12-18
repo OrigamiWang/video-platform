@@ -10,9 +10,9 @@
 
 <!--    void insert(User user);-->
     <insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="id">
-        insert into user (`name`, `email`)
+        insert into user (`name`, `email`, `phone`, `password`)
             values
-        (#{name}, #{email});
+        (#{name}, #{email}, #{phone}, #{password});
     </insert>
 
 
@@ -21,13 +21,13 @@
         update user
         <set>
             <if test="name != null">
-                name = #{name},
+                `name` = #{name},
             </if>
             <if test="level != null">
                 `level` = #{level},
             </if>
             <if test="status != null">
-                status = #{status},
+                `status` = #{status},
             </if>
             <if test="phone != null">
                 `phone` = #{phone},

@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@ApiModel("视频搜索文档实体类")
+@ApiModel(description = "视频搜索文档实体类")
 public class VideoSearchDoc {
     @ApiModelProperty("动态id")
     private int id;

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@ApiModel("用户搜索文档实体类")
+@ApiModel(description = "用户搜索文档实体类")
 public class UserSearchDoc {
     @ApiModelProperty("用户uid")
     private int id;

@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-@ApiModel("历史记录视频列表的vo")
+@ApiModel(description = "历史记录视频列表的vo")
 public class HistoryVo {
     @ApiModelProperty("视频对应的id")
     private Integer uid;

@@ -77,7 +77,11 @@ public class LoginServiceImpl implements LoginService {
                     return CommonResult.failed("该手机号已经被注册！");
                 }
                 // 创建用户
-                loginDao.registerByPhone(name, phone, ShaUtil.encode(pswd));
+                User userTmp = new User();
+                userTmp.setName(name);
+                userTmp.setPhone(phone);
+                userTmp.setPassword(ShaUtil.encode(pswd));
+                userService.insert(userTmp);
                 break;
             }
             case 2: {

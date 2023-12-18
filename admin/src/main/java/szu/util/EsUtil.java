@@ -386,6 +386,7 @@ public class EsUtil {
         try {
             VideoSearchDoc videoSearchDoc = videoDao.selectVideoSearchDocByVid(vid);
             if(videoSearchDoc == null) return false;
+            videoSearchDoc.setSuggestion(Arrays.asList(videoSearchDoc.getTitle(),videoSearchDoc.getName()));
             IndexRequest request = new IndexRequest(INDICES_FOR_VIDEO).id(vid+"");
             request.source(JSONUtil.toJsonStr(videoSearchDoc), XContentType.JSON);
             client.index(request, RequestOptions.DEFAULT);

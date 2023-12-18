@@ -222,7 +222,7 @@ public class StarServiceImpl implements StarService {
         starVo.setPlayNum((Integer) redisService.hGet(key,"playNum"));
         starVo.setStarNum((Integer) redisService.hGet(key,"starNum"));
         starVo.setUpName((String) redisService.hGet(key,"upName"));
-        LocalDateTime uploadTime = LocalDateTime.parse((String) redisService.hGet(key, "uploadTime"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime uploadTime = LocalDateTime.parse((String) redisService.hGet(key, "uploadTime"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
         starVo.setUploadTime(uploadTime);
     }
 

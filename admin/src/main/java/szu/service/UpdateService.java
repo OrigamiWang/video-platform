@@ -44,6 +44,8 @@ public interface UpdateService {
      */
     byte[] getImage(String url);
 
+    Integer countEssayByUid(int uid);
+
     /***
      * 获取指定动态
      */

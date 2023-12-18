@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.simpleframework.xml.Path;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import szu.common.api.CommonResult;
@@ -140,7 +141,7 @@ public class VideoController {
 
 
     @ApiOperation("获取视频文件流")
-    @GetMapping("/getVideo/{bucketName}/{objectName}")
+    @GetMapping("/getVideo/{bucketName}/{objectName:.+}")
     public ResponseEntity<org.springframework.core.io.Resource> getVideo(@PathVariable @ApiParam("bucketName") String bucketName,
                                                                          @PathVariable @ApiParam("objectName") String objectName) {
         try {

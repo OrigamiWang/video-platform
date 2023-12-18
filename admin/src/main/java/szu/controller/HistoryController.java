@@ -42,7 +42,7 @@ public class HistoryController {
     private UserInfoService userInfoService;
 
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping( "/add")
     @ApiOperation("添加历史记录")
     public CommonResult<String> addHistory(
             @ApiParam("历史记录JSON") @RequestBody HistoryDto historyDto) {
@@ -50,7 +50,7 @@ public class HistoryController {
         return CommonResult.success("添加成功");
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping("/update")
     public CommonResult<String> updateHistory(
             @ApiParam("历史记录JSON") @RequestBody HistoryDto historyDto) {
         historyService.updateHistory(historyDto);
@@ -60,7 +60,7 @@ public class HistoryController {
     /**
      * 获取最近20条历史记录
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping("/recent")
     @ApiOperation("获取最从cntStart到cntEnd条历史记录")
     public CommonResult<List<History>> getRecentHistory(
             @ApiParam("历史记录对应的用户和类型") @RequestBody HisQueryDto hisQueryDto,

@@ -8,7 +8,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@ApiModel("返回视频列表的vo")
+@ApiModel(description = "返回视频列表的vo")
 @Data
 public class VideoVo {
     @ApiModelProperty("动态id")

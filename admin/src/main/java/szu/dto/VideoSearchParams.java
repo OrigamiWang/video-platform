@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * 视频搜索传递的参数
  */
-@ApiModel("视频搜索传递的参数，其他id默认为0，表示不区分")
+@ApiModel(description = "视频搜索传递的参数，其他id默认为0，表示不区分")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

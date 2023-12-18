@@ -9,6 +9,8 @@ import szu.dto.LoginDto;
 import szu.dto.RegisterDto;
 import szu.model.User;
 import szu.service.LoginService;
+import szu.service.UserService;
+import szu.util.AuthUtil;
 import szu.validator.LoginValidator;
 import szu.validator.PermissionValidator;
 
@@ -29,6 +31,8 @@ public class LoginController {
     @Resource
     private LoginService loginService;
 
+    @Resource
+    private UserService userService;
 
 
     // validated = false: 不用校验
@@ -51,6 +55,22 @@ public class LoginController {
     @LoginValidator
     public CommonResult<User> getCurrentUser(@RequestHeader String token) {
         return CommonResult.success(loginService.getCurrentUser(token));
+    }
+
+    @PostMapping("/update")
+    @ApiOperation("修改用户信息")
+    @LoginValidator
+    public CommonResult<Boolean> updateUsername(@RequestBody User user) {
+        User newUser = new User();
+        newUser.setId(AuthUtil.getCurrentUser().map(User::getId).orElse(0));
+        if (user.getName() != null) {
+            newUser.setName(user.getName());
+        }
+        if (user.getPassword() != null) {
+            newUser.setPassword(user.getPassword());
+        }
+        userService.updateUser(newUser);
+        return CommonResult.success(true);
     }
 
     @PostMapping("/pin")

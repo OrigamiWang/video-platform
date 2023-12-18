@@ -8,7 +8,7 @@ public class CommonResult<T> {
     /**
      * 状态码
      */
-    private int code;
+    private Integer code;
     /**
      * 提示信息
      */
@@ -107,7 +107,7 @@ public class CommonResult<T> {
         return new CommonResult<T>(Long.valueOf(ResultCode.FORBIDDEN.getCode()).intValue(), ResultCode.FORBIDDEN.getMessage(), data);
     }
 
-    public long getCode() {
+    public int getCode() {
         return code;
     }
 

@@ -12,7 +12,7 @@ import java.sql.Time;
 
 @Data
 @AllArgsConstructor
-@ApiModel("video实体类（数据库字段）")
+@ApiModel(description = "video实体类（数据库字段）")
 @NoArgsConstructor
 public class Video {
     @ApiModelProperty("视频id")

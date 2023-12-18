@@ -95,6 +95,13 @@ public class UpdatesController {
         return CommonResult.success(updatesService.findEssayAll());
     }
 
+    @GetMapping("/count/{uid}")
+    @ApiOperation("获取动态数量")
+    @ApiResponse(code = 200, message = "获取成功")
+    public CommonResult<Integer> countUpdates(@PathVariable("uid") int uid) {
+        return CommonResult.success(updatesService.countEssayByUid(uid));
+    }
+
     @DeleteMapping("/delete")
     @ApiOperation("删除指定图文动态")
     public CommonResult<String> deleteEssayById(@RequestParam("id") int id,

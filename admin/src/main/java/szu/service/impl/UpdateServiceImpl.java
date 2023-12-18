@@ -1,6 +1,7 @@
 package szu.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -176,6 +177,7 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Override
     public List<Update> findEssayInPage(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
         return updatesDao.findInPage(pageNum, pageSize);
     }
 
@@ -187,6 +189,11 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public List<Update> findEssayByUid(int uid) {//获取指定用户的动态,返回List<Update>
         return updatesDao.findByUid(uid);
+    }
+
+    @Override
+    public Integer countEssayByUid(int uid) {//获取指定用户的动态数量
+        return updatesDao.countByUid(uid);
     }
 
     @Override
@@ -281,11 +288,11 @@ public class UpdateServiceImpl implements UpdateService {
             //新建一个update_heat记录
             updateHeatDao.insert(new_ud.getId(), 0, 0, 0);
             //将新视频通过异步线程更新到es中
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(() -> {
+//            ExecutorService executor = Executors.newSingleThreadExecutor();
+//            executor.submit(() -> {
                 esUtil.insertNewVideoIntoEs(new_vd.getId());
-            });
-            executor.shutdown();
+//            });
+//            executor.shutdown();
             //TODO 通知管理员审核
             return "发布成功";
         } catch (Exception e) {
@@ -328,7 +335,7 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public ResponseEntity<org.springframework.core.io.Resource> previewVideoCover(int uid) {
         try {
-            String path = PREFIX_VIDEO_COVER_CACHE + uid + ".jpg";
+            String path = PREFIX_VIDEO_COVER_CACHE + uid;
             //返回存储路径
             return minioService.viewImage(bucketName, path);
         } catch (Exception e) {
@@ -428,13 +435,16 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public List<VideoVo> getHomePage(int pageSize,int uid) {
         //TODO 推荐算法
-        List<Integer> ids;
-        try {
-            ids = recommendService.recommendUpdateList(uid);
-        } catch (IOException | TasteException e) {
-            throw new RuntimeException(e);
-        }
-        if(ids.isEmpty()){  //历史数据不够，随机推荐
+        List<Integer> ids = new ArrayList<>();
+//        try {
+//            if (uid > 0) {
+//                ids = recommendService.recommendUpdateList(uid);
+//            }
+//        } catch (IOException | TasteException e) {
+//            throw new RuntimeException(e);
+//        }
+
+//        if(ids.isEmpty()){  //历史数据不够，随机推荐
             ids = videoDao.selectAllId();
             int videoNum = ids.size();
             if (videoNum == 0) return new ArrayList<>();
@@ -443,24 +453,23 @@ public class UpdateServiceImpl implements UpdateService {
             for (int i = 0; i < pageSize; i++) {
                 randomNums[i] = ((int) (Math.random() * 10 * videoNum)) % videoNum;
             }
-        }
+//        }
         //获取这些动态与视频,拼接vo
         List<VideoVo> videoVos = new ArrayList<>();
-        for (int id : ids) {
-            if (videoVos.size() == pageSize) break;
-            Video video = findVideoByVid(id);
-            Update update = updatesDao.findByVid(id);
-            VideoVo videoVo = new VideoVo();
-            videoVo.setId(update.getId());
-            videoVo.setUrl(video.getUrl());
-            videoVo.setUploadTime(update.getUploadTime());
-            videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
-            videoVo.setPlayNum(video.getPlayNum());
-            videoVo.setDmNum(video.getDmNum());
-            videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
-            videoVo.setTitle(video.getTitle());
-            videoVos.add(videoVo);
-        }
+            ids.parallelStream().forEach(v -> {
+                Video video = findVideoByVid(v);
+                Update update = updatesDao.findByVid(v);
+                VideoVo videoVo = new VideoVo();
+                videoVo.setId(update.getId());
+                videoVo.setUrl(video.getUrl());
+                videoVo.setUploadTime(update.getUploadTime());
+                videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
+                videoVo.setPlayNum(video.getPlayNum());
+                videoVo.setDmNum(video.getDmNum());
+                videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
+                videoVo.setTitle(video.getTitle());
+                videoVos.add(videoVo);
+            });
         return videoVos;
     }
 

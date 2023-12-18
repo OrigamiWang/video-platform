@@ -54,4 +54,9 @@
         where vid = #{vid,jdbcType=INTEGER}
     </select>
 
+    <select id="countByUid" resultType="java.lang.Integer">
+        select count(*)
+        from `updates`
+        where uid = #{uid,jdbcType=INTEGER}
+    </select>
 </mapper>

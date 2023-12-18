@@ -82,6 +82,7 @@ public class CommentServiceImpl implements CommentService {
         }
         HashMap<String, Integer> fidMap = like.getFidMap();
         List<CommentVo> commentVoList = new ArrayList<>();
+        if (commentList == null) return commentVoList; //安全性检查
         for (Comment comment : commentList) {
             CommentVo commentVo = new CommentVo();
             BeanUtils.copyProperties(comment,commentVo);

@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@ApiModel("视频详情页的vo")
+@ApiModel(description = "视频详情页的vo")
 public class VideoDetailVo {
 //    视频标题、播放量、弹幕量、点赞、收藏、投币、转发、作者名字、作者关注数、发布时间
     @ApiModelProperty("视频id")

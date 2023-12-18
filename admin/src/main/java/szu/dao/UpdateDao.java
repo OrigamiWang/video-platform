@@ -9,6 +9,7 @@ import java.util.List;
 public interface UpdateDao {
     List<Update> findInPage(int pageNum, int pageSize);//获取所有动态,返回List<Update>
     List<Update> findByUid(int uid);//获取指定用户的动态,返回List<Update>
+    Integer countByUid(int uid);//获取指定用户的动态数量
     Update findById(int id);//获取指定id的动态,返回Update
     void update(int id, int vid, int uid, String content, int status, String uploadTime, String urls);//更新指定id的动态
     int insert(Update update);//插入动态

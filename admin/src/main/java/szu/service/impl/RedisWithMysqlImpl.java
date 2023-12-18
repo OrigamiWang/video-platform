@@ -114,6 +114,7 @@ public class RedisWithMysqlImpl implements RedisWithMysql {
             String key = "updates:videoUpdate:"+ update.getId();
             //video表
             Video video = videoDao.findById(update.getVid());
+            redisService.hSet(key,"vid",video.getId());
             redisService.hSet(key,"title",video.getTitle());
             redisService.hSet(key,"playNum",video.getPlayNum());
             redisService.hSet(key,"dmNum",video.getDmNum());

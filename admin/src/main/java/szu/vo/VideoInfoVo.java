@@ -7,7 +7,7 @@ import szu.model.Update;
 import szu.model.User;
 import szu.model.Video;
 
-@ApiModel("返回视频信息的vo")
+@ApiModel(description = "返回视频信息的vo")
 @Data
 public class VideoInfoVo {
     @ApiModelProperty("动态信息")

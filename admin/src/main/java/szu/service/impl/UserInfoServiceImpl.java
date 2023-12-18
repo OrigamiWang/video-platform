@@ -32,8 +32,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserDetail userDetail = userInfoDao.getUserDetailById(uid);//性别、ip、自我介绍
             UserStatistics userStatistics = userInfoDao.getUserStatisticsById(uid);//粉丝、关注、点赞
             BeanUtils.copyProperties(user, userInfo);
-            BeanUtils.copyProperties(userDetail, userInfo);
-            BeanUtils.copyProperties(userStatistics, userInfo);
+            if (userDetail != null) {
+                BeanUtils.copyProperties(userDetail, userInfo);
+            }
+            if (userStatistics != null) {
+                BeanUtils.copyProperties(userStatistics, userInfo);
+            }
             // 保存到redis中
             redisTemplate.opsForValue().set(USER_INFO_PREFIX + uid, userInfo);
         }

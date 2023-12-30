@@ -47,7 +47,7 @@ public class VideoController {
     }
 
     @GetMapping("/info/{id}")
-    @ApiOperation("获取视频预览信息，传入路径参数id")
+    @ApiOperation("获取视频所有信息组合，传入路径参数id")
     public CommonResult<VideoInfoVo> getVideoInfo(@PathVariable @ApiParam("视频id") Integer id){
         VideoInfoVo videoVo = videoService.getVideoInfoById(id);
         if(videoVo == null){

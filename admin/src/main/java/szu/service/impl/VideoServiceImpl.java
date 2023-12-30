@@ -4,14 +4,11 @@ import org.springframework.stereotype.Service;
 import szu.common.api.CommonResult;
 import szu.common.api.ListResult;
 import szu.dao.UpdateDao;
+import szu.dao.UpdateHeatDao;
 import szu.dao.UserInfoDao;
 import szu.dao.VideoDao;
 import szu.dto.VideoSearchParams;
-import szu.model.Barrage;
-import szu.model.Update;
-import szu.model.User;
-import szu.model.UserSearchDoc;
-import szu.model.Video;
+import szu.model.*;
 import szu.service.VideoService;
 import szu.util.EsUtil;
 import szu.vo.BarrageVo;
@@ -32,6 +29,8 @@ public class VideoServiceImpl implements VideoService {
     private VideoDao videoDao;
     @Resource
     private UpdateDao updateDao;
+    @Resource
+    private UpdateHeatDao updateHeatDao;
 
     @Override
     public VideoDetailVo getVideoDetail(Integer id) {
@@ -41,12 +40,15 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public VideoInfoVo getVideoInfoById(Integer vid) {
         Update update = updateDao.findByVid(vid);
+        if (update == null) return null;
+        UpdateHeat updateHeat = updateHeatDao.getByUpdateId(update.getId());
         User user = userInfoDao.getUserById(update.getUid());
         Video video = videoDao.findById(vid);
         VideoInfoVo videoInfoVo = new VideoInfoVo();
         videoInfoVo.setVideo(video);
         videoInfoVo.setUser(user);
         videoInfoVo.setUpdate(update);
+        videoInfoVo.setUpdateHeat(updateHeat);
         return videoInfoVo;
     }
 

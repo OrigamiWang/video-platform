@@ -86,19 +86,4 @@ public class LoginController {
         return CommonResult.success("登出");
     }
 
-    @GetMapping("/p1")
-    @PermissionValidator(pid = 1)
-    @LoginValidator
-    public CommonResult<String> p1() {
-        return CommonResult.success("when the pid is 1");
-    }
-
-    @GetMapping("/p6")
-    @PermissionValidator(pid = 6)
-    @LoginValidator
-    public CommonResult<String> p6() {
-        return CommonResult.success("when the pid is 6");
-    }
-
-
 }

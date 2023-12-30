@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import szu.model.Update;
+import szu.model.UpdateHeat;
 import szu.model.User;
 import szu.model.Video;
 
@@ -12,6 +13,8 @@ import szu.model.Video;
 public class VideoInfoVo {
     @ApiModelProperty("动态信息")
     private Update update;
+    @ApiModelProperty("动态热度信息")
+    private UpdateHeat updateHeat;
     @ApiModelProperty("用户信息")
     private User user;
     @ApiModelProperty("视频信息")

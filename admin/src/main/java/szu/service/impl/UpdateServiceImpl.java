@@ -22,12 +22,9 @@ import szu.vo.VideoVo;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 public class UpdateServiceImpl implements UpdateService {
@@ -451,25 +448,29 @@ public class UpdateServiceImpl implements UpdateService {
             //获取pageSize个随机int
             int[] randomNums = new int[pageSize];
             for (int i = 0; i < pageSize; i++) {
-                randomNums[i] = ((int) (Math.random() * 10 * videoNum)) % videoNum;
+                randomNums[i] = (int) Math.floor((Math.random() * videoNum + 1));
+                if (randomNums[i] < 25) {
+                    randomNums[i] += 20;
+                }
             }
 //        }
         //获取这些动态与视频,拼接vo
         List<VideoVo> videoVos = new ArrayList<>();
-            ids.parallelStream().forEach(v -> {
-                Video video = findVideoByVid(v);
-                Update update = updatesDao.findByVid(v);
-                VideoVo videoVo = new VideoVo();
-                videoVo.setId(update.getId());
-                videoVo.setUrl(video.getUrl());
-                videoVo.setUploadTime(update.getUploadTime());
-                videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
-                videoVo.setPlayNum(video.getPlayNum());
-                videoVo.setDmNum(video.getDmNum());
-                videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
-                videoVo.setTitle(video.getTitle());
-                videoVos.add(videoVo);
-            });
+        ids.parallelStream().forEach(v -> {
+            if (v < 25) return;
+            Video video = findVideoByVid(v);
+            Update update = updatesDao.findByVid(v);
+            VideoVo videoVo = new VideoVo();
+            videoVo.setId(update.getId());
+            videoVo.setUrl(video.getUrl());
+            videoVo.setUploadTime(update.getUploadTime());
+            videoVo.setUpName(userInfoDao.getNameById(update.getUid()));
+            videoVo.setPlayNum(video.getPlayNum());
+            videoVo.setDmNum(video.getDmNum());
+            videoVo.setTotalTime(TimeUtil.secondsToHHMMSS(video.getTotalTime()));
+            videoVo.setTitle(video.getTitle());
+            videoVos.add(videoVo);
+        });
         return videoVos;
     }
 

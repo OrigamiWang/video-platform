@@ -11,6 +11,6 @@ spring:
 mybatis:
   mapper-locations:
     - classpath:dao/*.xml
-    - classpath*:com/**/mapper/*.xml
+    - classpath*:dao/*.xml
   configuration:
     map-underscore-to-camel-case: true  # ??????

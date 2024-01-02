@@ -70,9 +70,14 @@ public class CommentController {
                                           @PathVariable("size") @ApiParam("每页大小") int size,
                                           @RequestParam @ApiParam("排序字段") String sortBy){
         log.info("uid，{} 要获取的评论区域，{},page:{},size:{}",uid,foreignId,page,size);
-        Long total = commentService.countCommentsByForeignId(foreignId);
         List<CommentVo> commentsByForeignIdAndPages = commentService.getCommentsByForeignIdAndPages(uid,foreignId, page, size, sortBy);
-        return CommonResult.success(new ListResult<>(commentsByForeignIdAndPages, total));
+        Long total = commentService.countCommentsByForeignId(foreignId);
+        if(commentsByForeignIdAndPages==null){
+            return CommonResult.failed();
+        }else{
+            return CommonResult.success(new ListResult<>(commentsByForeignIdAndPages, total));
+        }
+
     }
 
     @GetMapping("/countChildrenComments/{pid}")

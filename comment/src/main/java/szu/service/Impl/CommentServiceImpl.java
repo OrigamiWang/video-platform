@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
         }
         HashMap<String, Integer> fidMap = like.getFidMap();
         List<CommentVo> commentVoList = new ArrayList<>();
-        if (commentList == null) return commentVoList; //安全性检查
+        if (commentList.size()==0||commentList == null) return commentVoList; //安全性检查
         for (Comment comment : commentList) {
             CommentVo commentVo = new CommentVo();
             BeanUtils.copyProperties(comment,commentVo);
@@ -124,7 +124,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public List<CommentVo> getCommentsByForeignIdAndPages(Integer uid,Integer foreignId, int page, int size, String sortBy) {
-        if(foreignId<0||page<0||size<0) throw new IllegalArgumentException(); //安全性检查
+        if(foreignId<0||page<0||size<0) return null; //安全性检查
         Query query = Query.query(Criteria.where("foreignId").is(foreignId));
         //根据点赞数量降序分页查询
         //如果有置顶的那么置顶的就是第一个

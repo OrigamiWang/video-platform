@@ -89,6 +89,9 @@ public class RecommendServiceImpl implements RecommendService {
         }else{
             System.out.println("创建");
             recommender = getGenericItemBasedRecommender();
+            if(recommender==null){
+                return new ArrayList<>();
+            }
             map.put(uid,recommender);
         }
         //推荐50个视频
@@ -160,9 +163,12 @@ public class RecommendServiceImpl implements RecommendService {
      * @return
      * @throws TasteException
      */
-    @NotNull
+
     private GenericItemBasedRecommender getGenericItemBasedRecommender() throws TasteException {
         List<UserPreferences> userPreferences = mongoTemplate.findAll(UserPreferences.class);
+        if(userPreferences.isEmpty()){
+            return null;
+        }
         // 创建一个新的 FastByIDMap 用于存储用户-项偏好 FastByIDMap：key: userId，value:<userId,<ItemId..>,<score..>>
         FastByIDMap<PreferenceArray> userData = new FastByIDMap<>();
         //遍历每个用户的喜好
